@@ -153,3 +153,17 @@
   font-family: var(--kairos-font);
 }
 .addingCancel:hover { color: #f87171; background: rgba(248,113,113,0.1); }
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .column { border-radius: 10px; }
+}
+
+@media (max-width: 768px) {
+  .column {
+    /* En móvil cada columna ocupa casi toda la pantalla, mostrando el borde de la siguiente */
+    width: calc(100vw - 80px);
+    max-width: var(--kairos-col-w);
+    scroll-snap-align: start;
+  }
+}

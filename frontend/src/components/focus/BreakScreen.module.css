@@ -130,3 +130,11 @@
 }
 
 .resumeBtn:hover { background: var(--kairos-purple-400); }
+
+@media (max-width: 768px) {
+  .wrap { padding: 20px 14px; gap: 16px; }
+  .playerWrap { max-width: 100%; }
+  .catRow { gap: 6px; }
+  .catBtn { padding: 6px 12px; font-size: 12px; }
+  .videosRow { gap: 8px; }
+}

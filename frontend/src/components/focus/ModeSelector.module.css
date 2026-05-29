@@ -179,3 +179,11 @@
 
 .startBtn:hover:not(:disabled) { background: var(--kairos-purple-400); }
 .startBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media (max-width: 768px) {
+  .wrap { padding: 16px; align-items: flex-start; }
+  .card { padding: 24px 20px; }
+  .modeRow { grid-template-columns: 1fr 1fr; }
+  .duracionRow { flex-wrap: wrap; }
+  .durBtn { min-width: calc(50% - 4px); }
+}

@@ -127,3 +127,10 @@
 }
 
 .abandonBtn:hover { color: #f87171; }
+
+@media (max-width: 768px) {
+  .wrap { gap: 24px; padding: 20px 16px; }
+  .ringWrap { width: 200px; height: 200px; }
+  .time { font-size: 42px; }
+  .pauseBtn, .finishBtn { padding: 10px 20px; font-size: 13px; }
+}

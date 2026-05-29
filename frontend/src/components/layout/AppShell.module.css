@@ -17,4 +17,22 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+}
+
+/* ── Tablet ── */
+@media (max-width: 1024px) {
+  .body { gap: 0; }
+}
+
+/* ── Móvil: sidebar se mueve al fondo ── */
+@media (max-width: 768px) {
+  .body {
+    flex-direction: column;
+  }
+
+  .main {
+    order: 1;
+    flex: 1;
+  }
 }

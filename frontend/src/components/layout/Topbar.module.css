@@ -273,3 +273,23 @@
 }
 .submitBtn:hover:not(:disabled) { background: var(--kairos-purple-400); }
 .submitBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Responsive Topbar ─────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .topbar { gap: 12px; padding: 0 12px; }
+  .search { width: 120px; }
+}
+
+@media (max-width: 768px) {
+  .topbar { gap: 8px; padding: 0 12px; }
+
+  /* Ocultar nav — la navegación queda en el bottom sidebar */
+  .nav { display: none; }
+
+  /* Ocultar buscador en móvil */
+  .search { display: none; }
+
+  .actions { gap: 6px; }
+
+  .createBtn { padding: 5px 10px; font-size: 12px; }
+}

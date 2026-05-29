@@ -10,8 +10,8 @@
   position: relative;
 }
 
-.left  { display: flex; align-items: center; gap: 10px; }
-.right { display: flex; align-items: center; gap: 8px; }
+.left  { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
 /* ── Selector de proyecto ── */
 .projectSelector { position: relative; }
@@ -352,3 +352,15 @@
   white-space: nowrap;
   flex-shrink: 0;
 }
+
+/* ── Responsive BoardNav ── */
+@media (max-width: 768px) {
+  .boardnav { padding: 0 12px; height: 44px; }
+  .viewBtn  { display: none; }
+  .action   { display: none; }
+
+  .projectName { font-size: 13px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .inviteModal { max-width: 100%; margin: 0 8px; }
+}
+

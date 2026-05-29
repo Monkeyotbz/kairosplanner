@@ -31,20 +31,24 @@ a {
   text-decoration: none;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Scrollbars */
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ── Responsive tokens ─────────────────────────────────────── */
+@media (max-width: 1024px) {
+  :root {
+    --kairos-sidebar-w: 64px;
+    --kairos-col-w: 240px;
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+@media (max-width: 768px) {
+  :root {
+    --kairos-topnav-h:  48px;
+    --kairos-sidebar-w: 0px;
+    --kairos-col-w:     260px;
+  }
 }

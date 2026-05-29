@@ -6,8 +6,22 @@
   overflow-x: auto;
   overflow-y: hidden;
   align-items: flex-start;
+  scroll-snap-type: x proximity;
 }
 
-.board::-webkit-scrollbar {
-  height: 6px;
+.board::-webkit-scrollbar { height: 6px; }
+
+/* ── Tablet ── */
+@media (max-width: 1024px) {
+  .board { padding: 12px 16px 16px; gap: 10px; }
+}
+
+/* ── Móvil ── */
+@media (max-width: 768px) {
+  .board {
+    padding: 10px 12px 12px;
+    gap: 10px;
+    /* Mostrar borde del siguiente elemento para indicar scroll */
+    scroll-padding-left: 12px;
+  }
 }

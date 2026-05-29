@@ -61,3 +61,14 @@
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 1024px) {
+  .page { padding: 16px; gap: 12px; }
+  .cards { gap: 8px; }
+  .bottomRow { flex-direction: column; }
+}
+
+@media (max-width: 768px) {
+  .page { padding: 14px 12px; }
+  .cards > * { min-width: calc(50% - 4px); }
+}
