@@ -3,6 +3,7 @@ import { useBoardStore } from '../store/boardStore'
 import BoardNav from '../components/layout/BoardNav'
 import QuoteStrip from '../components/entorno/QuoteStrip'
 import Board from '../components/kanban/Board'
+import EmptyBoard from '../components/kanban/EmptyBoard'
 import styles from './BoardPage.module.css'
 
 export default function BoardPage() {
@@ -17,6 +18,11 @@ export default function BoardPage() {
         Cargando tablero...
       </div>
     )
+  }
+
+  // Sin proyectos → crear el primero
+  if (error === 'empty') {
+    return <EmptyBoard />
   }
 
   if (error) {

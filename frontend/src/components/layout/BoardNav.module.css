@@ -7,13 +7,28 @@
   justify-content: space-between;
   padding: 0 20px;
   flex-shrink: 0;
+  position: relative;
 }
 
-.left {
+.left  { display: flex; align-items: center; gap: 10px; }
+.right { display: flex; align-items: center; gap: 8px; }
+
+/* ── Selector de proyecto ── */
+.projectSelector { position: relative; }
+
+.projectBtn {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+  padding: 4px 8px;
+  border-radius: var(--kairos-radius-sm);
+  transition: background 0.15s;
 }
+.projectBtn:hover { background: rgba(255,255,255,0.06); }
 
 .projectName {
   font-weight: 600;
@@ -21,10 +36,115 @@
   color: var(--kairos-text-primary);
 }
 
-.divider {
-  color: rgba(255, 255, 255, 0.2);
-  font-size: 16px;
+.chevron {
+  font-size: 9px;
+  color: var(--kairos-text-muted);
 }
+
+.projectMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: var(--kairos-purple-800);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--kairos-radius-md);
+  padding: 8px;
+  min-width: 220px;
+  box-shadow: var(--kairos-shadow-modal);
+  z-index: 50;
+}
+
+.menuLabel {
+  font-size: 11px;
+  color: var(--kairos-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px 6px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: var(--kairos-radius-sm);
+  font-size: 13px;
+  color: var(--kairos-text-secondary);
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: all 0.12s;
+  text-align: left;
+  background: none;
+  border: none;
+}
+.menuItem:hover { background: rgba(255,255,255,0.06); color: var(--kairos-text-primary); }
+.menuItemActive { color: var(--kairos-purple-100) !important; background: rgba(83,74,183,0.18) !important; }
+
+.menuItemDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--kairos-purple-400);
+  flex-shrink: 0;
+}
+
+.menuDivider {
+  height: 1px;
+  background: rgba(255,255,255,0.07);
+  margin: 6px 0;
+}
+
+.menuItemNew {
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: var(--kairos-radius-sm);
+  font-size: 13px;
+  color: var(--kairos-purple-200);
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  text-align: left;
+  background: none;
+  border: none;
+  transition: background 0.12s;
+}
+.menuItemNew:hover { background: rgba(83,74,183,0.15); }
+
+.newProjectForm {
+  display: flex;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.newProjectInput {
+  flex: 1;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--kairos-radius-sm);
+  padding: 6px 8px;
+  font-size: 12px;
+  color: var(--kairos-text-primary);
+  font-family: var(--kairos-font);
+  outline: none;
+}
+.newProjectInput:focus { border-color: var(--kairos-purple-400); }
+.newProjectInput::placeholder { color: var(--kairos-text-muted); }
+
+.newProjectSave {
+  background: var(--kairos-purple-600);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: var(--kairos-radius-sm);
+  border: none;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+  white-space: nowrap;
+}
+
+/* ── Separador y controles ── */
+.divider { color: rgba(255,255,255,0.2); font-size: 16px; }
 
 .viewBtn {
   display: flex;
@@ -32,7 +152,7 @@
   gap: 6px;
   padding: 4px 10px;
   border-radius: var(--kairos-radius-sm);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255,255,255,0.08);
   color: var(--kairos-text-primary);
   font-size: 13px;
   font-weight: 500;
@@ -41,77 +161,194 @@
   cursor: pointer;
 }
 
-.viewIcon {
-  font-size: 14px;
-  opacity: 0.7;
-}
-
-.right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
 .action {
   display: flex;
   align-items: center;
   gap: 5px;
   padding: 4px 10px;
   border-radius: var(--kairos-radius-sm);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255,255,255,0.05);
   color: var(--kairos-text-secondary);
   font-size: 13px;
   font-family: var(--kairos-font);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255,255,255,0.08);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.15s;
 }
+.action:hover { background: rgba(255,255,255,0.09); color: var(--kairos-text-primary); }
 
-.action:hover {
-  background: rgba(255, 255, 255, 0.09);
-  color: var(--kairos-text-primary);
+.inviteBtn {
+  padding: 4px 12px;
+  border-radius: var(--kairos-radius-sm);
+  background: rgba(83,74,183,0.2);
+  border: 1px solid rgba(83,74,183,0.4);
+  color: var(--kairos-purple-100);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: all 0.15s;
 }
+.inviteBtn:hover { background: rgba(83,74,183,0.35); }
 
-.members {
-  display: flex;
-  align-items: center;
-}
-
-.avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  font-size: 10px;
-  font-weight: 700;
-  color: #fff;
+/* ── Modal invitar ── */
+.inviteOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--kairos-bg-app);
-  margin-left: -6px;
-  cursor: pointer;
+  z-index: 100;
+  padding: 16px;
 }
 
-.members .avatar:first-child {
-  margin-left: 0;
+.inviteModal {
+  background: var(--kairos-purple-800);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--kairos-radius-lg);
+  padding: 28px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--kairos-shadow-modal);
 }
 
-.shareBtn {
+.inviteHeader {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 12px;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.inviteHeader h3 { font-size: 15px; font-weight: 700; color: var(--kairos-text-primary); }
+.inviteHeader button { font-size: 14px; color: var(--kairos-text-muted); padding: 2px 6px; border-radius: 4px; cursor: pointer; transition: color 0.12s; }
+.inviteHeader button:hover { color: var(--kairos-text-primary); }
+
+/* ── Search ── */
+.inviteSearch {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
   border-radius: var(--kairos-radius-sm);
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--kairos-text-secondary);
+  padding: 9px 12px;
   font-size: 13px;
+  color: var(--kairos-text-primary);
   font-family: var(--kairos-font);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  cursor: pointer;
-  transition: background 0.15s;
+  outline: none;
+  margin-bottom: 10px;
+  transition: border-color 0.15s;
+}
+.inviteSearch::placeholder { color: var(--kairos-text-muted); }
+.inviteSearch:focus { border-color: var(--kairos-purple-400); }
+
+.searchResults {
+  list-style: none;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--kairos-radius-sm);
+  overflow: hidden;
+  margin-bottom: 12px;
 }
 
-.shareBtn:hover {
-  background: rgba(255, 255, 255, 0.09);
-  color: var(--kairos-text-primary);
+.searchItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.12s;
+}
+.searchItem:last-child { border-bottom: none; }
+.searchItem:hover { background: rgba(255,255,255,0.04); }
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--kairos-purple-600);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.userInfo { flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.userName  { font-size: 13px; font-weight: 500; color: var(--kairos-text-primary); }
+.userEmail { font-size: 11px; color: var(--kairos-text-muted); }
+
+.addMemberBtn {
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: rgba(83,74,183,0.2);
+  border: 1px solid rgba(83,74,183,0.35);
+  color: var(--kairos-purple-100);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.addMemberBtn:hover:not(:disabled) { background: rgba(83,74,183,0.35); }
+.addMemberBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+.addedBtn { background: rgba(74,222,128,0.15) !important; border-color: rgba(74,222,128,0.3) !important; color: #4ade80 !important; }
+
+.alreadyMember { font-size: 11px; color: var(--kairos-text-muted); flex-shrink: 0; }
+
+.noResults { font-size: 13px; color: var(--kairos-text-muted); text-align: center; padding: 12px 0; margin-bottom: 10px; }
+
+/* ── Miembros actuales ── */
+.currentMembers { margin-bottom: 14px; }
+
+.membersLabel { font-size: 11px; font-weight: 600; color: var(--kairos-text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+
+.memberItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.roleBadge {
+  font-size: 10px;
+  background: rgba(255,255,255,0.08);
+  color: var(--kairos-text-muted);
+  padding: 2px 7px;
+  border-radius: 10px;
+  text-transform: capitalize;
+}
+
+.inviteLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--kairos-radius-sm);
+  padding: 8px 12px;
+}
+
+.inviteLinkText {
+  flex: 1;
+  font-size: 13px;
+  color: var(--kairos-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copyBtn {
+  background: var(--kairos-purple-600);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+  white-space: nowrap;
+  flex-shrink: 0;
 }

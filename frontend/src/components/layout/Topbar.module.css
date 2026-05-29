@@ -102,6 +102,10 @@
   border-color: var(--kairos-purple-400);
 }
 
+.avatarWrap {
+  position: relative;
+}
+
 .avatar {
   width: 28px;
   height: 28px;
@@ -114,4 +118,158 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  border: none;
+  font-family: var(--kairos-font);
+  transition: background 0.15s;
 }
+.avatar:hover { background: var(--kairos-purple-400); }
+
+/* ── User menu ── */
+.userMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--kairos-purple-800);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--kairos-radius-md);
+  padding: 8px;
+  min-width: 220px;
+  box-shadow: var(--kairos-shadow-modal);
+  z-index: 200;
+}
+
+.userMenuInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+}
+
+.userMenuAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--kairos-purple-600);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.userMenuEmail {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--kairos-text-primary);
+  word-break: break-all;
+}
+
+.userMenuRole {
+  font-size: 11px;
+  color: var(--kairos-text-muted);
+  margin-top: 2px;
+}
+
+.userMenuDivider {
+  height: 1px;
+  background: rgba(255,255,255,0.07);
+  margin: 6px 0;
+}
+
+.logoutBtn {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--kairos-radius-sm);
+  background: none;
+  border: none;
+  color: #f87171;
+  font-size: 13px;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+.logoutBtn:hover { background: rgba(248,113,113,0.1); }
+
+/* ── Modal crear proyecto ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 16px;
+}
+
+.modal {
+  background: var(--kairos-purple-800);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--kairos-radius-lg);
+  padding: 28px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--kairos-shadow-modal);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modalTitle { font-size: 16px; font-weight: 700; color: var(--kairos-text-primary); }
+
+.closeBtn {
+  font-size: 14px;
+  color: var(--kairos-text-muted);
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.12s;
+}
+.closeBtn:hover { color: var(--kairos-text-primary); }
+
+.form { display: flex; flex-direction: column; gap: 12px; }
+
+.input {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--kairos-radius-sm);
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--kairos-text-primary);
+  font-family: var(--kairos-font);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input::placeholder { color: var(--kairos-text-muted); }
+.input:focus { border-color: var(--kairos-purple-400); }
+
+.formError {
+  font-size: 12px;
+  color: #f87171;
+  background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.2);
+  border-radius: var(--kairos-radius-sm);
+  padding: 6px 10px;
+}
+
+.submitBtn {
+  background: var(--kairos-purple-600);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px;
+  border-radius: var(--kairos-radius-sm);
+  border: none;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+  transition: background 0.15s, opacity 0.15s;
+}
+.submitBtn:hover:not(:disabled) { background: var(--kairos-purple-400); }
+.submitBtn:disabled { opacity: 0.45; cursor: not-allowed; }

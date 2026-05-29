@@ -4,8 +4,35 @@
   box-shadow: var(--kairos-shadow-card);
   overflow: hidden;
   transition: box-shadow 0.15s, transform 0.1s;
+  -webkit-user-select: none;
   user-select: none;
+  position: relative;
 }
+
+.cardActions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+  z-index: 2;
+  transition: opacity 0.15s;
+}
+
+.deleteBtn {
+  font-size: 11px;
+  color: #fff;
+  background: rgba(0,0,0,0.45);
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+  cursor: pointer;
+  transition: background 0.12s;
+  font-family: var(--kairos-font);
+}
+.deleteBtn:hover { background: #ef4444; }
+
+.dragArea { cursor: grab; }
 
 .card:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);

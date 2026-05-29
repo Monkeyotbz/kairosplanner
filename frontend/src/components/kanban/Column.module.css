@@ -96,3 +96,60 @@
   color: var(--kairos-text-primary);
   background: rgba(255, 255, 255, 0.04);
 }
+
+/* ── Inline card creation ── */
+.addingCard {
+  background: var(--kairos-bg-card);
+  border-radius: var(--kairos-radius-card);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--kairos-shadow-card);
+}
+
+.addingInput {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--kairos-text-card);
+  font-family: var(--kairos-font);
+  resize: none;
+  line-height: 1.4;
+}
+
+.addingInput::placeholder { color: #9ca3af; }
+
+.addingActions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.addingConfirm {
+  background: var(--kairos-purple-600);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+  transition: background 0.15s;
+}
+.addingConfirm:hover:not(:disabled) { background: var(--kairos-purple-400); }
+.addingConfirm:disabled { opacity: 0.5; }
+
+.addingCancel {
+  font-size: 13px;
+  color: var(--kairos-text-muted);
+  padding: 4px 7px;
+  border-radius: 5px;
+  transition: all 0.12s;
+  font-family: var(--kairos-font);
+}
+.addingCancel:hover { color: #f87171; background: rgba(248,113,113,0.1); }
