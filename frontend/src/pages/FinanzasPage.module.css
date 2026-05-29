@@ -1,0 +1,108 @@
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 24px 28px;
+  overflow-y: auto;
+  background: var(--kairos-bg-app);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.title { font-size: 20px; font-weight: 700; color: var(--kairos-text-primary); }
+
+.tabs { display: flex; gap: 6px; }
+
+.tab {
+  padding: 7px 16px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--kairos-text-secondary);
+  font-size: 13px;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tab:hover { background: rgba(255,255,255,0.09); color: var(--kairos-text-primary); }
+.tabActive {
+  background: rgba(83,74,183,0.2) !important;
+  border-color: var(--kairos-purple-400) !important;
+  color: var(--kairos-purple-100) !important;
+}
+
+/* Month picker */
+.monthRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.monthBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--kairos-text-secondary);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--kairos-font);
+}
+.monthBtn:hover { background: rgba(255,255,255,0.12); color: var(--kairos-text-primary); }
+
+.monthLabel {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--kairos-text-primary);
+  min-width: 90px;
+  text-align: center;
+}
+
+/* Main row */
+.mainRow {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Add button */
+.newBtn {
+  align-self: flex-start;
+  padding: 10px 20px;
+  border-radius: var(--kairos-radius-md);
+  background: var(--kairos-purple-600);
+  border: none;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.newBtn:hover { background: var(--kairos-purple-400); }
+
+/* Loading */
+.state { display: flex; align-items: center; gap: 10px; color: var(--kairos-text-secondary); font-size: 14px; padding: 32px 0; }
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--kairos-purple-400);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }

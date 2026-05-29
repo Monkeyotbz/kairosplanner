@@ -1,0 +1,49 @@
+.card {
+  background: var(--kairos-purple-800);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--kairos-radius-md);
+  padding: 20px 20px 12px;
+  flex: 1;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--kairos-text-secondary);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.empty {
+  font-size: 13px;
+  color: var(--kairos-text-muted);
+  text-align: center;
+  padding: 48px 0;
+}
+
+.tooltip {
+  background: var(--kairos-purple-900);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--kairos-radius-sm);
+  padding: 8px 12px;
+}
+
+.tooltipLabel {
+  font-size: 11px;
+  color: var(--kairos-text-muted);
+  text-transform: capitalize;
+  margin-bottom: 2px;
+}
+
+.tooltipValue {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--kairos-purple-100);
+}
+
+.tooltipSub {
+  font-size: 11px;
+  color: var(--kairos-text-muted);
+  margin-top: 2px;
+}

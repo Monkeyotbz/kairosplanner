@@ -1,0 +1,121 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+
+.modal {
+  background: var(--kairos-purple-800);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--kairos-radius-lg);
+  padding: 28px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--kairos-shadow-modal);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modalTitle { font-size: 16px; font-weight: 700; color: var(--kairos-text-primary); }
+
+.closeBtn {
+  font-size: 14px;
+  color: var(--kairos-text-muted);
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.12s;
+}
+.closeBtn:hover { color: var(--kairos-text-primary); }
+
+.form { display: flex; flex-direction: column; gap: 16px; }
+
+/* Tipo toggle */
+.tipoRow { display: flex; gap: 8px; }
+
+.tipoBtn {
+  flex: 1;
+  padding: 9px;
+  border-radius: var(--kairos-radius-sm);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--kairos-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tipoBtnGasto   { background: rgba(248,113,113,0.12) !important; border-color: rgba(248,113,113,0.3) !important; color: #f87171 !important; }
+.tipoBtnIngreso { background: rgba(74,222,128,0.12) !important; border-color: rgba(74,222,128,0.3) !important; color: #4ade80 !important; }
+
+/* Fields */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.fieldRow { display: flex; gap: 10px; }
+.fieldRow .field { flex: 1; }
+
+.label { font-size: 12px; font-weight: 500; color: var(--kairos-text-secondary); }
+.opt   { color: var(--kairos-text-muted); font-weight: 400; }
+
+.input, .select {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--kairos-radius-sm);
+  padding: 9px 12px;
+  font-size: 13px;
+  color: var(--kairos-text-primary);
+  font-family: var(--kairos-font);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.input:focus, .select:focus { border-color: var(--kairos-purple-400); }
+.input::placeholder { color: var(--kairos-text-muted); }
+.select option { background: var(--kairos-purple-800); }
+
+.error {
+  font-size: 12px;
+  color: #f87171;
+  background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.2);
+  border-radius: var(--kairos-radius-sm);
+  padding: 7px 10px;
+}
+
+.actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+
+.cancelBtn {
+  padding: 9px 18px;
+  border-radius: var(--kairos-radius-sm);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--kairos-text-secondary);
+  font-size: 13px;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+}
+
+.saveBtn {
+  padding: 9px 22px;
+  border-radius: var(--kairos-radius-sm);
+  background: var(--kairos-purple-600);
+  border: none;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+.saveBtn:hover:not(:disabled) { background: var(--kairos-purple-400); }
+.saveBtn:disabled { opacity: 0.5; cursor: not-allowed; }

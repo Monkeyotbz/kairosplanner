@@ -9,6 +9,7 @@ import FocusPage from './pages/FocusPage'
 import CalendarPage from './pages/CalendarPage'
 import ProductivityPage from './pages/ProductivityPage'
 import EntornoPage from './pages/EntornoPage'
+import FinanzasPage from './pages/FinanzasPage'
 
 export default function App() {
   const init = useAuthStore((s) => s.init)
@@ -31,7 +32,7 @@ export default function App() {
           <Route path="/focus" element={<FocusPage />} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/productivity" element={<ProductivityPage />} />
-          <Route path="/finanzas" element={<EntornoPage />} />
+          <Route path="/finanzas" element={<FinanzasPage />} />
           <Route path="/entorno" element={<EntornoPage />} />
         </Route>
       </Routes>
