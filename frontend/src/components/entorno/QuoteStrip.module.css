@@ -1,0 +1,71 @@
+.strip {
+  height: var(--kairos-entorno-h);
+  background: var(--kairos-entorno-bg);
+  border-bottom: 1px solid var(--kairos-entorno-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  flex-shrink: 0;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.icon {
+  color: var(--kairos-purple-400);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.quote {
+  font-size: 12px;
+  color: var(--kairos-entorno-quote);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.playlistDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--kairos-timer-active);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.playlistName {
+  font-size: 12px;
+  color: var(--kairos-entorno-text);
+  font-weight: 500;
+}
+
+.separator {
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 12px;
+}
+
+.time {
+  font-size: 12px;
+  color: var(--kairos-entorno-quote);
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,109 @@
+.card {
+  background: var(--kairos-bg-card);
+  border-radius: var(--kairos-radius-card);
+  box-shadow: var(--kairos-shadow-card);
+  overflow: hidden;
+  transition: box-shadow 0.15s, transform 0.1s;
+  user-select: none;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+}
+
+.dragging {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Cover ── */
+.cover {
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+  background: var(--kairos-purple-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Body ── */
+.body {
+  padding: 10px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Labels ── */
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+/* ── Título ── */
+.title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--kairos-text-card);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* ── Footer ── */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.metaChip {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.metaIcon {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* ── Avatar ── */
+.avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--kairos-purple-600);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}

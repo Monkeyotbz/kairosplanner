@@ -1,0 +1,13 @@
+.board {
+  display: flex;
+  gap: var(--kairos-col-gap);
+  padding: 16px 20px 20px;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  align-items: flex-start;
+}
+
+.board::-webkit-scrollbar {
+  height: 6px;
+}

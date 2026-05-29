@@ -1,0 +1,158 @@
+.page {
+  min-height: 100vh;
+  background-color: var(--kairos-bg-app);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.card {
+  background: var(--kairos-purple-800);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--kairos-radius-lg);
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--kairos-shadow-modal);
+}
+
+/* ── Marca ── */
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.logo {
+  color: var(--kairos-purple-400);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.name {
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--kairos-purple-100);
+  letter-spacing: 0.06em;
+}
+
+/* ── Encabezado ── */
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--kairos-text-primary);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--kairos-text-secondary);
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+/* ── Formulario ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--kairos-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--kairos-radius-sm);
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--kairos-text-primary);
+  font-family: var(--kairos-font);
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+  width: 100%;
+}
+
+.input::placeholder {
+  color: var(--kairos-text-muted);
+}
+
+.input:focus {
+  border-color: var(--kairos-purple-400);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+/* ── Error ── */
+.error {
+  font-size: 13px;
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  border-radius: var(--kairos-radius-sm);
+  padding: 8px 12px;
+  text-align: center;
+}
+
+/* ── Botón principal ── */
+.submitBtn {
+  background: var(--kairos-purple-600);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px;
+  border-radius: var(--kairos-radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  margin-top: 4px;
+  font-family: var(--kairos-font);
+  letter-spacing: 0.01em;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: var(--kairos-purple-400);
+}
+
+.submitBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Toggle login/registro ── */
+.toggle {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--kairos-text-secondary);
+}
+
+.toggleBtn {
+  color: var(--kairos-purple-200);
+  font-size: 13px;
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--kairos-font);
+  transition: color 0.15s;
+}
+
+.toggleBtn:hover {
+  color: var(--kairos-purple-100);
+}

@@ -1,0 +1,69 @@
+:root {
+  /* ── Fondos ── */
+  --kairos-bg-app:        #1e1b2e;
+  --kairos-bg-sidebar:    #1a1625;
+  --kairos-bg-topnav:     #1a1625;
+  --kairos-bg-boardnav:   rgba(0, 0, 0, 0.25);
+  --kairos-bg-col:        rgba(255, 255, 255, 0.08);
+  --kairos-bg-card:       #ffffff;
+
+  /* ── Acento: Púrpura KAIROS ── */
+  --kairos-purple-900:    #1a1625;
+  --kairos-purple-800:    #2d2445;
+  --kairos-purple-600:    #534AB7;
+  --kairos-purple-400:    #7F77DD;
+  --kairos-purple-200:    #AFA9EC;
+  --kairos-purple-100:    #CECBF6;
+  --kairos-purple-50:     #EEEDFE;
+
+  /* ── Etiquetas de tarjetas ── */
+  --kairos-label-dev:     #378ADD;
+  --kairos-label-ux:      #534AB7;
+  --kairos-label-mktg:    #D4537E;
+  --kairos-label-seo:     #639922;
+  --kairos-label-social:  #EF9F27;
+  --kairos-label-qa:      #1D9E75;
+  --kairos-label-alta:    #D85A30;
+
+  /* ── Columnas Kanban ── */
+  --kairos-col-backlog:   #B4B2A9;
+  --kairos-col-progress:  #378ADD;
+  --kairos-col-review:    #EF9F27;
+  --kairos-col-done:      #639922;
+
+  /* ── Timer ── */
+  --kairos-timer-active:  #378ADD;
+  --kairos-timer-stop:    #D85A30;
+  --kairos-timer-saved:   #3B6D11;
+
+  /* ── Entorno KAIROS ── */
+  --kairos-entorno-bg:    rgba(83, 74, 183, 0.25);
+  --kairos-entorno-border:rgba(83, 74, 183, 0.30);
+  --kairos-entorno-text:  #CECBF6;
+  --kairos-entorno-quote: #AFA9EC;
+
+  /* ── Tipografía ── */
+  --kairos-font:          'Inter', system-ui, sans-serif;
+  --kairos-text-primary:  #f0eeff;
+  --kairos-text-secondary:#AFA9EC;
+  --kairos-text-muted:    #6b7280;
+  --kairos-text-card:     #111827;
+
+  /* ── Espaciado ── */
+  --kairos-radius-sm:     6px;
+  --kairos-radius-md:     10px;
+  --kairos-radius-lg:     14px;
+  --kairos-radius-card:   12px;
+
+  /* ── Sombras ── */
+  --kairos-shadow-card:   0 2px 8px rgba(0, 0, 0, 0.18);
+  --kairos-shadow-modal:  0 20px 60px rgba(0, 0, 0, 0.50);
+
+  /* ── Layout ── */
+  --kairos-topnav-h:      44px;
+  --kairos-boardnav-h:    48px;
+  --kairos-entorno-h:     36px;
+  --kairos-sidebar-w:     116px;
+  --kairos-col-w:         260px;
+  --kairos-col-gap:       12px;
+}

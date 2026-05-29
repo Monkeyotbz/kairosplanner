@@ -1,0 +1,129 @@
+.wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 32px 24px;
+  background: var(--kairos-bg-app);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.badge {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--kairos-purple-200);
+  background: rgba(83,74,183,0.2);
+  border: 1px solid rgba(83,74,183,0.35);
+  padding: 4px 14px;
+  border-radius: 20px;
+}
+
+/* ── Anillo ── */
+.ringWrap {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.pulsing {
+  animation: ringPulse 2s ease-in-out infinite;
+}
+
+@keyframes ringPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.timeDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 1;
+}
+
+.time {
+  font-size: 52px;
+  font-weight: 700;
+  color: var(--kairos-text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.timeLabel {
+  font-size: 12px;
+  color: var(--kairos-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Acciones principales ── */
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.pauseBtn {
+  padding: 12px 28px;
+  border-radius: var(--kairos-radius-md);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--kairos-text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.pauseBtn:hover {
+  background: rgba(255,255,255,0.13);
+}
+
+.finishBtn {
+  padding: 12px 28px;
+  border-radius: var(--kairos-radius-md);
+  background: var(--kairos-purple-600);
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.finishBtn:hover { background: var(--kairos-purple-400); }
+
+/* ── Abandonar ── */
+.abandonBtn {
+  font-size: 12px;
+  color: var(--kairos-text-muted);
+  background: none;
+  border: none;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: color 0.15s;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.abandonBtn:hover { color: #f87171; }
