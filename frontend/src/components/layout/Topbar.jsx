@@ -77,6 +77,7 @@ export default function Topbar() {
           <button className={styles.createBtn} onClick={() => { setShowModal(true); setError('') }}>
             + Crear
           </button>
+
           <input className={styles.search} type="text" placeholder="Buscar..." />
 
           {/* Selector de tema — solo visible en móvil (en desktop está en BoardNav) */}

@@ -1,0 +1,34 @@
+.wrapper {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: var(--kairos-radius-md);
+  overflow: hidden;
+}
+
+.header {
+  background: var(--kairos-bg-sidebar);
+  padding: 8px 0;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--kairos-text-muted);
+}
+
+/* ── Mobile: ocultar texto, mantener cuadrículas ── */
+@media (max-width: 640px) {
+  .header {
+    font-size: 0.68rem;
+    padding: 6px 0;
+  }
+}

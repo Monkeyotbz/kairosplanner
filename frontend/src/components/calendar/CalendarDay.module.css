@@ -1,0 +1,109 @@
+.cell {
+  background: var(--kairos-bg-app);
+  min-height: 100px;
+  padding: 6px 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  position: relative;
+  cursor: default;
+}
+
+.cell.dim {
+  opacity: 0.35;
+}
+
+.cell.today .num {
+  background: var(--kairos-purple-600);
+  color: #fff;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.num {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--kairos-text-secondary);
+  line-height: 22px;
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+
+.chips {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.chip {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--kairos-bg-col);
+  border: none;
+  border-left: 3px solid var(--chip-bar, var(--kairos-purple-600));
+  border-radius: 3px;
+  padding: 2px 5px;
+  font-size: 0.72rem;
+  color: var(--kairos-text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.12s;
+}
+
+.chip:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.more {
+  font-size: 0.68rem;
+  color: var(--kairos-text-muted);
+  padding: 1px 5px;
+}
+
+/* Badge visible solo en mobile */
+.badge {
+  display: none;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: var(--kairos-purple-600);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+@media (max-width: 640px) {
+  .cell {
+    min-height: 52px;
+    padding: 4px;
+  }
+
+  .chips {
+    display: none;
+  }
+
+  .badge {
+    display: flex;
+  }
+
+  .num {
+    font-size: 0.72rem;
+  }
+}
