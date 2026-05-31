@@ -112,7 +112,7 @@
   align-items: center;
   gap: 3px;
   font-size: 11px;
-  color: #6b7280;
+  color: var(--kairos-text-muted);
 }
 
 .metaIcon {

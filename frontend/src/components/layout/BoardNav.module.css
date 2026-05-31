@@ -175,7 +175,8 @@
   cursor: pointer;
   transition: all 0.15s;
 }
-.action:hover { background: rgba(255,255,255,0.09); color: var(--kairos-text-primary); }
+.action:hover  { background: rgba(255,255,255,0.09); color: var(--kairos-text-primary); }
+.actionActive  { background: rgba(255,255,255,0.09); color: var(--kairos-text-primary) !important; }
 
 .inviteBtn {
   padding: 4px 12px;
@@ -353,11 +354,41 @@
   flex-shrink: 0;
 }
 
+/* ── Botón panel lateral ── */
+.panelBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 28px;
+  border-radius: var(--kairos-radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--kairos-text-secondary);
+  font-size: 15px;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.panelBtn:hover {
+  background: rgba(255, 255, 255, 0.10);
+  color: var(--kairos-text-primary);
+}
+.panelBtnActive {
+  background: rgba(83, 74, 183, 0.22);
+  border-color: rgba(83, 74, 183, 0.45);
+  color: var(--kairos-purple-100);
+}
+.panelBtnActive:hover {
+  background: rgba(83, 74, 183, 0.35);
+}
+
 /* ── Responsive BoardNav ── */
 @media (max-width: 768px) {
   .boardnav { padding: 0 12px; height: 44px; }
   .viewBtn  { display: none; }
   .action   { display: none; }
+  .panelBtn { display: none; }
 
   .projectName { font-size: 13px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { DndContext, DragOverlay, closestCorners, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { DndContext, DragOverlay, closestCorners, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { useBoardStore } from '../../store/boardStore'
 import Column from './Column'
 import Card from './Card'
@@ -11,7 +11,8 @@ export default function Board() {
   const [workingCards, setWorkingCards] = useState(null)
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
   )
 
   function getCards() {

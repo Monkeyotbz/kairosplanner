@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 
-const CARD_SELECT = 'id, columna_id, titulo, prioridad, fecha_limite, cover_url, orden, tarjeta_etiqueta(etiquetas(id, nombre, color))'
+const CARD_SELECT = 'id, columna_id, titulo, descripcion, prioridad, fecha_limite, cover_url, orden, tarjeta_etiqueta(etiquetas(id, nombre, color))'
 
 function mapCards(rawCards) {
   return (rawCards || []).map(card => ({
@@ -118,6 +118,17 @@ export async function createCard({ columna_id, titulo }) {
 export async function deleteCard(id) {
   const { error } = await supabase.from('tarjetas').delete().eq('id', id)
   if (error) throw error
+}
+
+export async function updateCard(cardId, fields) {
+  const { data, error } = await supabase
+    .from('tarjetas')
+    .update(fields)
+    .eq('id', cardId)
+    .select(CARD_SELECT)
+    .single()
+  if (error) throw error
+  return { ...data, labels: (data.tarjeta_etiqueta || []).map(te => te.etiquetas).filter(Boolean) }
 }
 
 export async function updateCardColumn(cardId, columnId) {

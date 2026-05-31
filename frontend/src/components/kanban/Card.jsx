@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useBoardStore } from '../../store/boardStore'
@@ -16,9 +16,10 @@ function getPriorityColor(prioridad) {
 }
 
 export default function Card({ card, columnaId, isOverlay = false }) {
-  const { removeCard } = useBoardStore()
+  const { removeCard, selectCard } = useBoardStore()
   const [hovered, setHovered] = useState(false)
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card.id })
+  const pointerPos = useRef(null)
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -35,6 +36,17 @@ export default function Card({ card, columnaId, isOverlay = false }) {
     removeCard(card.id, columnaId)
   }
 
+  function handlePointerDown(e) {
+    pointerPos.current = { x: e.clientX, y: e.clientY }
+  }
+
+  function handleClick(e) {
+    if (isOverlay || !pointerPos.current) return
+    const dx = Math.abs(e.clientX - pointerPos.current.x)
+    const dy = Math.abs(e.clientY - pointerPos.current.y)
+    if (dx < 5 && dy < 5) selectCard(card)
+  }
+
   return (
     <div
       ref={setNodeRef}
@@ -42,6 +54,8 @@ export default function Card({ card, columnaId, isOverlay = false }) {
       className={`${styles.card} ${isDragging ? styles.dragging : ''}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onPointerDown={handlePointerDown}
+      onClick={handleClick}
     >
       {/* Drag handle + delete */}
       <div className={styles.cardActions} style={{ opacity: hovered && !isDragging ? 1 : 0 }}>

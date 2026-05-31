@@ -1,0 +1,184 @@
+.panel {
+  width: var(--kairos-panel-w);
+  flex-shrink: 0;
+  background: var(--kairos-bg-sidebar);
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  animation: slideIn 0.18s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--kairos-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-family: var(--kairos-font);
+}
+
+.closeBtn {
+  font-size: 13px;
+  color: var(--kairos-text-muted);
+  padding: 2px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: var(--kairos-font);
+  transition: color 0.12s, background 0.12s;
+}
+.closeBtn:hover { color: var(--kairos-text-primary); background: rgba(255,255,255,0.06); }
+
+/* ── Sections ── */
+.section { padding: 14px 16px; }
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--kairos-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 10px;
+  font-family: var(--kairos-font);
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 0 16px;
+  flex-shrink: 0;
+}
+
+/* ── Timer widget ── */
+.timerWidget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 0 8px;
+}
+
+.timerBadge {
+  font-size: 11px;
+  color: var(--kairos-purple-200);
+  background: rgba(83, 74, 183, 0.15);
+  border: 1px solid rgba(83, 74, 183, 0.28);
+  border-radius: 20px;
+  padding: 3px 10px;
+  margin-bottom: 8px;
+  font-family: var(--kairos-font);
+}
+
+.timerTime {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--kairos-text-primary);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  font-family: var(--kairos-font);
+}
+
+.timerLabel {
+  font-size: 11px;
+  color: var(--kairos-text-muted);
+  margin-bottom: 14px;
+  font-family: var(--kairos-font);
+}
+
+.timerActions {
+  display: flex;
+  gap: 8px;
+}
+
+.timerPause {
+  padding: 7px 14px;
+  border-radius: var(--kairos-radius-sm);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--kairos-text-secondary);
+  font-size: 12px;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.timerPause:hover { background: rgba(255,255,255,0.13); color: var(--kairos-text-primary); }
+
+.timerFinish {
+  padding: 7px 14px;
+  border-radius: var(--kairos-radius-sm);
+  background: rgba(99, 153, 34, 0.18);
+  border: 1px solid rgba(99, 153, 34, 0.32);
+  color: #86efac;
+  font-size: 12px;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.timerFinish:hover { background: rgba(99,153,34,0.32); }
+
+/* ── Botón iniciar ── */
+.startFocusBtn {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: var(--kairos-radius-md);
+  background: rgba(83, 74, 183, 0.14);
+  border: 1px solid rgba(83, 74, 183, 0.3);
+  color: var(--kairos-purple-200);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.startFocusBtn:hover { background: rgba(83,74,183,0.26); color: var(--kairos-purple-100); }
+
+/* ── Música placeholder ── */
+.musicCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--kairos-radius-md);
+}
+
+.musicIcon { font-size: 22px; flex-shrink: 0; }
+
+.musicTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--kairos-text-secondary);
+  font-family: var(--kairos-font);
+}
+
+.musicSub {
+  font-size: 11px;
+  color: var(--kairos-text-muted);
+  margin-top: 2px;
+  font-family: var(--kairos-font);
+}
+
+/* ── Móvil: nunca visible ── */
+@media (max-width: 768px) {
+  .panel { display: none; }
+}

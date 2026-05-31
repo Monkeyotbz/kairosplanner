@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { getMisProyectos, getBoardByProject, getMyBoard, updateCardColumn, createCard, deleteCard } from '../services/boardService'
+import { getMisProyectos, getBoardByProject, getMyBoard, updateCardColumn, updateCard, createCard, deleteCard } from '../services/boardService'
 
 export const useBoardStore = create((set, get) => ({
   proyectos: [],
@@ -7,6 +7,7 @@ export const useBoardStore = create((set, get) => ({
   board: null,
   columns: [],
   cardsByColumn: {},
+  selectedCard: null,
   loading: true,
   error: null,
 
@@ -65,6 +66,24 @@ export const useBoardStore = create((set, get) => ({
       },
     }))
     await deleteCard(cardId)
+  },
+
+  selectCard: (card) => set({ selectedCard: card }),
+  clearSelectedCard: () => set({ selectedCard: null }),
+
+  editCard: async (cardId, columnaId, fields) => {
+    try {
+      const updated = await updateCard(cardId, fields)
+      set(s => ({
+        cardsByColumn: {
+          ...s.cardsByColumn,
+          [columnaId]: (s.cardsByColumn[columnaId] || []).map(c => c.id === cardId ? updated : c),
+        },
+        selectedCard: updated,
+      }))
+    } catch (err) {
+      console.error('Error al editar tarjeta:', err)
+    }
   },
 
   setCardsByColumn: (cardsByColumn) => set({ cardsByColumn }),

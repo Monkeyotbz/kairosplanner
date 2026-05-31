@@ -5,6 +5,22 @@
   overflow: hidden;
 }
 
+/* ── Contenedor split-view ── */
+.content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── Lado Kanban (ocupa todo menos el panel) ── */
+.kanbanSide {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
 .boardWrapper {
   flex: 1;
   overflow: hidden;
@@ -12,6 +28,7 @@
   flex-direction: column;
 }
 
+/* ── Estados loading/error ── */
 .state {
   flex: 1;
   display: flex;
@@ -40,4 +57,9 @@
 .error {
   color: #f87171;
   font-size: 13px;
+}
+
+/* ── Móvil: columna única, panel oculto por CSS en SidePanel ── */
+@media (max-width: 768px) {
+  .content { flex-direction: column; }
 }

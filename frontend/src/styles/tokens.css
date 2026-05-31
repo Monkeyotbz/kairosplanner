@@ -66,4 +66,137 @@
   --kairos-sidebar-w:     116px;
   --kairos-col-w:         260px;
   --kairos-col-gap:       12px;
+  --kairos-panel-w:       280px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   STUDIO — Ableton Live inspired (charcoal + orange)
+═══════════════════════════════════════════════════════════ */
+[data-theme="studio"] {
+  --kairos-bg-app:        #1C1C1C;
+  --kairos-bg-sidebar:    #141414;
+  --kairos-bg-topnav:     #161616;
+  --kairos-bg-boardnav:   rgba(0, 0, 0, 0.35);
+  --kairos-bg-col:        rgba(0, 0, 0, 0.20);
+  --kairos-bg-card:       #323232;
+
+  --kairos-purple-900:    #141414;
+  --kairos-purple-800:    #2A2200;
+  --kairos-purple-600:    #FF7200;
+  --kairos-purple-400:    #FF9A3C;
+  --kairos-purple-200:    #FFBB77;
+  --kairos-purple-100:    #FFD4A8;
+  --kairos-purple-50:     #FFF0E0;
+
+  --kairos-text-primary:  #F5F5F5;
+  --kairos-text-secondary:#AAAAAA;
+  --kairos-text-muted:    #666666;
+  --kairos-text-card:     #EEEEEE;
+
+  --kairos-entorno-bg:    rgba(255, 114, 0, 0.14);
+  --kairos-entorno-border:rgba(255, 114, 0, 0.28);
+  --kairos-entorno-text:  #FFD4A8;
+  --kairos-entorno-quote: #FFBB77;
+
+  --kairos-shadow-card:   0 2px 8px rgba(0, 0, 0, 0.35);
+  --kairos-shadow-modal:  0 20px 60px rgba(0, 0, 0, 0.65);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FOREST — Spotify inspired (deep black + green)
+═══════════════════════════════════════════════════════════ */
+[data-theme="forest"] {
+  --kairos-bg-app:        #121212;
+  --kairos-bg-sidebar:    #040404;
+  --kairos-bg-topnav:     #181818;
+  --kairos-bg-boardnav:   rgba(0, 0, 0, 0.45);
+  --kairos-bg-col:        rgba(0, 0, 0, 0.22);
+  --kairos-bg-card:       #242424;
+
+  --kairos-purple-900:    #040404;
+  --kairos-purple-800:    #0A2218;
+  --kairos-purple-600:    #1DB954;
+  --kairos-purple-400:    #1ED760;
+  --kairos-purple-200:    #6FE098;
+  --kairos-purple-100:    #A8F0C0;
+  --kairos-purple-50:     #E0FAE8;
+
+  --kairos-text-primary:  #FFFFFF;
+  --kairos-text-secondary:#B3B3B3;
+  --kairos-text-muted:    #535353;
+  --kairos-text-card:     #FFFFFF;
+
+  --kairos-entorno-bg:    rgba(29, 185, 84, 0.12);
+  --kairos-entorno-border:rgba(29, 185, 84, 0.25);
+  --kairos-entorno-text:  #A8F0C0;
+  --kairos-entorno-quote: #6FE098;
+
+  --kairos-shadow-card:   0 2px 8px rgba(0, 0, 0, 0.5);
+  --kairos-shadow-modal:  0 20px 60px rgba(0, 0, 0, 0.75);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   OCEAN — Tidal inspired (void black + cyan)
+═══════════════════════════════════════════════════════════ */
+[data-theme="ocean"] {
+  --kairos-bg-app:        #080808;
+  --kairos-bg-sidebar:    #030303;
+  --kairos-bg-topnav:     #0A0A0A;
+  --kairos-bg-boardnav:   rgba(0, 0, 0, 0.55);
+  --kairos-bg-col:        rgba(0, 0, 0, 0.25);
+  --kairos-bg-card:       #1A1A1A;
+
+  --kairos-purple-900:    #030303;
+  --kairos-purple-800:    #001A22;
+  --kairos-purple-600:    #00C6E8;
+  --kairos-purple-400:    #33D6F5;
+  --kairos-purple-200:    #7DE8FF;
+  --kairos-purple-100:    #B8F3FF;
+  --kairos-purple-50:     #E0FAFF;
+
+  --kairos-text-primary:  #FFFFFF;
+  --kairos-text-secondary:#888888;
+  --kairos-text-muted:    #444444;
+  --kairos-text-card:     #FFFFFF;
+
+  --kairos-entorno-bg:    rgba(0, 198, 232, 0.10);
+  --kairos-entorno-border:rgba(0, 198, 232, 0.22);
+  --kairos-entorno-text:  #B8F3FF;
+  --kairos-entorno-quote: #7DE8FF;
+
+  --kairos-shadow-card:   0 2px 8px rgba(0, 0, 0, 0.6);
+  --kairos-shadow-modal:  0 20px 60px rgba(0, 0, 0, 0.85);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SNOW — Light & minimal (white + purple brand)
+═══════════════════════════════════════════════════════════ */
+[data-theme="snow"] {
+  --kairos-bg-app:        #F0F0F5;
+  --kairos-bg-sidebar:    #FFFFFF;
+  --kairos-bg-topnav:     #FFFFFF;
+  --kairos-bg-boardnav:   rgba(0, 0, 0, 0.04);
+  --kairos-bg-col:        rgba(0, 0, 0, 0.04);
+  --kairos-bg-card:       #FFFFFF;
+
+  --kairos-purple-900:    #EEEDFE;
+  --kairos-purple-800:    #DDDCFC;
+  --kairos-purple-600:    #534AB7;
+  --kairos-purple-400:    #7F77DD;
+  --kairos-purple-200:    #534AB7;
+  --kairos-purple-100:    #7F77DD;
+  --kairos-purple-50:     #EEEDFE;
+
+  --kairos-text-primary:  #1D1B2E;
+  --kairos-text-secondary:#4B5563;
+  --kairos-text-muted:    #9CA3AF;
+  --kairos-text-card:     #1D1B2E;
+
+  --kairos-entorno-bg:    rgba(83, 74, 183, 0.07);
+  --kairos-entorno-border:rgba(83, 74, 183, 0.18);
+  --kairos-entorno-text:  #534AB7;
+  --kairos-entorno-quote: #7F77DD;
+
+  --kairos-shadow-card:   0 2px 10px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0,0,0,0.05);
+  --kairos-shadow-modal:  0 20px 60px rgba(0, 0, 0, 0.22);
 }

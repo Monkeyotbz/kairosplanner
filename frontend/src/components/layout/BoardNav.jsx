@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useBoardStore } from '../../store/boardStore'
 import { createProject, searchUsuarios, addMemberToProject, getProjectMembers } from '../../services/boardService'
+import ThemeSwitcher from './ThemeSwitcher'
 import styles from './BoardNav.module.css'
 
-export default function BoardNav({ proyecto }) {
+export default function BoardNav({ proyecto, panelOpen, onTogglePanel }) {
   const { proyectos, loadBoard, loadProyectos } = useBoardStore()
   const [showProjectMenu, setShowProjectMenu] = useState(false)
   const [showNewProject, setShowNewProject]   = useState(false)
   const [showInvite, setShowInvite]           = useState(false)
+  const [showTheme, setShowTheme]             = useState(false)
   const [newNombre, setNewNombre]             = useState('')
   const [saving, setSaving]                   = useState(false)
   const menuRef = useRef(null)
@@ -115,6 +117,23 @@ export default function BoardNav({ proyecto }) {
         <button className={styles.action}>⊟ Filtrar</button>
         <button className={styles.inviteBtn} onClick={() => setShowInvite(true)}>+ Invitar</button>
         <button className={styles.action}>•••</button>
+        <div style={{ position: 'relative' }}>
+          <button
+            className={`${styles.action} ${showTheme ? styles.actionActive : ''}`}
+            onClick={() => setShowTheme(v => !v)}
+            title="Cambiar apariencia"
+          >
+            <i className="ti ti-palette" style={{ fontSize: 15 }} />
+          </button>
+          <ThemeSwitcher open={showTheme} onClose={() => setShowTheme(false)} />
+        </div>
+        <button
+          className={`${styles.panelBtn} ${panelOpen ? styles.panelBtnActive : ''}`}
+          onClick={onTogglePanel}
+          title={panelOpen ? 'Cerrar panel' : 'Abrir panel lateral'}
+        >
+          ◧
+        </button>
       </div>
 
       {/* ── Modal invitar ── */}

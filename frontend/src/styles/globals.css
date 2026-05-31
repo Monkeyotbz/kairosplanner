@@ -37,6 +37,10 @@ a {
 ::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.12); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
+/* Snow theme — invert scrollbar + border utilities */
+[data-theme="snow"] ::-webkit-scrollbar-thumb       { background: rgba(0,0,0,0.15); }
+[data-theme="snow"] ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.28); }
+
 /* ── Responsive tokens ─────────────────────────────────────── */
 @media (max-width: 1024px) {
   :root {
