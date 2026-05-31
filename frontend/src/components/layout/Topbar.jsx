@@ -4,6 +4,7 @@ import { createProject } from '../../services/boardService'
 import { signOut } from '../../services/authService'
 import { useAuthStore } from '../../store/authStore'
 import { useBoardStore } from '../../store/boardStore'
+import ThemeSwitcher from './ThemeSwitcher'
 import styles from './Topbar.module.css'
 
 export default function Topbar() {
@@ -16,6 +17,7 @@ export default function Topbar() {
   const [saving, setSaving]         = useState(false)
   const [error, setError]           = useState('')
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [showTheme, setShowTheme]   = useState(false)
   const userMenuRef = useRef(null)
 
   const initial = user?.email?.[0]?.toUpperCase() ?? 'U'
@@ -76,6 +78,18 @@ export default function Topbar() {
             + Crear
           </button>
           <input className={styles.search} type="text" placeholder="Buscar..." />
+
+          {/* Selector de tema — solo visible en móvil (en desktop está en BoardNav) */}
+          <div className={styles.themeMobileWrap}>
+            <button
+              className={`${styles.themeBtn} ${showTheme ? styles.themeBtnActive : ''}`}
+              onClick={() => setShowTheme(v => !v)}
+              title="Apariencia"
+            >
+              <i className="ti ti-palette" />
+            </button>
+            <ThemeSwitcher open={showTheme} onClose={() => setShowTheme(false)} />
+          </div>
 
           {/* Avatar con menú */}
           <div className={styles.avatarWrap} ref={userMenuRef}>
