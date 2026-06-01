@@ -55,6 +55,18 @@
   --kairos-radius-lg:     14px;
   --kairos-radius-card:   12px;
 
+  /* ── Superficies y bordes adaptativos ── */
+  --kairos-surface-1:     rgba(255,255,255,0.04);
+  --kairos-surface-2:     rgba(255,255,255,0.07);
+  --kairos-surface-3:     rgba(255,255,255,0.11);
+  --kairos-section-bg:    rgba(0,0,0,0.22);
+  --kairos-border-1:      rgba(255,255,255,0.08);
+  --kairos-border-2:      rgba(255,255,255,0.13);
+  --kairos-border-dashed: rgba(255,255,255,0.18);
+  --kairos-input-bg:      rgba(255,255,255,0.06);
+  --kairos-input-border:  rgba(255,255,255,0.12);
+  --kairos-modal-bg:      #1a1625;
+
   /* ── Sombras ── */
   --kairos-shadow-card:   0 2px 8px rgba(0, 0, 0, 0.18);
   --kairos-shadow-modal:  0 20px 60px rgba(0, 0, 0, 0.50);
@@ -73,6 +85,8 @@
    STUDIO — Ableton Live inspired (charcoal + orange)
 ═══════════════════════════════════════════════════════════ */
 [data-theme="studio"] {
+  --kairos-modal-bg:      #141414;
+  --kairos-section-bg:    rgba(0,0,0,0.30);
   --kairos-bg-app:        #1C1C1C;
   --kairos-bg-sidebar:    #141414;
   --kairos-bg-topnav:     #161616;
@@ -106,6 +120,8 @@
    FOREST — Spotify inspired (deep black + green)
 ═══════════════════════════════════════════════════════════ */
 [data-theme="forest"] {
+  --kairos-modal-bg:      #040404;
+  --kairos-section-bg:    rgba(0,0,0,0.35);
   --kairos-bg-app:        #121212;
   --kairos-bg-sidebar:    #040404;
   --kairos-bg-topnav:     #181818;
@@ -139,6 +155,8 @@
    OCEAN — Tidal inspired (void black + cyan)
 ═══════════════════════════════════════════════════════════ */
 [data-theme="ocean"] {
+  --kairos-modal-bg:      #030303;
+  --kairos-section-bg:    rgba(0,0,0,0.40);
   --kairos-bg-app:        #080808;
   --kairos-bg-sidebar:    #030303;
   --kairos-bg-topnav:     #0A0A0A;
@@ -172,6 +190,16 @@
    SNOW — Light & minimal (white + purple brand)
 ═══════════════════════════════════════════════════════════ */
 [data-theme="snow"] {
+  --kairos-modal-bg:      #FFFFFF;
+  --kairos-surface-1:     rgba(0,0,0,0.03);
+  --kairos-surface-2:     rgba(0,0,0,0.06);
+  --kairos-surface-3:     rgba(0,0,0,0.10);
+  --kairos-section-bg:    rgba(0,0,0,0.04);
+  --kairos-border-1:      rgba(0,0,0,0.09);
+  --kairos-border-2:      rgba(0,0,0,0.15);
+  --kairos-border-dashed: rgba(0,0,0,0.20);
+  --kairos-input-bg:      rgba(0,0,0,0.04);
+  --kairos-input-border:  rgba(0,0,0,0.14);
   --kairos-bg-app:        #F0F0F5;
   --kairos-bg-sidebar:    #FFFFFF;
   --kairos-bg-topnav:     #FFFFFF;

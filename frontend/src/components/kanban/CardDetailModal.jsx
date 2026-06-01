@@ -373,10 +373,14 @@ export default function CardDetailModal() {
                 className={styles.descArea}
                 value={localDesc}
                 onChange={e => setLocalDesc(e.target.value)}
-                onBlur={saveDesc}
                 placeholder="Añade una descripción detallada..."
                 rows={4}
               />
+              {localDesc.trim() !== (selectedCard.descripcion || '') && (
+                <button className={styles.descSaveBtn} onClick={saveDesc}>
+                  Guardar descripción
+                </button>
+              )}
             </div>
 
             {/* Comentarios */}

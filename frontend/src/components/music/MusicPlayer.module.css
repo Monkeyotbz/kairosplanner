@@ -1,15 +1,15 @@
 /* ── Panel ── */
 .panel {
   position: fixed;
-  bottom: 42px;   /* above QuoteStrip */
+  bottom: 42px;
   right: 16px;
   z-index: 900;
   width: 340px;
   max-height: calc(100vh - 90px);
-  background: #1a1625;
-  border: 0.5px solid rgba(255,255,255,0.1);
+  background: var(--kairos-modal-bg);
+  border: 0.5px solid var(--kairos-border-2);
   border-radius: 14px;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+  box-shadow: var(--kairos-shadow-modal);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -40,7 +40,7 @@
 .tabs {
   display: flex;
   gap: 4px;
-  background: rgba(255,255,255,0.05);
+  background: var(--kairos-surface-1);
   border-radius: 8px;
   padding: 3px;
 }
@@ -61,12 +61,12 @@
   transition: all 0.15s;
 }
 .tab:hover { color: var(--kairos-text-secondary); }
-.tabActive  { background: rgba(255,255,255,0.1); color: var(--kairos-text-primary); }
+.tabActive  { background: var(--kairos-surface-3); color: var(--kairos-text-primary); }
 
 .closeBtn {
   width: 26px; height: 26px;
   border-radius: 6px;
-  background: rgba(255,255,255,0.06);
+  background: var(--kairos-surface-2);
   border: none;
   color: var(--kairos-text-muted);
   cursor: pointer;
@@ -75,7 +75,7 @@
   transition: background 0.12s;
   flex-shrink: 0;
 }
-.closeBtn:hover { background: rgba(255,255,255,0.12); color: var(--kairos-text-primary); }
+.closeBtn:hover { background: var(--kairos-surface-3); color: var(--kairos-text-primary); }
 
 /* ── Tab content ── */
 .tabContent {
@@ -189,7 +189,7 @@
   gap: 10px;
   align-items: center;
   padding: 10px;
-  background: rgba(255,255,255,0.04);
+  background: var(--kairos-surface-1);
   border-radius: 10px;
 }
 
@@ -246,7 +246,7 @@
 .ctrlBtn {
   width: 34px; height: 34px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.06);
+  background: var(--kairos-surface-2);
   border: none;
   color: var(--kairos-text-secondary);
   cursor: pointer;
@@ -254,7 +254,7 @@
   font-size: 14px;
   transition: all 0.15s;
 }
-.ctrlBtn:hover { background: rgba(255,255,255,0.12); color: var(--kairos-text-primary); }
+.ctrlBtn:hover { background: var(--kairos-surface-3); color: var(--kairos-text-primary); }
 .ctrlBtn:disabled { opacity: 0.35; cursor: default; }
 
 .ctrlBtnMain {
@@ -322,7 +322,7 @@
   object-fit: cover;
 }
 .plThumbFallback {
-  background: rgba(255,255,255,0.07);
+  background: var(--kairos-surface-2);
   display: flex; align-items: center; justify-content: center;
   color: var(--kairos-text-muted);
   font-size: 14px;
@@ -401,8 +401,8 @@
 .ytCard {
   border-radius: 8px;
   overflow: hidden;
-  background: rgba(255,255,255,0.04);
-  border: 0.5px solid rgba(255,255,255,0.07);
+  background: var(--kairos-surface-1);
+  border: 0.5px solid var(--kairos-border-1);
   transition: border-color 0.15s;
 }
 .ytCardActive { border-color: rgba(255,68,68,0.5); }
@@ -422,7 +422,7 @@
 
 .ytThumbFallback {
   width: 100%; height: 100%;
-  background: rgba(255,255,255,0.05);
+  background: var(--kairos-surface-1);
   display: flex; align-items: center; justify-content: center;
   color: var(--kairos-text-muted);
   font-size: 20px;
@@ -469,8 +469,8 @@
 }
 
 .ytInput {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--kairos-input-bg);
+  border: 1px solid var(--kairos-input-border);
   border-radius: 7px;
   padding: 7px 10px;
   font-size: 0.82rem;

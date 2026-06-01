@@ -19,15 +19,15 @@
 
 /* ── Modal ── */
 .modal {
-  background: #1a1625;
+  background: var(--kairos-modal-bg);
   border-radius: 12px;
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border: 0.5px solid var(--kairos-border-1);
   width: 100%;
   max-width: 660px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--kairos-shadow-modal);
   animation: slideUp 0.18s ease-out;
   max-height: calc(100vh - 48px);
 }
@@ -106,7 +106,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  border-right: 0.5px solid rgba(255, 255, 255, 0.07);
+  border-right: 0.5px solid var(--kairos-border-1);
   overflow-y: auto;
 }
 
@@ -136,15 +136,15 @@
   border-radius: 4px;
   cursor: pointer;
   font-family: var(--kairos-font);
-  background: rgba(255, 255, 255, 0.06);
-  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  background: var(--kairos-surface-1);
+  border: 0.5px solid var(--kairos-border-1);
   color: var(--kairos-text-muted);
   display: flex;
   align-items: center;
   gap: 4px;
   transition: all 0.12s;
 }
-.lblAdd:hover { background: rgba(255,255,255,0.1); color: var(--kairos-text-secondary); }
+.lblAdd:hover { background: var(--kairos-surface-2); color: var(--kairos-text-secondary); }
 .lblAdd i { font-size: 12px; }
 
 /* ── Title ── */
@@ -162,11 +162,11 @@
   padding: 4px 6px;
   margin: -4px -6px;
   font-family: var(--kairos-font);
-  transition: background 0.15s, border 0.15s;
+  transition: background 0.15s;
 }
 .titleInput:focus {
-  background: rgba(255, 255, 255, 0.04);
-  outline: 0.5px solid rgba(255, 255, 255, 0.12);
+  background: var(--kairos-surface-1);
+  outline: 0.5px solid var(--kairos-border-2);
 }
 
 /* ── Meta row ── */
@@ -216,7 +216,7 @@
 }
 
 .dueChip {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--kairos-surface-2);
   color: var(--kairos-text-secondary);
   padding: 4px 10px;
   border-radius: 6px;
@@ -225,12 +225,12 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border: 0.5px solid var(--kairos-border-1);
   cursor: pointer;
   font-family: var(--kairos-font);
   transition: background 0.12s;
 }
-.dueChip:hover { background: rgba(255,255,255,0.13); }
+.dueChip:hover { background: var(--kairos-surface-3); }
 .dueChip i { font-size: 13px; }
 
 .dueChipPast {
@@ -241,7 +241,7 @@
 
 .metaEmpty {
   background: transparent;
-  border: 0.5px dashed rgba(255, 255, 255, 0.15);
+  border: 0.5px dashed var(--kairos-border-dashed);
   color: var(--kairos-text-muted);
   padding: 4px 10px;
   border-radius: 6px;
@@ -253,7 +253,7 @@
   font-family: var(--kairos-font);
   transition: all 0.12s;
 }
-.metaEmpty:hover { border-color: rgba(255,255,255,0.3); color: var(--kairos-text-secondary); }
+.metaEmpty:hover { border-color: var(--kairos-border-2); color: var(--kairos-text-secondary); }
 .metaEmpty i { font-size: 13px; }
 
 .hiddenDate {
@@ -331,8 +331,8 @@
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  border: 0.5px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.07);
+  border: 0.5px solid var(--kairos-border-2);
+  background: var(--kairos-surface-2);
   color: var(--kairos-text-secondary);
   display: flex;
   align-items: center;
@@ -341,7 +341,7 @@
   font-family: var(--kairos-font);
   transition: all 0.15s;
 }
-.tBtnPause:hover { background: rgba(255,255,255,0.13); color: var(--kairos-text-primary); }
+.tBtnPause:hover { background: var(--kairos-surface-3); color: var(--kairos-text-primary); }
 .tBtnPause i { font-size: 14px; }
 
 .tBtnStop {
@@ -397,33 +397,11 @@
 }
 .sectionTitle i { font-size: 16px; color: var(--kairos-text-muted); }
 
-.comingBadge {
-  font-size: 10px;
-  font-weight: 500;
-  padding: 2px 7px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--kairos-text-muted);
-  margin-left: 4px;
-}
-
-/* ── Placeholder / coming soon ── */
-.placeholderBox {
-  background: rgba(255, 255, 255, 0.03);
-  border: 0.5px dashed rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 14px 16px;
-  font-size: 12px;
-  color: var(--kairos-text-muted);
-  line-height: 1.6;
-  font-family: var(--kairos-font);
-}
-
 /* ── Description ── */
 .descArea {
   width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 0.5px solid rgba(255, 255, 255, 0.09);
+  background: var(--kairos-input-bg);
+  border: 0.5px solid var(--kairos-border-1);
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 13px;
@@ -435,8 +413,23 @@
   box-sizing: border-box;
   transition: border-color 0.15s;
 }
-.descArea:focus { border-color: rgba(83, 74, 183, 0.5); }
+.descArea:focus { border-color: var(--kairos-purple-600); }
 .descArea::placeholder { color: var(--kairos-text-muted); }
+
+.descSaveBtn {
+  margin-top: 6px;
+  background: var(--kairos-purple-600);
+  border: none;
+  border-radius: 6px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+  transition: opacity 0.15s;
+}
+.descSaveBtn:hover { opacity: 0.85; }
 
 /* ── Side column ── */
 .sideCol {
@@ -444,7 +437,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  background: rgba(0, 0, 0, 0.22);
+  background: var(--kairos-section-bg);
   overflow-y: auto;
 }
 
@@ -469,14 +462,14 @@
   font-size: 12px;
   color: var(--kairos-text-secondary);
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.05);
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  background: var(--kairos-surface-1);
+  border: 0.5px solid var(--kairos-border-1);
   font-family: var(--kairos-font);
   transition: all 0.15s;
   text-align: left;
   width: 100%;
 }
-.sideBtn:hover { background: rgba(255,255,255,0.1); color: var(--kairos-text-primary); }
+.sideBtn:hover { background: var(--kairos-surface-2); color: var(--kairos-text-primary); }
 .sideBtn i { font-size: 15px; color: var(--kairos-text-muted); }
 .sideBtn:hover i { color: var(--kairos-text-secondary); }
 
@@ -500,7 +493,7 @@
   cursor: pointer;
   transition: background 0.12s;
 }
-.memberRow:hover { background: rgba(255,255,255,0.05); }
+.memberRow:hover { background: var(--kairos-surface-1); }
 
 .memberAv {
   width: 26px;
@@ -540,8 +533,8 @@
 .priorityBtn {
   padding: 6px 10px;
   border-radius: 6px;
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  border: 0.5px solid var(--kairos-border-1);
+  background: var(--kairos-surface-1);
   color: var(--kairos-text-muted);
   font-size: 11px;
   font-weight: 500;
@@ -550,7 +543,7 @@
   transition: all 0.15s;
   text-align: left;
 }
-.priorityBtn:hover { color: var(--kairos-text-secondary); background: rgba(255,255,255,0.08); }
+.priorityBtn:hover { color: var(--kairos-text-secondary); background: var(--kairos-surface-2); }
 .priorityBtnActive { font-weight: 600; }
 
 /* ── Cover image ── */
@@ -575,14 +568,14 @@
   bottom: calc(100% + 6px);
   right: 0;
   width: 240px;
-  background: var(--kairos-bg-sidebar);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--kairos-modal-bg);
+  border: 1px solid var(--kairos-border-2);
   border-radius: var(--kairos-radius-md);
   padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  box-shadow: var(--kairos-shadow-modal);
   z-index: 10;
 }
 
@@ -594,8 +587,8 @@
 }
 
 .coverInput {
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: var(--kairos-input-bg);
+  border: 1px solid var(--kairos-input-border);
   border-radius: var(--kairos-radius-sm);
   padding: 6px 8px;
   font-size: 0.8rem;
@@ -605,6 +598,7 @@
   box-sizing: border-box;
 }
 .coverInput:focus { border-color: var(--kairos-purple-400); }
+.coverInput::placeholder { color: var(--kairos-text-muted); }
 
 .coverBtns { display: flex; gap: 6px; }
 
@@ -635,8 +629,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255,255,255,0.06);
-  border: 0.5px solid rgba(255,255,255,0.1);
+  background: var(--kairos-surface-2);
+  border: 0.5px solid var(--kairos-border-1);
   color: var(--kairos-text-primary);
   padding: 3px 8px 3px 4px;
   border-radius: 6px;
@@ -645,7 +639,7 @@
   font-family: var(--kairos-font);
   transition: background 0.12s;
 }
-.assignedChip:hover { background: rgba(255,255,255,0.1); }
+.assignedChip:hover { background: var(--kairos-surface-3); }
 
 /* ── Assign dropdown ── */
 .assignMenu {
@@ -654,10 +648,10 @@
   left: 0;
   z-index: 100;
   width: 200px;
-  background: var(--kairos-bg-sidebar);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--kairos-modal-bg);
+  border: 1px solid var(--kairos-border-2);
   border-radius: var(--kairos-radius-md);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  box-shadow: var(--kairos-shadow-modal);
   padding: 4px;
   display: flex;
   flex-direction: column;
@@ -680,7 +674,7 @@
   font-family: var(--kairos-font);
   transition: background 0.1s;
 }
-.assignItem:hover { background: rgba(255,255,255,0.06); }
+.assignItem:hover { background: var(--kairos-surface-1); }
 .assignActive { background: rgba(83,74,183,0.12); }
 
 .assignAv {
@@ -708,5 +702,5 @@
   .overlay { padding: 0; align-items: flex-end; }
   .modal { max-width: 100%; border-radius: 16px 16px 0 0; max-height: 92vh; }
   .body { grid-template-columns: 1fr; }
-  .sideCol { order: -1; border-right: none; border-bottom: 0.5px solid rgba(255,255,255,0.07); }
+  .sideCol { order: -1; border-right: none; border-bottom: 0.5px solid var(--kairos-border-1); }
 }
