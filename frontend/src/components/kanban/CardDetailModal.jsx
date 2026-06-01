@@ -4,6 +4,8 @@ import { useBoardStore } from '../../store/boardStore'
 import { useFocusStore } from '../../store/focusStore'
 import { getProjectMembers } from '../../services/boardService'
 import CardChecklist from './CardChecklist'
+import LabelPicker from './LabelPicker'
+import CardComments from './CardComments'
 import styles from './CardDetailModal.module.css'
 
 function formatTime(seconds) {
@@ -49,19 +51,39 @@ export default function CardDetailModal() {
   const [localDate,    setLocalDate]    = useState('')
   const [members,      setMembers]      = useState([])
   const [addSubtask,   setAddSubtask]   = useState(0)
-  const dateRef = useRef(null)
+  const [showLabels,   setShowLabels]   = useState(false)
+  const [showAssign,   setShowAssign]   = useState(false)
+  const [showCover,    setShowCover]    = useState(false)
+  const [coverInput,   setCoverInput]   = useState('')
+  const dateRef    = useRef(null)
+  const assignRef  = useRef(null)
+  const coverRef   = useRef(null)
 
   useEffect(() => {
     if (!selectedCard) return
     setLocalTitle(selectedCard.titulo      || '')
     setLocalDesc (selectedCard.descripcion || '')
     setLocalDate (selectedCard.fecha_limite || '')
+    setCoverInput(selectedCard.cover_url   || '')
+    setShowLabels(false)
+    setShowAssign(false)
+    setShowCover(false)
   }, [selectedCard?.id])
 
   useEffect(() => {
     if (!selectedCard || !proyecto?.id) return
     getProjectMembers(proyecto.id).then(setMembers).catch(() => {})
   }, [selectedCard?.id, proyecto?.id])
+
+  // Cerrar dropdown de asignación al hacer click afuera
+  useEffect(() => {
+    function onClickOut(e) {
+      if (assignRef.current && !assignRef.current.contains(e.target)) setShowAssign(false)
+      if (coverRef.current  && !coverRef.current.contains(e.target))  setShowCover(false)
+    }
+    document.addEventListener('mousedown', onClickOut)
+    return () => document.removeEventListener('mousedown', onClickOut)
+  }, [])
 
   // Close on Escape
   useEffect(() => {
@@ -80,6 +102,10 @@ export default function CardDetailModal() {
   const displaySec = isPomodoro ? Math.max(0, totalSec - elapsedSeconds) : elapsedSeconds
   const dateInfo  = buildDateInfo(selectedCard.fecha_limite)
   const prioMeta  = selectedCard.prioridad ? PRIORITY_META[selectedCard.prioridad] : null
+
+  // Miembro asignado
+  const assignedMember = members.find(m => m.usuario_id === selectedCard.asignado_a)
+  const assignedName   = assignedMember?.usuarios?.nombre || assignedMember?.usuarios?.email || null
 
   function saveTitle() {
     const t = localTitle.trim()
@@ -104,6 +130,19 @@ export default function CardDetailModal() {
     editCard(selectedCard.id, selectedCard.columna_id, { prioridad: next })
   }
 
+  function assignTo(userId) {
+    setShowAssign(false)
+    const next = selectedCard.asignado_a === userId ? null : userId
+    editCard(selectedCard.id, selectedCard.columna_id, { asignado_a: next })
+  }
+
+  function saveCover() {
+    const url = coverInput.trim() || null
+    if (url === (selectedCard.cover_url || null)) { setShowCover(false); return }
+    editCard(selectedCard.id, selectedCard.columna_id, { cover_url: url })
+    setShowCover(false)
+  }
+
   async function handleDelete() {
     if (!confirm(`¿Eliminar la tarjeta "${selectedCard.titulo}"? Esta acción no se puede deshacer.`)) return
     clearSelectedCard()
@@ -116,10 +155,38 @@ export default function CardDetailModal() {
 
         {/* ── Cover ── */}
         <div className={styles.cover} style={{ background: coverBg }}>
+          {selectedCard.cover_url && (
+            <img src={selectedCard.cover_url} alt="" className={styles.coverImg} />
+          )}
           <i className="ti ti-layout-kanban" aria-hidden="true" />
-          <button className={styles.coverBtn}>
-            <i className="ti ti-photo" aria-hidden="true" /> Cambiar portada
-          </button>
+          <div className={styles.coverActions}>
+            <div style={{ position: 'relative' }} ref={coverRef}>
+              <button className={styles.coverBtn} onClick={() => setShowCover(v => !v)}>
+                <i className="ti ti-photo" aria-hidden="true" /> Cambiar portada
+              </button>
+              {showCover && (
+                <div className={styles.coverPopover}>
+                  <p className={styles.coverLabel}>URL de imagen</p>
+                  <input
+                    className={styles.coverInput}
+                    value={coverInput}
+                    onChange={e => setCoverInput(e.target.value)}
+                    placeholder="https://..."
+                    autoFocus
+                    onKeyDown={e => { if (e.key === 'Enter') saveCover(); if (e.key === 'Escape') setShowCover(false) }}
+                  />
+                  <div className={styles.coverBtns}>
+                    <button className={styles.coverSaveBtn} onClick={saveCover}>Guardar</button>
+                    {selectedCard.cover_url && (
+                      <button className={styles.coverRemoveBtn} onClick={() => { setCoverInput(''); editCard(selectedCard.id, selectedCard.columna_id, { cover_url: null }); setShowCover(false) }}>
+                        Quitar portada
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
           <button className={styles.closeBtn} onClick={clearSelectedCard} aria-label="Cerrar">
             <i className="ti ti-x" aria-hidden="true" />
           </button>
@@ -132,7 +199,7 @@ export default function CardDetailModal() {
           <div className={styles.mainCol}>
 
             {/* Labels row */}
-            <div className={styles.labelsRow}>
+            <div className={styles.labelsRow} style={{ position: 'relative' }}>
               {selectedCard.labels?.map(lbl => (
                 <span
                   key={lbl.id}
@@ -147,9 +214,10 @@ export default function CardDetailModal() {
                   {prioMeta.label}
                 </span>
               )}
-              <button className={styles.lblAdd}>
+              <button className={styles.lblAdd} onClick={() => setShowLabels(v => !v)}>
                 <i className="ti ti-plus" aria-hidden="true" /> Etiqueta
               </button>
+              {showLabels && <LabelPicker onClose={() => setShowLabels(false)} />}
             </div>
 
             {/* Title */}
@@ -164,14 +232,53 @@ export default function CardDetailModal() {
 
             {/* Meta row */}
             <div className={styles.metaRow}>
+              {/* Asignado a */}
               <div className={styles.metaItem}>
                 <span className={styles.metaLabel}>Asignado a</span>
-                <div className={styles.metaVal}>
-                  <div className={styles.avatarSm}>?</div>
-                  <span>Sin asignar</span>
+                <div className={styles.metaVal} style={{ position: 'relative' }} ref={assignRef}>
+                  <button
+                    className={assignedName ? styles.assignedChip : styles.metaEmpty}
+                    onClick={() => setShowAssign(v => !v)}
+                  >
+                    {assignedName ? (
+                      <>
+                        <div className={styles.avatarSm}>{assignedName[0].toUpperCase()}</div>
+                        <span>{assignedName}</span>
+                      </>
+                    ) : (
+                      <><i className="ti ti-user" aria-hidden="true" /> Asignar</>
+                    )}
+                  </button>
+                  {showAssign && (
+                    <div className={styles.assignMenu}>
+                      <button
+                        className={`${styles.assignItem} ${!selectedCard.asignado_a ? styles.assignActive : ''}`}
+                        onClick={() => assignTo(null)}
+                      >
+                        <div className={styles.assignAv}>–</div>
+                        <span>Sin asignar</span>
+                      </button>
+                      {members.map(m => {
+                        const name = m.usuarios?.nombre || m.usuarios?.email || '?'
+                        const active = selectedCard.asignado_a === m.usuario_id
+                        return (
+                          <button
+                            key={m.usuario_id}
+                            className={`${styles.assignItem} ${active ? styles.assignActive : ''}`}
+                            onClick={() => assignTo(m.usuario_id)}
+                          >
+                            <div className={styles.assignAv}>{name[0].toUpperCase()}</div>
+                            <span>{name}</span>
+                            {active && <span className={styles.assignCheck}>✓</span>}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
 
+              {/* Fecha límite */}
               <div className={styles.metaItem}>
                 <span className={styles.metaLabel}>Fecha límite</span>
                 <div className={styles.metaVal} style={{ position: 'relative' }}>
@@ -198,6 +305,7 @@ export default function CardDetailModal() {
                 </div>
               </div>
 
+              {/* Columna */}
               <div className={styles.metaItem}>
                 <span className={styles.metaLabel}>Columna</span>
                 <div className={styles.metaVal}>
@@ -235,7 +343,7 @@ export default function CardDetailModal() {
               )}
             </div>
 
-            {/* Subtareas / Checklist */}
+            {/* Subtareas */}
             <div>
               <div className={styles.sectionTitle}>
                 <i className="ti ti-checklist" aria-hidden="true" /> Subtareas
@@ -258,15 +366,12 @@ export default function CardDetailModal() {
               />
             </div>
 
-            {/* Comments placeholder */}
+            {/* Comentarios */}
             <div>
               <div className={styles.sectionTitle}>
                 <i className="ti ti-message" aria-hidden="true" /> Comentarios
-                <span className={styles.comingBadge}>Próximamente</span>
               </div>
-              <div className={styles.placeholderBox}>
-                Los comentarios del equipo llegarán en la próxima versión.
-              </div>
+              <CardComments cardId={selectedCard.id} />
             </div>
 
           </div>
@@ -317,16 +422,16 @@ export default function CardDetailModal() {
             <button className={styles.sideBtn} onClick={() => dateRef.current?.showPicker?.()}>
               <i className="ti ti-calendar" aria-hidden="true" /> Fecha límite
             </button>
-            <button className={styles.sideBtn}>
+            <button className={styles.sideBtn} onClick={() => setShowLabels(v => !v)}>
               <i className="ti ti-tag" aria-hidden="true" /> Editar etiquetas
             </button>
-            <button className={styles.sideBtn}>
+            <button className={styles.sideBtn} onClick={() => setShowAssign(v => !v)}>
               <i className="ti ti-user-plus" aria-hidden="true" /> Asignar miembro
             </button>
             <button className={styles.sideBtn} onClick={() => setAddSubtask(n => n + 1)}>
               <i className="ti ti-checklist" aria-hidden="true" /> Añadir subtarea
             </button>
-            <button className={styles.sideBtn}>
+            <button className={styles.sideBtn} onClick={() => setShowCover(v => !v)}>
               <i className="ti ti-photo" aria-hidden="true" /> Portada
             </button>
 

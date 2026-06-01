@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 
-const CARD_SELECT = 'id, columna_id, titulo, descripcion, prioridad, fecha_limite, cover_url, orden, tarjeta_etiqueta(etiquetas(id, nombre, color))'
+const CARD_SELECT = 'id, columna_id, titulo, descripcion, prioridad, fecha_limite, cover_url, orden, asignado_a, tarjeta_etiqueta(etiquetas(id, nombre, color))'
 
 function mapCards(rawCards) {
   return (rawCards || []).map(card => ({
@@ -136,6 +136,70 @@ export async function updateCardColumn(cardId, columnId) {
     .from('tarjetas')
     .update({ columna_id: columnId })
     .eq('id', cardId)
+  if (error) throw error
+}
+
+// ── Etiquetas ────────────────────────────────────────────────
+export async function getProyectoEtiquetas(proyectoId) {
+  const { data, error } = await supabase
+    .from('etiquetas')
+    .select('id, nombre, color')
+    .eq('proyecto_id', proyectoId)
+    .order('nombre')
+  if (error) throw error
+  return data || []
+}
+
+export async function createEtiqueta(proyectoId, nombre, color) {
+  const { data, error } = await supabase
+    .from('etiquetas')
+    .insert({ proyecto_id: proyectoId, nombre, color })
+    .select('id, nombre, color')
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function addEtiquetaToCard(tarjetaId, etiquetaId) {
+  const { error } = await supabase
+    .from('tarjeta_etiqueta')
+    .insert({ tarjeta_id: tarjetaId, etiqueta_id: etiquetaId })
+  if (error && error.code !== '23505') throw error // ignore duplicate
+}
+
+export async function removeEtiquetaFromCard(tarjetaId, etiquetaId) {
+  const { error } = await supabase
+    .from('tarjeta_etiqueta')
+    .delete()
+    .eq('tarjeta_id', tarjetaId)
+    .eq('etiqueta_id', etiquetaId)
+  if (error) throw error
+}
+
+// ── Comentarios ───────────────────────────────────────────────
+export async function getComentarios(tarjetaId) {
+  const { data, error } = await supabase
+    .from('comentarios')
+    .select('id, contenido, creado_en, autor_id')
+    .eq('tarjeta_id', tarjetaId)
+    .order('creado_en')
+  if (error) throw error
+  return data || []
+}
+
+export async function addComentario(tarjetaId, contenido) {
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data, error } = await supabase
+    .from('comentarios')
+    .insert({ tarjeta_id: tarjetaId, contenido, autor_id: user.id })
+    .select('id, contenido, creado_en, autor_id')
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteComentario(id) {
+  const { error } = await supabase.from('comentarios').delete().eq('id', id)
   if (error) throw error
 }
 

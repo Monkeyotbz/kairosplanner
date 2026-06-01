@@ -10,7 +10,7 @@ import styles from './Topbar.module.css'
 export default function Topbar() {
   const navigate = useNavigate()
   const { user, clearUser } = useAuthStore()
-  const { loadBoard, loadProyectos } = useBoardStore()
+  const { loadBoard, loadProyectos, setSearchQuery } = useBoardStore()
 
   const [showModal, setShowModal]   = useState(false)
   const [nombre, setNombre]         = useState('')
@@ -78,7 +78,12 @@ export default function Topbar() {
             + Crear
           </button>
 
-          <input className={styles.search} type="text" placeholder="Buscar..." />
+          <input
+            className={styles.search}
+            type="text"
+            placeholder="Buscar tarjetas..."
+            onChange={e => setSearchQuery(e.target.value)}
+          />
 
           {/* Selector de tema — solo visible en móvil (en desktop está en BoardNav) */}
           <div className={styles.themeMobileWrap}>

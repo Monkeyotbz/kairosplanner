@@ -8,6 +8,7 @@ export const useBoardStore = create((set, get) => ({
   columns: [],
   cardsByColumn: {},
   selectedCard: null,
+  searchQuery: '',
   loading: true,
   error: null,
 
@@ -70,6 +71,20 @@ export const useBoardStore = create((set, get) => ({
 
   selectCard: (card) => set({ selectedCard: card }),
   clearSelectedCard: () => set({ selectedCard: null }),
+  setSearchQuery: (q) => set({ searchQuery: q }),
+  updateSelectedCardLabels: (labels) => {
+    const card = get().selectedCard
+    if (!card) return
+    set(s => ({
+      selectedCard: { ...card, labels },
+      cardsByColumn: {
+        ...s.cardsByColumn,
+        [card.columna_id]: (s.cardsByColumn[card.columna_id] || []).map(
+          c => c.id === card.id ? { ...c, labels } : c
+        ),
+      },
+    }))
+  },
 
   editCard: async (cardId, columnaId, fields) => {
     try {

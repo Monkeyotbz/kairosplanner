@@ -6,7 +6,7 @@ import Card from './Card'
 import styles from './Board.module.css'
 
 export default function Board() {
-  const { columns, cardsByColumn, setCardsByColumn, persistMove } = useBoardStore()
+  const { columns, cardsByColumn, setCardsByColumn, persistMove, searchQuery } = useBoardStore()
   const [activeCard, setActiveCard] = useState(null)
   const [workingCards, setWorkingCards] = useState(null)
 
@@ -67,7 +67,18 @@ export default function Board() {
     }
   }
 
-  const displayCards = workingCards || cardsByColumn
+  const baseCards = workingCards || cardsByColumn
+  const displayCards = searchQuery
+    ? Object.fromEntries(
+        Object.entries(baseCards).map(([colId, cards]) => [
+          colId,
+          cards.filter(c =>
+            c.titulo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (c.descripcion || '').toLowerCase().includes(searchQuery.toLowerCase())
+          ),
+        ])
+      )
+    : baseCards
 
   return (
     <DndContext
