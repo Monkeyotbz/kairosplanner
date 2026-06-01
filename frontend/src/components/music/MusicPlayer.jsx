@@ -255,7 +255,7 @@ export default function MusicPlayer() {
                         }
                         <div className={styles.plInfo}>
                           <span className={styles.plName}>{pl.name}</span>
-                          <span className={styles.plTracks}>{pl.tracks.total} canciones</span>
+                          <span className={styles.plTracks}>{pl.tracks?.total ?? '–'} canciones</span>
                         </div>
                         <i className="ti ti-player-play" style={{ fontSize: 13, color: 'var(--kairos-text-muted)', flexShrink: 0 }} />
                       </button>
