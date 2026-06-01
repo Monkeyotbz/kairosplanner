@@ -139,6 +139,43 @@ export async function updateCardColumn(cardId, columnId) {
   if (error) throw error
 }
 
+// ── Subtareas ────────────────────────────────────────────────
+export async function getSubtareas(tarjetaId) {
+  const { data, error } = await supabase
+    .from('subtareas')
+    .select('id, titulo, completada, orden')
+    .eq('tarjeta_id', tarjetaId)
+    .order('orden')
+  if (error) throw error
+  return data || []
+}
+
+export async function createSubtarea(tarjetaId, titulo) {
+  const { data, error } = await supabase
+    .from('subtareas')
+    .insert({ tarjeta_id: tarjetaId, titulo })
+    .select('id, titulo, completada, orden')
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function toggleSubtarea(id, completada) {
+  const { error } = await supabase
+    .from('subtareas')
+    .update({ completada })
+    .eq('id', id)
+  if (error) throw error
+}
+
+export async function deleteSubtarea(id) {
+  const { error } = await supabase
+    .from('subtareas')
+    .delete()
+    .eq('id', id)
+  if (error) throw error
+}
+
 // ── Entorno ──────────────────────────────────────────────────
 export async function getActiveFrase() {
   const { data } = await supabase

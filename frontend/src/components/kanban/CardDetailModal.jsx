@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useBoardStore } from '../../store/boardStore'
 import { useFocusStore } from '../../store/focusStore'
 import { getProjectMembers } from '../../services/boardService'
+import CardChecklist from './CardChecklist'
 import styles from './CardDetailModal.module.css'
 
 function formatTime(seconds) {
@@ -43,10 +44,11 @@ export default function CardDetailModal() {
   const { selectedCard, clearSelectedCard, editCard, removeCard, columns, proyecto } = useBoardStore()
   const { phase, tipo, duracion_plan_min, elapsedSeconds, startBreak, finishSession } = useFocusStore()
 
-  const [localTitle, setLocalTitle] = useState('')
-  const [localDesc,  setLocalDesc]  = useState('')
-  const [localDate,  setLocalDate]  = useState('')
-  const [members,    setMembers]    = useState([])
+  const [localTitle,   setLocalTitle]   = useState('')
+  const [localDesc,    setLocalDesc]    = useState('')
+  const [localDate,    setLocalDate]    = useState('')
+  const [members,      setMembers]      = useState([])
+  const [addSubtask,   setAddSubtask]   = useState(0)
   const dateRef = useRef(null)
 
   useEffect(() => {
@@ -233,15 +235,12 @@ export default function CardDetailModal() {
               )}
             </div>
 
-            {/* Checklist placeholder */}
+            {/* Subtareas / Checklist */}
             <div>
               <div className={styles.sectionTitle}>
-                <i className="ti ti-checklist" aria-hidden="true" /> Checklist
-                <span className={styles.comingBadge}>Próximamente</span>
+                <i className="ti ti-checklist" aria-hidden="true" /> Subtareas
               </div>
-              <div className={styles.placeholderBox}>
-                Subtareas con progreso, responsables y pomodoros propios llegarán pronto.
-              </div>
+              <CardChecklist cardId={selectedCard.id} triggerAdd={addSubtask} />
             </div>
 
             {/* Description */}
@@ -324,8 +323,8 @@ export default function CardDetailModal() {
             <button className={styles.sideBtn}>
               <i className="ti ti-user-plus" aria-hidden="true" /> Asignar miembro
             </button>
-            <button className={styles.sideBtn}>
-              <i className="ti ti-checklist" aria-hidden="true" /> Añadir checklist
+            <button className={styles.sideBtn} onClick={() => setAddSubtask(n => n + 1)}>
+              <i className="ti ti-checklist" aria-hidden="true" /> Añadir subtarea
             </button>
             <button className={styles.sideBtn}>
               <i className="ti ti-photo" aria-hidden="true" /> Portada

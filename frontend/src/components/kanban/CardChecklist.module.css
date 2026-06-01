@@ -1,0 +1,208 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Barra de progreso ───────────────────────────────────── */
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.pct {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--kairos-text-muted);
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background: var(--kairos-col-done);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.count {
+  font-size: 0.7rem;
+  color: var(--kairos-text-muted);
+  flex-shrink: 0;
+}
+
+/* ── Lista ───────────────────────────────────────────────── */
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px;
+  border-radius: var(--kairos-radius-sm);
+  transition: background 0.1s;
+}
+
+.item:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+.item:hover .del {
+  opacity: 1;
+}
+
+/* Checkbox */
+.check {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--kairos-text-muted);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: color 0.12s;
+  line-height: 1;
+}
+
+.check:hover { color: var(--kairos-purple-400); }
+.itemDone .check { color: var(--kairos-col-done); }
+
+/* Texto */
+.itemText {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--kairos-text-primary);
+  line-height: 1.4;
+  user-select: text;
+}
+
+.itemDone .itemText {
+  text-decoration: line-through;
+  color: var(--kairos-text-muted);
+}
+
+/* Botón borrar */
+.del {
+  opacity: 0;
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  color: var(--kairos-text-muted);
+  font-size: 0.72rem;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.12s, color 0.12s;
+  flex-shrink: 0;
+  border-radius: 3px;
+}
+
+.del:hover { color: var(--kairos-col-review); }
+
+/* ── Formulario para agregar ─────────────────────────────── */
+.addForm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.addInput {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--kairos-radius-sm);
+  padding: 7px 10px;
+  font-size: 0.85rem;
+  color: var(--kairos-text-primary);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.addInput::placeholder {
+  color: var(--kairos-text-muted);
+}
+
+.addInput:focus {
+  border-color: var(--kairos-purple-400);
+}
+
+.addActions {
+  display: flex;
+  gap: 6px;
+}
+
+.addConfirm {
+  background: var(--kairos-purple-600);
+  border: none;
+  border-radius: var(--kairos-radius-sm);
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.addConfirm:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.addCancel {
+  background: none;
+  border: none;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  color: var(--kairos-text-secondary);
+  cursor: pointer;
+  border-radius: var(--kairos-radius-sm);
+  transition: color 0.12s;
+}
+
+.addCancel:hover { color: var(--kairos-text-primary); }
+
+/* ── Botón "Agregar subtarea" ────────────────────────────── */
+.addBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 5px 6px;
+  font-size: 0.82rem;
+  color: var(--kairos-text-muted);
+  cursor: pointer;
+  border-radius: var(--kairos-radius-sm);
+  transition: color 0.12s, background 0.12s;
+  align-self: flex-start;
+}
+
+.addBtn:hover {
+  color: var(--kairos-text-primary);
+  background: rgba(255,255,255,0.04);
+}
+
+.loadingText {
+  font-size: 0.8rem;
+  color: var(--kairos-text-muted);
+  padding: 4px 6px;
+}
