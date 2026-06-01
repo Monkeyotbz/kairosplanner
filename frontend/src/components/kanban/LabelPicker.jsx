@@ -8,7 +8,7 @@ const PRESET_COLORS = [
   '#D4537E', '#534AB7', '#1D9E75', '#B4B2A9',
 ]
 
-export default function LabelPicker({ onClose }) {
+export default function LabelPicker({ onClose, style }) {
   const { selectedCard, proyecto, updateSelectedCardLabels } = useBoardStore()
   const [labels, setLabels]       = useState([])
   const [creating, setCreating]   = useState(false)
@@ -66,7 +66,7 @@ export default function LabelPicker({ onClose }) {
   }
 
   return (
-    <div className={styles.popover} ref={ref}>
+    <div className={styles.popover} ref={ref} style={style}>
       <div className={styles.header}>
         <span>Etiquetas</span>
         <button className={styles.closeBtn} onClick={onClose}>✕</button>

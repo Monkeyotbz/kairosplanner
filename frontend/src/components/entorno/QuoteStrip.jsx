@@ -1,34 +1,90 @@
 import { useEffect, useState } from 'react'
-import { getActiveFrase, getActivePlaylist } from '../../services/boardService'
+import { getActiveFrase } from '../../services/boardService'
+import { useMusicStore } from '../../store/musicStore'
+import { pauseApi, resumeApi, nextApi } from '../../services/spotifyService'
 import styles from './QuoteStrip.module.css'
 
 export default function QuoteStrip() {
   const [frase, setFrase] = useState(null)
-  const [playlist, setPlaylist] = useState(null)
 
-  useEffect(() => {
-    getActiveFrase().then(setFrase)
-    getActivePlaylist().then(setPlaylist)
-  }, [])
+  const {
+    showPlayer, setShowPlayer, activeTab,
+    spotifyTrack, spotifyPlaying, spotifyDeviceId, setSpotifyPlaying,
+    ytCurrent, ytPlaying,
+  } = useMusicStore()
+
+  useEffect(() => { getActiveFrase().then(setFrase) }, [])
+
+  // ── Mini Spotify controls ────────────────────────────────────
+  async function toggleSpotify() {
+    try {
+      if (spotifyPlaying) await pauseApi(spotifyDeviceId)
+      else                await resumeApi(spotifyDeviceId)
+      setSpotifyPlaying(!spotifyPlaying)
+    } catch (_) {}
+  }
+
+  async function skipSpotify() {
+    try { await nextApi(spotifyDeviceId) } catch (_) {}
+  }
+
+  const spTrackName = spotifyTrack?.name || ''
+  const spArtist    = spotifyTrack?.artists?.[0]?.name || ''
+  const hasSpotify  = !!spotifyTrack
+  const hasYt       = !!ytCurrent && ytPlaying
 
   return (
     <div className={styles.strip}>
+      {/* Left: Quote */}
       <div className={styles.left}>
         <span className={styles.icon}>✦</span>
         {frase
           ? <span className={styles.quote}>"{frase.contenido}" — {frase.autor}</span>
-          : <span className={styles.quote}>Cargando frase del día...</span>
+          : <span className={styles.quote}>Cargando frase del día…</span>
         }
       </div>
 
-      {playlist && (
-        <div className={styles.right}>
-          <span className={styles.playlistDot} />
-          <span className={styles.playlistName}>{playlist.nombre}</span>
-          <span className={styles.separator}>·</span>
-          <span className={styles.time}>04:06</span>
-        </div>
-      )}
+      {/* Right: Music mini-player */}
+      <div className={styles.right}>
+        {hasSpotify && (
+          <div className={styles.miniPlayer}>
+            <span className={styles.playlistDot} style={{ background: '#1DB954' }} />
+            <button className={styles.miniInfo} onClick={() => setShowPlayer(true)} title="Abrir player">
+              <span className={styles.miniTrack}>{spTrackName}</span>
+              {spArtist && <span className={styles.miniArtist}>{spArtist}</span>}
+            </button>
+            <button className={styles.miniCtrl} onClick={toggleSpotify} title={spotifyPlaying ? 'Pausar' : 'Reproducir'}>
+              <i className={spotifyPlaying ? 'ti ti-player-pause' : 'ti ti-player-play'} />
+            </button>
+            <button className={styles.miniCtrl} onClick={skipSpotify} title="Siguiente">
+              <i className="ti ti-player-skip-forward" />
+            </button>
+          </div>
+        )}
+
+        {!hasSpotify && hasYt && (
+          <div className={styles.miniPlayer}>
+            <span className={styles.playlistDot} style={{ background: '#ff4444' }} />
+            <button className={styles.miniInfo} onClick={() => setShowPlayer(true)} title="Abrir player">
+              <span className={styles.miniTrack}>{ytCurrent.nombre}</span>
+            </button>
+            <button className={styles.miniCtrl} onClick={() => setShowPlayer(true)} title="Abrir player">
+              <i className="ti ti-music" />
+            </button>
+          </div>
+        )}
+
+        {!hasSpotify && !hasYt && (
+          <button
+            className={`${styles.musicToggle} ${showPlayer ? styles.musicToggleActive : ''}`}
+            onClick={() => setShowPlayer(!showPlayer)}
+            title="Música"
+          >
+            <i className="ti ti-music" />
+            <span>Música</span>
+          </button>
+        )}
+      </div>
     </div>
   )
 }

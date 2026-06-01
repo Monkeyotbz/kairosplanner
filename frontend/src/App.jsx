@@ -10,6 +10,7 @@ import CalendarPage from './pages/CalendarPage'
 import ProductivityPage from './pages/ProductivityPage'
 import EntornoPage from './pages/EntornoPage'
 import FinanzasPage from './pages/FinanzasPage'
+import SpotifyCallbackPage from './pages/SpotifyCallbackPage'
 
 export default function App() {
   const init = useAuthStore((s) => s.init)
@@ -19,7 +20,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login"    element={<LoginPage />} />
+        <Route path="/callback" element={<SpotifyCallbackPage />} />
         <Route
           element={
             <ProtectedRoute>
@@ -28,12 +30,12 @@ export default function App() {
           }
         >
           <Route path="/" element={<Navigate to="/board" replace />} />
-          <Route path="/board" element={<BoardPage />} />
-          <Route path="/focus" element={<FocusPage />} />
-          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/board"        element={<BoardPage />} />
+          <Route path="/focus"        element={<FocusPage />} />
+          <Route path="/calendar"     element={<CalendarPage />} />
           <Route path="/productivity" element={<ProductivityPage />} />
-          <Route path="/finanzas" element={<FinanzasPage />} />
-          <Route path="/entorno" element={<EntornoPage />} />
+          <Route path="/finanzas"     element={<FinanzasPage />} />
+          <Route path="/entorno"      element={<EntornoPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

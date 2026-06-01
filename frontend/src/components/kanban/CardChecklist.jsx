@@ -7,6 +7,7 @@ export default function CardChecklist({ cardId, triggerAdd = 0 }) {
   const [loading, setLoading] = useState(true)
   const [adding, setAdding] = useState(false)
   const [newTitle, setNewTitle] = useState('')
+  const [addError, setAddError] = useState('')
   const inputRef = useRef(null)
 
   useEffect(() => {
@@ -14,6 +15,7 @@ export default function CardChecklist({ cardId, triggerAdd = 0 }) {
     setLoading(true)
     getSubtareas(cardId)
       .then(setItems)
+      .catch(() => {})
       .finally(() => setLoading(false))
   }, [cardId])
 
@@ -30,11 +32,15 @@ export default function CardChecklist({ cardId, triggerAdd = 0 }) {
     e.preventDefault()
     const t = newTitle.trim()
     if (!t) return
-    const item = await createSubtarea(cardId, t)
-    setItems(prev => [...prev, item])
-    setNewTitle('')
-    // Keep form open for quick multi-add
-    inputRef.current?.focus()
+    setAddError('')
+    try {
+      const item = await createSubtarea(cardId, t)
+      setItems(prev => [...prev, item])
+      setNewTitle('')
+      inputRef.current?.focus()
+    } catch (err) {
+      setAddError(err.message || 'Error al guardar')
+    }
   }
 
   async function handleToggle(id, current) {
@@ -51,6 +57,7 @@ export default function CardChecklist({ cardId, triggerAdd = 0 }) {
   function cancelAdding() {
     setAdding(false)
     setNewTitle('')
+    setAddError('')
   }
 
   const done = items.filter(i => i.completada).length
@@ -105,10 +112,11 @@ export default function CardChecklist({ cardId, triggerAdd = 0 }) {
             ref={inputRef}
             className={styles.addInput}
             value={newTitle}
-            onChange={e => setNewTitle(e.target.value)}
+            onChange={e => { setNewTitle(e.target.value); setAddError('') }}
             placeholder="Descripción de la subtarea…"
             onKeyDown={e => { if (e.key === 'Escape') cancelAdding() }}
           />
+          {addError && <p className={styles.addError}>{addError}</p>}
           <div className={styles.addActions}>
             <button type="submit" className={styles.addConfirm} disabled={!newTitle.trim()}>
               Agregar

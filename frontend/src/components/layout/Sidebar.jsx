@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { to: '/productivity', icon: '◈', label: 'Stats' },
   { to: '/finanzas',     icon: '◑', label: 'Finanzas' },
   { to: '/calendar',     icon: '◫', label: 'Agenda' },
+  { to: '/entorno',      icon: '◉', label: 'Perfil' },
 ]
 
 export default function Sidebar() {

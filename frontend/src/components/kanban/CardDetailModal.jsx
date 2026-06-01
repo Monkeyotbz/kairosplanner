@@ -55,9 +55,16 @@ export default function CardDetailModal() {
   const [showAssign,   setShowAssign]   = useState(false)
   const [showCover,    setShowCover]    = useState(false)
   const [coverInput,   setCoverInput]   = useState('')
-  const dateRef    = useRef(null)
-  const assignRef  = useRef(null)
-  const coverRef   = useRef(null)
+  const [labelsSide, setLabelsSide] = useState({ open: false, top: 0, right: 0 })
+  const [assignSide, setAssignSide] = useState({ open: false, top: 0, right: 0 })
+  const [coverSide,  setCoverSide]  = useState({ open: false, top: 0, right: 0 })
+  const dateRef       = useRef(null)
+  const assignRef     = useRef(null)
+  const coverRef      = useRef(null)
+  const dateSideRef   = useRef(null)
+  const labelsWrapRef = useRef(null)
+  const assignWrapRef = useRef(null)
+  const coverWrapRef  = useRef(null)
 
   useEffect(() => {
     if (!selectedCard) return
@@ -68,6 +75,9 @@ export default function CardDetailModal() {
     setShowLabels(false)
     setShowAssign(false)
     setShowCover(false)
+    setLabelsSide({ open: false, top: 0, right: 0 })
+    setAssignSide({ open: false, top: 0, right: 0 })
+    setCoverSide({ open: false, top: 0, right: 0 })
   }, [selectedCard?.id])
 
   useEffect(() => {
@@ -78,8 +88,11 @@ export default function CardDetailModal() {
   // Cerrar dropdown de asignación al hacer click afuera
   useEffect(() => {
     function onClickOut(e) {
-      if (assignRef.current && !assignRef.current.contains(e.target)) setShowAssign(false)
-      if (coverRef.current  && !coverRef.current.contains(e.target))  setShowCover(false)
+      if (assignRef.current     && !assignRef.current.contains(e.target))     setShowAssign(false)
+      if (coverRef.current      && !coverRef.current.contains(e.target))      setShowCover(false)
+      if (labelsWrapRef.current && !labelsWrapRef.current.contains(e.target)) setLabelsSide(s => s.open ? { ...s, open: false } : s)
+      if (assignWrapRef.current && !assignWrapRef.current.contains(e.target)) setAssignSide(s => s.open ? { ...s, open: false } : s)
+      if (coverWrapRef.current  && !coverWrapRef.current.contains(e.target))  setCoverSide(s => s.open ? { ...s, open: false } : s)
     }
     document.addEventListener('mousedown', onClickOut)
     return () => document.removeEventListener('mousedown', onClickOut)
@@ -419,21 +432,125 @@ export default function CardDetailModal() {
             </div>
 
             <span className={styles.sideLabel}>Acciones</span>
-            <button className={styles.sideBtn} onClick={() => dateRef.current?.showPicker?.()}>
-              <i className="ti ti-calendar" aria-hidden="true" /> Fecha límite
-            </button>
-            <button className={styles.sideBtn} onClick={() => setShowLabels(v => !v)}>
-              <i className="ti ti-tag" aria-hidden="true" /> Editar etiquetas
-            </button>
-            <button className={styles.sideBtn} onClick={() => setShowAssign(v => !v)}>
-              <i className="ti ti-user-plus" aria-hidden="true" /> Asignar miembro
-            </button>
+
+            {/* Fecha límite */}
+            <div style={{ position: 'relative' }}>
+              <button className={styles.sideBtn} onClick={() => dateSideRef.current?.showPicker?.()}>
+                <i className="ti ti-calendar" aria-hidden="true" /> Fecha límite
+              </button>
+              <input
+                ref={dateSideRef}
+                type="date"
+                className={styles.hiddenDate}
+                value={localDate}
+                onChange={e => setLocalDate(e.target.value)}
+                onBlur={saveDate}
+              />
+            </div>
+
+            {/* Editar etiquetas */}
+            <div ref={labelsWrapRef}>
+              <button className={styles.sideBtn} onClick={e => {
+                if (labelsSide.open) { setLabelsSide(s => ({ ...s, open: false })); return }
+                const r = e.currentTarget.getBoundingClientRect()
+                setLabelsSide({ open: true, top: r.bottom + 4, right: window.innerWidth - r.right })
+              }}>
+                <i className="ti ti-tag" aria-hidden="true" /> Editar etiquetas
+              </button>
+              {labelsSide.open && (
+                <LabelPicker
+                  style={{ position: 'fixed', top: labelsSide.top, right: labelsSide.right, left: 'auto', bottom: 'auto' }}
+                  onClose={() => setLabelsSide(s => ({ ...s, open: false }))}
+                />
+              )}
+            </div>
+
+            {/* Asignar miembro */}
+            <div ref={assignWrapRef}>
+              <button className={styles.sideBtn} onClick={e => {
+                if (assignSide.open) { setAssignSide(s => ({ ...s, open: false })); return }
+                const r = e.currentTarget.getBoundingClientRect()
+                setAssignSide({ open: true, top: r.bottom + 4, right: window.innerWidth - r.right })
+              }}>
+                <i className="ti ti-user-plus" aria-hidden="true" /> Asignar miembro
+              </button>
+              {assignSide.open && (
+                <div
+                  className={styles.assignMenu}
+                  style={{ position: 'fixed', top: assignSide.top, right: assignSide.right, left: 'auto' }}
+                >
+                  <button
+                    className={`${styles.assignItem} ${!selectedCard.asignado_a ? styles.assignActive : ''}`}
+                    onClick={() => { assignTo(null); setAssignSide(s => ({ ...s, open: false })) }}
+                  >
+                    <div className={styles.assignAv}>–</div>
+                    <span>Sin asignar</span>
+                  </button>
+                  {members.map(m => {
+                    const name = m.usuarios?.nombre || m.usuarios?.email || '?'
+                    const active = selectedCard.asignado_a === m.usuario_id
+                    return (
+                      <button
+                        key={m.usuario_id}
+                        className={`${styles.assignItem} ${active ? styles.assignActive : ''}`}
+                        onClick={() => { assignTo(m.usuario_id); setAssignSide(s => ({ ...s, open: false })) }}
+                      >
+                        <div className={styles.assignAv}>{name[0].toUpperCase()}</div>
+                        <span>{name}</span>
+                        {active && <span className={styles.assignCheck}>✓</span>}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Añadir subtarea */}
             <button className={styles.sideBtn} onClick={() => setAddSubtask(n => n + 1)}>
               <i className="ti ti-checklist" aria-hidden="true" /> Añadir subtarea
             </button>
-            <button className={styles.sideBtn} onClick={() => setShowCover(v => !v)}>
-              <i className="ti ti-photo" aria-hidden="true" /> Portada
-            </button>
+
+            {/* Portada */}
+            <div ref={coverWrapRef}>
+              <button className={styles.sideBtn} onClick={e => {
+                if (coverSide.open) { setCoverSide(s => ({ ...s, open: false })); return }
+                const r = e.currentTarget.getBoundingClientRect()
+                setCoverSide({ open: true, top: r.bottom + 4, right: window.innerWidth - r.right })
+              }}>
+                <i className="ti ti-photo" aria-hidden="true" /> Portada
+              </button>
+              {coverSide.open && (
+                <div
+                  className={styles.coverPopover}
+                  style={{ position: 'fixed', top: coverSide.top, right: coverSide.right, left: 'auto', bottom: 'auto' }}
+                >
+                  <p className={styles.coverLabel}>URL de imagen</p>
+                  <input
+                    className={styles.coverInput}
+                    value={coverInput}
+                    onChange={e => setCoverInput(e.target.value)}
+                    placeholder="https://..."
+                    autoFocus
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') { saveCover(); setCoverSide(s => ({ ...s, open: false })) }
+                      if (e.key === 'Escape') setCoverSide(s => ({ ...s, open: false }))
+                    }}
+                  />
+                  <div className={styles.coverBtns}>
+                    <button className={styles.coverSaveBtn} onClick={() => { saveCover(); setCoverSide(s => ({ ...s, open: false })) }}>Guardar</button>
+                    {selectedCard.cover_url && (
+                      <button className={styles.coverRemoveBtn} onClick={() => {
+                        setCoverInput('')
+                        editCard(selectedCard.id, selectedCard.columna_id, { cover_url: null })
+                        setCoverSide(s => ({ ...s, open: false }))
+                      }}>
+                        Quitar portada
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
 
             <span className={styles.sideLabel}>Peligro</span>
             <button className={`${styles.sideBtn} ${styles.sideBtnDanger}`} onClick={handleDelete}>

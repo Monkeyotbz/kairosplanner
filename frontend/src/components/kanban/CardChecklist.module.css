@@ -180,6 +180,13 @@
 
 .addCancel:hover { color: var(--kairos-text-primary); }
 
+.addError {
+  font-size: 0.75rem;
+  color: #fca07a;
+  margin: 0;
+  padding: 0 2px;
+}
+
 /* ── Botón "Agregar subtarea" ────────────────────────────── */
 .addBtn {
   display: flex;

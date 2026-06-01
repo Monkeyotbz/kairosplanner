@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useBoardStore } from '../store/boardStore'
 import BoardNav from '../components/layout/BoardNav'
-import QuoteStrip from '../components/entorno/QuoteStrip'
 import Board from '../components/kanban/Board'
 import EmptyBoard from '../components/kanban/EmptyBoard'
 import SidePanel from '../components/layout/SidePanel'
@@ -47,7 +46,6 @@ export default function BoardPage() {
       <BoardNav proyecto={proyecto} panelOpen={panelOpen} onTogglePanel={togglePanel} />
       <div className={styles.content}>
         <div className={styles.kanbanSide}>
-          <QuoteStrip />
           <div className={styles.boardWrapper}>
             <Board />
           </div>
