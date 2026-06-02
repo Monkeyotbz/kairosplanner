@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useMusicStore } from '../../store/musicStore'
+import { useChatStore } from '../../store/chatStore'
 import {
   initiateLogin, isConnected, disconnectSpotify,
   initSDKPlayer, playPlaylist, pauseApi, resumeApi, nextApi, prevApi, setVolumeApi,
@@ -137,9 +138,13 @@ export default function MusicPlayer() {
   const ytInfo      = ytCurrent ? extractYtInfo(ytCurrent.url) : null
   const embedUrl    = ytEmbedUrl(ytInfo)
   const spConnected = isConnected() && !!spotifyUser
+  const chatOpen    = useChatStore(s => s.isOpen)
 
   return (
-    <div className={`${styles.panel} ${showPlayer ? styles.panelVisible : styles.panelHidden}`}>
+    <div
+      className={`${styles.panel} ${showPlayer ? styles.panelVisible : styles.panelHidden}`}
+      style={{ right: chatOpen ? '316px' : '16px' }}
+    >
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.tabs}>

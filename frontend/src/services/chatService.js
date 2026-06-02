@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 
-const MSG_SELECT = 'id, contenido, created_at, usuario_id, usuarios!usuario_id(nombre, email, avatar_url)'
+const MSG_SELECT = 'id, contenido, created_at, usuario_id, usuarios(nombre, email, avatar_url)'
 
 export async function getMessages(proyectoId, limit = 60) {
   const { data, error } = await supabase

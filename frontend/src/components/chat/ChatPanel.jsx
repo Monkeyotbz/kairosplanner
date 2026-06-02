@@ -27,17 +27,19 @@ function Avatar({ name, url, size = 28 }) {
 export default function ChatPanel({ onClose }) {
   const { proyecto } = useBoardStore()
   const { user, profile } = useAuthStore()
-  const [messages, setMessages] = useState([])
-  const [members,  setMembers]  = useState([])
-  const [input,    setInput]    = useState('')
-  const [loading,  setLoading]  = useState(true)
-  const [sending,  setSending]  = useState(false)
-  const bottomRef  = useRef(null)
-  const inputRef   = useRef(null)
-  const channelRef = useRef(null)
+  const [messages,    setMessages]    = useState([])
+  const [members,     setMembers]     = useState([])
+  const [onlineUsers, setOnlineUsers] = useState(new Set())
+  const [input,       setInput]       = useState('')
+  const [loading,     setLoading]     = useState(true)
+  const [sending,     setSending]     = useState(false)
+  const bottomRef    = useRef(null)
+  const inputRef     = useRef(null)
+  const channelRef   = useRef(null)
+  const presenceRef  = useRef(null)
 
   useEffect(() => {
-    if (!proyecto?.id) return
+    if (!proyecto?.id || !user?.id) return
     setLoading(true)
 
     Promise.all([
@@ -48,6 +50,7 @@ export default function ChatPanel({ onClose }) {
       setMembers(mbs)
     }).catch(console.error).finally(() => setLoading(false))
 
+    // Suscripción a mensajes nuevos
     channelRef.current = subscribeToMessages(proyecto.id, (msg) => {
       setMessages(prev => {
         if (prev.some(m => m.id === msg.id)) return prev
@@ -55,10 +58,27 @@ export default function ChatPanel({ onClose }) {
       })
     })
 
+    // Presencia online — rastrea quién tiene el chat abierto
+    presenceRef.current = supabase.channel(`presence-${proyecto.id}`)
+    presenceRef.current
+      .on('presence', { event: 'sync' }, () => {
+        const state = presenceRef.current.presenceState()
+        const online = new Set(
+          Object.values(state).flat().map(p => p.user_id)
+        )
+        setOnlineUsers(online)
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await presenceRef.current.track({ user_id: user.id })
+        }
+      })
+
     return () => {
-      if (channelRef.current) supabase.removeChannel(channelRef.current)
+      if (channelRef.current)  supabase.removeChannel(channelRef.current)
+      if (presenceRef.current) supabase.removeChannel(presenceRef.current)
     }
-  }, [proyecto?.id])
+  }, [proyecto?.id, user?.id])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -107,12 +127,16 @@ export default function ChatPanel({ onClose }) {
       {members.length > 0 && (
         <div className={styles.members}>
           {members.map(m => {
-            const name = m.usuarios?.nombre || m.usuarios?.email || '?'
-            const url  = m.usuarios?.avatar_url
-            const isMe = m.usuario_id === user?.id
+            const name     = m.usuarios?.nombre || m.usuarios?.email || '?'
+            const url      = m.usuarios?.avatar_url
+            const isMe     = m.usuario_id === user?.id
+            const isOnline = onlineUsers.has(m.usuario_id)
             return (
-              <div key={m.usuario_id} className={styles.memberPill} title={name}>
-                <Avatar name={name} url={url} size={24} />
+              <div key={m.usuario_id} className={styles.memberPill} title={isOnline ? `${name} — en línea` : name}>
+                <div className={styles.memberAvatarWrap}>
+                  <Avatar name={name} url={url} size={24} />
+                  <span className={`${styles.presenceDot} ${isOnline ? styles.online : styles.offline}`} />
+                </div>
                 <span className={`${styles.memberName} ${isMe ? styles.memberMe : ''}`}>
                   {isMe ? 'Tú' : name.split(' ')[0]}
                 </span>
