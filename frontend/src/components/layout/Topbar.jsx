@@ -5,6 +5,7 @@ import { signOut } from '../../services/authService'
 import { useAuthStore } from '../../store/authStore'
 import { useBoardStore } from '../../store/boardStore'
 import ThemeSwitcher from './ThemeSwitcher'
+import InfinityLogo from './InfinityLogo'
 import styles from './Topbar.module.css'
 
 export default function Topbar() {
@@ -63,7 +64,7 @@ export default function Topbar() {
     <>
       <header className={styles.topbar}>
         <div className={styles.brand}>
-          <span className={styles.logo}>◎</span>
+          <InfinityLogo size={38} state="idle" />
           <span className={styles.name}>KAIROS</span>
         </div>
 

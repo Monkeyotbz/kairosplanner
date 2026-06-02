@@ -1,5 +1,7 @@
 import { useKairosVoice } from '../../hooks/useKairosVoice'
 import { useChatStore } from '../../store/chatStore'
+import { useMusicStore } from '../../store/musicStore'
+import InfinityLogo from '../layout/InfinityLogo'
 import styles from './KairosAssistant.module.css'
 
 export default function KairosAssistant() {
@@ -8,25 +10,26 @@ export default function KairosAssistant() {
       console.log('KAIROS procesando comando:', text)
     }
   })
-  const chatOpen = useChatStore(s => s.isOpen)
+  const chatOpen    = useChatStore(s => s.isOpen)
+  const musicActive = useMusicStore(s => s.spotifyPlaying || s.ytPlaying)
+
+  const state = isListening ? 'listening' : musicActive ? 'pulsing' : 'idle'
 
   return (
     <div
-      className={`${styles.container} ${isListening ? styles.active : ''}`}
+      className={styles.container}
       style={{ right: chatOpen ? '316px' : '30px' }}
     >
-      {/* Tooltip con el texto en vivo (se muestra si está escuchando y hay texto) */}
       <div className={`${styles.tooltip} ${(isListening && transcript) ? styles.showTooltip : ''}`}>
         {transcript}
       </div>
 
-      {/* Orbe flotante (estilo Siri) */}
-      <button 
-        className={`${styles.orb} ${isListening ? styles.listening : ''}`} 
+      <button
+        className={`${styles.orbBtn} ${isListening ? styles.active : ''}`}
         onClick={toggleListening}
-        title="Hablar con KAIROS"
+        title="ABAD — Asistente de KAIROS"
       >
-        <span className={styles.innerOrb}></span>
+        <InfinityLogo size={64} state={state} />
       </button>
     </div>
   )

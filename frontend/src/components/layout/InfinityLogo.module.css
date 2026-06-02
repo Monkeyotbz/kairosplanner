@@ -1,0 +1,50 @@
+.root {
+  display: block;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+/* ── Path flow animations (always running) ── */
+.glowPath  { animation: flow 3.5s linear infinite; }
+.flowPath  { animation: flow 3.5s linear infinite; animation-delay: -0.55s; }
+.sparkPath { animation: flow 3.5s linear infinite; animation-delay: -1.1s;  }
+
+@keyframes flow {
+  from { stroke-dashoffset: 0;    }
+  to   { stroke-dashoffset: -100; }
+}
+
+/* ── Idle: subtle glow breath ── */
+.idle {
+  animation: idleGlow 3.2s ease-in-out infinite;
+}
+@keyframes idleGlow {
+  0%, 100% { filter: drop-shadow(0 0 2px var(--kairos-infinity-glow)); }
+  50%       { filter: drop-shadow(0 0 9px  var(--kairos-infinity-glow)); }
+}
+
+/* ── Listening: fast flow + expanding pulse ── */
+.listening .glowPath,
+.listening .flowPath,
+.listening .sparkPath { animation-duration: 0.65s !important; }
+
+.listening {
+  animation: listenGlow 0.65s ease-in-out infinite;
+}
+@keyframes listenGlow {
+  0%, 100% { transform: scale(1);    filter: drop-shadow(0 0 8px  var(--kairos-infinity-glow)); }
+  50%       { transform: scale(1.14); filter: drop-shadow(0 0 20px var(--kairos-infinity-glow)); }
+}
+
+/* ── Pulsing: music beat ── */
+.pulsing .glowPath,
+.pulsing .flowPath,
+.pulsing .sparkPath { animation-duration: 2.4s !important; }
+
+.pulsing {
+  animation: musicPulse 2.4s ease-in-out infinite;
+}
+@keyframes musicPulse {
+  0%, 100% { transform: scale(1);    filter: drop-shadow(0 0 3px  var(--kairos-infinity-glow)); }
+  50%       { transform: scale(1.06); filter: drop-shadow(0 0 12px var(--kairos-infinity-glow)); }
+}
