@@ -1,12 +1,16 @@
 .topbar {
+  position: relative;
+  z-index: 20;
   height: var(--kairos-topnav-h);
-  background-color: var(--kairos-bg-topnav);
+  background: var(--kairos-glass-chrome-bg);
+  -webkit-backdrop-filter: var(--kairos-glass-filter);
+  backdrop-filter: var(--kairos-glass-filter);
   display: flex;
   align-items: center;
   padding: 0 16px;
   gap: 24px;
   flex-shrink: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--kairos-glass-border);
 }
 
 .brand {
@@ -40,6 +44,7 @@
   padding: 4px 10px;
   border-radius: var(--kairos-radius-sm);
   font-size: 13px;
+  font-weight: 600;
   color: var(--kairos-text-secondary);
   transition: background 0.15s, color 0.15s;
   cursor: pointer;

@@ -1,5 +1,6 @@
 .card {
-  background: var(--kairos-bg-card);
+  background: var(--kairos-glass-card-bg);
+  border: 1px solid var(--kairos-glass-border);
   border-radius: var(--kairos-radius-card);
   box-shadow: var(--kairos-shadow-card);
   overflow: hidden;
@@ -87,8 +88,8 @@
 /* ── Título ── */
 .title {
   font-size: 13px;
-  font-weight: 500;
-  color: var(--kairos-text-card);
+  font-weight: 600;
+  color: var(--kairos-card-text-color);
   line-height: 1.45;
   margin: 0;
 }

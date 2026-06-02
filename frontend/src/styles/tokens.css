@@ -79,12 +79,31 @@
   --kairos-col-w:         260px;
   --kairos-col-gap:       12px;
   --kairos-panel-w:       280px;
+
+  /* ── Páginas ── */
+  --kairos-page-bg:           transparent;
+
+  /* ── Glassmorphism ── */
+  --kairos-glass-chrome-bg:   rgba(15, 10, 35, 0.60);    /* sidebar + topbar */
+  --kairos-glass-nav-bg:      rgba(10, 8, 25, 0.50);     /* boardnav */
+  --kairos-glass-col-bg:      rgba(255, 255, 255, 0.06); /* columnas kanban */
+  --kairos-glass-card-bg:     rgba(18, 14, 45, 0.84);   /* tarjetas */
+  --kairos-glass-border:      rgba(255, 255, 255, 0.11);
+  --kairos-glass-filter:      blur(18px);
+  --kairos-glass-card-filter: blur(10px);
+  --kairos-card-text-color:   var(--kairos-text-primary);
 }
 
 /* ═══════════════════════════════════════════════════════════
    STUDIO — Ableton Live inspired (charcoal + orange)
 ═══════════════════════════════════════════════════════════ */
 [data-theme="studio"] {
+  --kairos-glass-chrome-bg:   rgba(20, 20, 20, 0.68);
+  --kairos-glass-nav-bg:      rgba(15, 15, 15, 0.55);
+  --kairos-glass-col-bg:      rgba(0, 0, 0, 0.28);
+  --kairos-glass-card-bg:     rgba(50, 50, 50, 0.90);
+  --kairos-glass-border:      rgba(255, 255, 255, 0.09);
+  --kairos-card-text-color:   var(--kairos-text-primary);
   --kairos-modal-bg:      #141414;
   --kairos-section-bg:    rgba(0,0,0,0.30);
   --kairos-bg-app:        #1C1C1C;
@@ -120,6 +139,12 @@
    FOREST — Spotify inspired (deep black + green)
 ═══════════════════════════════════════════════════════════ */
 [data-theme="forest"] {
+  --kairos-glass-chrome-bg:   rgba(8, 14, 8, 0.68);
+  --kairos-glass-nav-bg:      rgba(5, 10, 5, 0.55);
+  --kairos-glass-col-bg:      rgba(0, 0, 0, 0.28);
+  --kairos-glass-card-bg:     rgba(36, 36, 36, 0.90);
+  --kairos-glass-border:      rgba(255, 255, 255, 0.08);
+  --kairos-card-text-color:   var(--kairos-text-primary);
   --kairos-modal-bg:      #040404;
   --kairos-section-bg:    rgba(0,0,0,0.35);
   --kairos-bg-app:        #121212;
@@ -155,6 +180,12 @@
    OCEAN — Tidal inspired (void black + cyan)
 ═══════════════════════════════════════════════════════════ */
 [data-theme="ocean"] {
+  --kairos-glass-chrome-bg:   rgba(5, 12, 22, 0.68);
+  --kairos-glass-nav-bg:      rgba(4, 10, 18, 0.55);
+  --kairos-glass-col-bg:      rgba(0, 0, 0, 0.30);
+  --kairos-glass-card-bg:     rgba(26, 26, 26, 0.90);
+  --kairos-glass-border:      rgba(255, 255, 255, 0.09);
+  --kairos-card-text-color:   var(--kairos-text-primary);
   --kairos-modal-bg:      #030303;
   --kairos-section-bg:    rgba(0,0,0,0.40);
   --kairos-bg-app:        #080808;
@@ -190,6 +221,15 @@
    SNOW — Light & minimal (white + purple brand)
 ═══════════════════════════════════════════════════════════ */
 [data-theme="snow"] {
+  --kairos-page-bg:           var(--kairos-bg-app);
+  --kairos-glass-chrome-bg:   var(--kairos-bg-sidebar);
+  --kairos-glass-nav-bg:      var(--kairos-bg-boardnav);
+  --kairos-glass-col-bg:      var(--kairos-bg-col);
+  --kairos-glass-card-bg:     var(--kairos-bg-card);
+  --kairos-glass-border:      var(--kairos-border-1);
+  --kairos-glass-filter:      none;
+  --kairos-glass-card-filter: none;
+  --kairos-card-text-color:   var(--kairos-text-card);
   --kairos-modal-bg:      #FFFFFF;
   --kairos-surface-1:     rgba(0,0,0,0.03);
   --kairos-surface-2:     rgba(0,0,0,0.06);

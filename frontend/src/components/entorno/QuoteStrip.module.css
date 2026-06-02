@@ -1,7 +1,9 @@
 .strip {
   height: var(--kairos-entorno-h);
-  background: var(--kairos-entorno-bg);
-  border-top: 0.5px solid var(--kairos-entorno-border);
+  background: var(--kairos-glass-nav-bg);
+  -webkit-backdrop-filter: var(--kairos-glass-filter);
+  backdrop-filter: var(--kairos-glass-filter);
+  border-top: 0.5px solid var(--kairos-glass-border);
   display: flex;
   align-items: center;
   justify-content: space-between;

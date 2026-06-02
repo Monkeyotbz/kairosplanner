@@ -6,8 +6,10 @@
   z-index: 900;
   width: 340px;
   max-height: calc(100vh - 90px);
-  background: var(--kairos-modal-bg);
-  border: 0.5px solid var(--kairos-border-2);
+  background: var(--kairos-glass-chrome-bg);
+  -webkit-backdrop-filter: var(--kairos-glass-filter);
+  backdrop-filter: var(--kairos-glass-filter);
+  border: 1px solid var(--kairos-glass-border);
   border-radius: 14px;
   box-shadow: var(--kairos-shadow-modal);
   display: flex;

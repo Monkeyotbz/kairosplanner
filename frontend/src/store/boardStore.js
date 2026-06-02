@@ -87,6 +87,18 @@ export const useBoardStore = create((set, get) => ({
   },
 
   editCard: async (cardId, columnaId, fields) => {
+    // Optimistic update — refresca la UI antes de la respuesta de Supabase
+    set(s => ({
+      selectedCard: s.selectedCard?.id === cardId
+        ? { ...s.selectedCard, ...fields }
+        : s.selectedCard,
+      cardsByColumn: {
+        ...s.cardsByColumn,
+        [columnaId]: (s.cardsByColumn[columnaId] || []).map(c =>
+          c.id === cardId ? { ...c, ...fields } : c
+        ),
+      },
+    }))
     try {
       const updated = await updateCard(cardId, fields)
       set(s => ({
@@ -94,7 +106,7 @@ export const useBoardStore = create((set, get) => ({
           ...s.cardsByColumn,
           [columnaId]: (s.cardsByColumn[columnaId] || []).map(c => c.id === cardId ? updated : c),
         },
-        selectedCard: updated,
+        selectedCard: s.selectedCard?.id === cardId ? updated : s.selectedCard,
       }))
     } catch (err) {
       console.error('Error al editar tarjeta:', err)

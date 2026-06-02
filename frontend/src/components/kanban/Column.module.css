@@ -1,7 +1,10 @@
 .column {
   width: var(--kairos-col-w);
   flex-shrink: 0;
-  background: var(--kairos-bg-col);
+  background: var(--kairos-glass-col-bg);
+  -webkit-backdrop-filter: var(--kairos-glass-card-filter);
+  backdrop-filter: var(--kairos-glass-card-filter);
+  border: 1px solid var(--kairos-glass-border);
   border-radius: var(--kairos-radius-lg);
   display: flex;
   flex-direction: column;
@@ -33,7 +36,7 @@
 
 .name {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--kairos-text-primary);
 }
 
@@ -102,7 +105,8 @@
 
 /* ── Inline card creation ── */
 .addingCard {
-  background: var(--kairos-bg-card);
+  background: var(--kairos-glass-card-bg);
+  border: 1px solid var(--kairos-glass-border);
   border-radius: var(--kairos-radius-card);
   padding: 8px;
   display: flex;
@@ -118,7 +122,7 @@
   outline: none;
   font-size: 13px;
   font-weight: 500;
-  color: var(--kairos-text-card);
+  color: var(--kairos-card-text-color);
   font-family: var(--kairos-font);
   resize: none;
   line-height: 1.4;

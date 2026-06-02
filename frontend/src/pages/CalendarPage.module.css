@@ -3,7 +3,7 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  background: var(--kairos-bg-app);
+  background: var(--kairos-page-bg);
   color: var(--kairos-text-primary);
 }
 

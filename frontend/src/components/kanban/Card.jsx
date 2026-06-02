@@ -65,7 +65,12 @@ export default function Card({ card, columnaId, isOverlay = false }) {
       <div className={styles.dragArea} {...attributes} {...listeners}>
         {card.cover_url && (
           <div className={styles.cover}>
-            <img src={card.cover_url} alt="" draggable={false} />
+            <img
+              src={card.cover_url}
+              alt=""
+              draggable={false}
+              onError={e => { e.currentTarget.parentElement.style.display = 'none' }}
+            />
           </div>
         )}
 

@@ -14,9 +14,13 @@ html, body, #root {
 body {
   font-family: var(--kairos-font);
   font-size: 14px;
-  background-color: var(--kairos-bg-app);
+  background-color: #06040f; /* darkest edge — canvas covers this */
   color: var(--kairos-text-primary);
   -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="snow"] body {
+  background-color: var(--kairos-bg-app);
 }
 
 button {

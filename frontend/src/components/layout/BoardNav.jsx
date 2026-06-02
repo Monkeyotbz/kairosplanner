@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useBoardStore } from '../../store/boardStore'
+import { useChatStore } from '../../store/chatStore'
 import { createProject, searchUsuarios, addMemberToProject, getProjectMembers } from '../../services/boardService'
 import ThemeSwitcher from './ThemeSwitcher'
 import styles from './BoardNav.module.css'
 
 export default function BoardNav({ proyecto, panelOpen, onTogglePanel }) {
+  const { isOpen: chatOpen, toggle: toggleChat } = useChatStore()
   const { proyectos, loadBoard, loadProyectos } = useBoardStore()
   const [showProjectMenu, setShowProjectMenu] = useState(false)
   const [showNewProject, setShowNewProject]   = useState(false)
@@ -127,6 +129,13 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel }) {
           </button>
           <ThemeSwitcher open={showTheme} onClose={() => setShowTheme(false)} />
         </div>
+        <button
+          className={`${styles.panelBtn} ${chatOpen ? styles.panelBtnActive : ''}`}
+          onClick={toggleChat}
+          title={chatOpen ? 'Cerrar chat' : 'Chat del proyecto'}
+        >
+          <i className="ti ti-message-circle" style={{ fontSize: 15 }} />
+        </button>
         <button
           className={`${styles.panelBtn} ${panelOpen ? styles.panelBtnActive : ''}`}
           onClick={onTogglePanel}

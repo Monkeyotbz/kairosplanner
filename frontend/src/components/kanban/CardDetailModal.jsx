@@ -6,6 +6,7 @@ import { getProjectMembers } from '../../services/boardService'
 import CardChecklist from './CardChecklist'
 import LabelPicker from './LabelPicker'
 import CardComments from './CardComments'
+import CoverPicker from './CoverPicker'
 import styles from './CardDetailModal.module.css'
 
 function formatTime(seconds) {
@@ -46,38 +47,34 @@ export default function CardDetailModal() {
   const { selectedCard, clearSelectedCard, editCard, removeCard, columns, proyecto } = useBoardStore()
   const { phase, tipo, duracion_plan_min, elapsedSeconds, startBreak, finishSession } = useFocusStore()
 
-  const [localTitle,   setLocalTitle]   = useState('')
-  const [localDesc,    setLocalDesc]    = useState('')
-  const [localDate,    setLocalDate]    = useState('')
+  const [localTitle,    setLocalTitle]    = useState('')
+  const [localDesc,     setLocalDesc]     = useState('')
+  const [localDate,     setLocalDate]     = useState('')
+  const [localCoverUrl, setLocalCoverUrl] = useState(undefined)
   const [members,      setMembers]      = useState([])
   const [addSubtask,   setAddSubtask]   = useState(0)
   const [showLabels,   setShowLabels]   = useState(false)
   const [showAssign,   setShowAssign]   = useState(false)
-  const [showCover,    setShowCover]    = useState(false)
-  const [coverInput,   setCoverInput]   = useState('')
+  const [coverPicker,  setCoverPicker]  = useState({ open: false, top: 0, right: 0 })
   const [labelsSide, setLabelsSide] = useState({ open: false, top: 0, right: 0 })
   const [assignSide, setAssignSide] = useState({ open: false, top: 0, right: 0 })
-  const [coverSide,  setCoverSide]  = useState({ open: false, top: 0, right: 0 })
   const dateRef       = useRef(null)
   const assignRef     = useRef(null)
-  const coverRef      = useRef(null)
   const dateSideRef   = useRef(null)
   const labelsWrapRef = useRef(null)
   const assignWrapRef = useRef(null)
-  const coverWrapRef  = useRef(null)
 
   useEffect(() => {
     if (!selectedCard) return
     setLocalTitle(selectedCard.titulo      || '')
     setLocalDesc (selectedCard.descripcion || '')
     setLocalDate (selectedCard.fecha_limite || '')
-    setCoverInput(selectedCard.cover_url   || '')
+    setLocalCoverUrl(undefined)
     setShowLabels(false)
     setShowAssign(false)
-    setShowCover(false)
+    setCoverPicker({ open: false, top: 0, right: 0 })
     setLabelsSide({ open: false, top: 0, right: 0 })
     setAssignSide({ open: false, top: 0, right: 0 })
-    setCoverSide({ open: false, top: 0, right: 0 })
   }, [selectedCard?.id])
 
   useEffect(() => {
@@ -85,14 +82,12 @@ export default function CardDetailModal() {
     getProjectMembers(proyecto.id).then(setMembers).catch(() => {})
   }, [selectedCard?.id, proyecto?.id])
 
-  // Cerrar dropdown de asignación al hacer click afuera
+  // Cerrar dropdowns al hacer click afuera
   useEffect(() => {
     function onClickOut(e) {
       if (assignRef.current     && !assignRef.current.contains(e.target))     setShowAssign(false)
-      if (coverRef.current      && !coverRef.current.contains(e.target))      setShowCover(false)
       if (labelsWrapRef.current && !labelsWrapRef.current.contains(e.target)) setLabelsSide(s => s.open ? { ...s, open: false } : s)
       if (assignWrapRef.current && !assignWrapRef.current.contains(e.target)) setAssignSide(s => s.open ? { ...s, open: false } : s)
-      if (coverWrapRef.current  && !coverWrapRef.current.contains(e.target))  setCoverSide(s => s.open ? { ...s, open: false } : s)
     }
     document.addEventListener('mousedown', onClickOut)
     return () => document.removeEventListener('mousedown', onClickOut)
@@ -149,11 +144,27 @@ export default function CardDetailModal() {
     editCard(selectedCard.id, selectedCard.columna_id, { asignado_a: next })
   }
 
-  function saveCover() {
-    const url = coverInput.trim() || null
-    if (url === (selectedCard.cover_url || null)) { setShowCover(false); return }
-    editCard(selectedCard.id, selectedCard.columna_id, { cover_url: url })
-    setShowCover(false)
+  function openCoverPicker(e) {
+    const r = e.currentTarget.getBoundingClientRect()
+    const pickerW = 380
+    let right = window.innerWidth - r.right
+    if (window.innerWidth - right - pickerW < 8) right = window.innerWidth - pickerW - 8
+    let top = r.bottom + 8
+    if (top + 340 > window.innerHeight) top = Math.max(8, r.top - 340 - 8)
+    setCoverPicker({ open: true, top, right })
+  }
+
+  function handleCoverSelect(url) {
+    const normalized = url?.trim() || null
+    setLocalCoverUrl(normalized)          // feedback inmediato sin esperar Supabase
+    editCard(selectedCard.id, selectedCard.columna_id, { cover_url: normalized })
+    setCoverPicker(p => ({ ...p, open: false }))
+  }
+
+  function handleCoverRemove() {
+    setLocalCoverUrl(null)
+    editCard(selectedCard.id, selectedCard.columna_id, { cover_url: null })
+    setCoverPicker(p => ({ ...p, open: false }))
   }
 
   async function handleDelete() {
@@ -168,37 +179,19 @@ export default function CardDetailModal() {
 
         {/* ── Cover ── */}
         <div className={styles.cover} style={{ background: coverBg }}>
-          {selectedCard.cover_url && (
-            <img src={selectedCard.cover_url} alt="" className={styles.coverImg} />
+          {(localCoverUrl !== undefined ? localCoverUrl : selectedCard.cover_url) && (
+            <img
+              src={localCoverUrl !== undefined ? localCoverUrl : selectedCard.cover_url}
+              alt=""
+              className={styles.coverImg}
+              onError={e => { e.currentTarget.style.display = 'none' }}
+            />
           )}
           <i className="ti ti-layout-kanban" aria-hidden="true" />
           <div className={styles.coverActions}>
-            <div style={{ position: 'relative' }} ref={coverRef}>
-              <button className={styles.coverBtn} onClick={() => setShowCover(v => !v)}>
-                <i className="ti ti-photo" aria-hidden="true" /> Cambiar portada
-              </button>
-              {showCover && (
-                <div className={styles.coverPopover}>
-                  <p className={styles.coverLabel}>URL de imagen</p>
-                  <input
-                    className={styles.coverInput}
-                    value={coverInput}
-                    onChange={e => setCoverInput(e.target.value)}
-                    placeholder="https://..."
-                    autoFocus
-                    onKeyDown={e => { if (e.key === 'Enter') saveCover(); if (e.key === 'Escape') setShowCover(false) }}
-                  />
-                  <div className={styles.coverBtns}>
-                    <button className={styles.coverSaveBtn} onClick={saveCover}>Guardar</button>
-                    {selectedCard.cover_url && (
-                      <button className={styles.coverRemoveBtn} onClick={() => { setCoverInput(''); editCard(selectedCard.id, selectedCard.columna_id, { cover_url: null }); setShowCover(false) }}>
-                        Quitar portada
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+            <button className={styles.coverBtn} onClick={openCoverPicker}>
+              <i className="ti ti-photo" aria-hidden="true" /> Cambiar portada
+            </button>
           </div>
           <button className={styles.closeBtn} onClick={clearSelectedCard} aria-label="Cerrar">
             <i className="ti ti-x" aria-hidden="true" />
@@ -515,46 +508,9 @@ export default function CardDetailModal() {
             </button>
 
             {/* Portada */}
-            <div ref={coverWrapRef}>
-              <button className={styles.sideBtn} onClick={e => {
-                if (coverSide.open) { setCoverSide(s => ({ ...s, open: false })); return }
-                const r = e.currentTarget.getBoundingClientRect()
-                setCoverSide({ open: true, top: r.bottom + 4, right: window.innerWidth - r.right })
-              }}>
-                <i className="ti ti-photo" aria-hidden="true" /> Portada
-              </button>
-              {coverSide.open && (
-                <div
-                  className={styles.coverPopover}
-                  style={{ position: 'fixed', top: coverSide.top, right: coverSide.right, left: 'auto', bottom: 'auto' }}
-                >
-                  <p className={styles.coverLabel}>URL de imagen</p>
-                  <input
-                    className={styles.coverInput}
-                    value={coverInput}
-                    onChange={e => setCoverInput(e.target.value)}
-                    placeholder="https://..."
-                    autoFocus
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') { saveCover(); setCoverSide(s => ({ ...s, open: false })) }
-                      if (e.key === 'Escape') setCoverSide(s => ({ ...s, open: false }))
-                    }}
-                  />
-                  <div className={styles.coverBtns}>
-                    <button className={styles.coverSaveBtn} onClick={() => { saveCover(); setCoverSide(s => ({ ...s, open: false })) }}>Guardar</button>
-                    {selectedCard.cover_url && (
-                      <button className={styles.coverRemoveBtn} onClick={() => {
-                        setCoverInput('')
-                        editCard(selectedCard.id, selectedCard.columna_id, { cover_url: null })
-                        setCoverSide(s => ({ ...s, open: false }))
-                      }}>
-                        Quitar portada
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+            <button className={styles.sideBtn} onClick={openCoverPicker}>
+              <i className="ti ti-photo" aria-hidden="true" /> Portada
+            </button>
 
             <span className={styles.sideLabel}>Peligro</span>
             <button className={`${styles.sideBtn} ${styles.sideBtnDanger}`} onClick={handleDelete}>
@@ -564,6 +520,16 @@ export default function CardDetailModal() {
           </div>
         </div>
       </div>
+
+      {coverPicker.open && (
+        <CoverPicker
+          currentUrl={selectedCard.cover_url}
+          onSelect={handleCoverSelect}
+          onRemove={handleCoverRemove}
+          onClose={() => setCoverPicker(p => ({ ...p, open: false }))}
+          style={{ top: coverPicker.top, right: coverPicker.right }}
+        />
+      )}
     </div>
   )
 }

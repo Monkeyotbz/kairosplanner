@@ -1,13 +1,16 @@
 .boardnav {
+  position: relative;
+  z-index: 10;
   height: var(--kairos-boardnav-h);
-  background: var(--kairos-bg-boardnav);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--kairos-glass-nav-bg);
+  -webkit-backdrop-filter: var(--kairos-glass-filter);
+  backdrop-filter: var(--kairos-glass-filter);
+  border-bottom: 1px solid var(--kairos-glass-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
   flex-shrink: 0;
-  position: relative;
 }
 
 .left  { display: flex; align-items: center; gap: 10px; min-width: 0; }
@@ -31,7 +34,7 @@
 .projectBtn:hover { background: rgba(255,255,255,0.06); }
 
 .projectName {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
   color: var(--kairos-text-primary);
 }

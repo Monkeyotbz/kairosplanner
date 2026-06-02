@@ -1,5 +1,5 @@
 .cell {
-  background: var(--kairos-bg-app);
+  background: var(--kairos-glass-card-bg);
   min-height: 100px;
   padding: 6px 6px 8px;
   display: flex;

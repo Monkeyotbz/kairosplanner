@@ -3,8 +3,14 @@
   flex-direction: column;
   height: 100vh;
   height: 100dvh; /* ajusta dinámicamente con barra del browser en móvil */
-  background-color: var(--kairos-bg-app);
+  background: transparent;
+  position: relative;
+  z-index: 1;
   overflow: hidden;
+}
+
+[data-theme="snow"] .shell {
+  background-color: var(--kairos-bg-app);
 }
 
 .body {

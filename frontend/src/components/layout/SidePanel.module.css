@@ -1,8 +1,12 @@
 .panel {
+  position: relative;
+  z-index: 15;
   width: var(--kairos-panel-w);
   flex-shrink: 0;
-  background: var(--kairos-bg-sidebar);
-  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--kairos-glass-chrome-bg);
+  -webkit-backdrop-filter: var(--kairos-glass-filter);
+  backdrop-filter: var(--kairos-glass-filter);
+  border-left: 1px solid var(--kairos-glass-border);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
