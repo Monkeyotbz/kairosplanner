@@ -1,20 +1,93 @@
+/* ════════════════════════════════════════════════════════
+   LOGIN — glassmorphism sobre StarField, acento del tema
+   ════════════════════════════════════════════════════════ */
+
+/* ── Variantes de opacidad del acento (pre-Chrome-111, sin color-mix) ── */
+/* Nebula / default */
+.page {
+  --l-a22: rgba(83,  74, 183, 0.22);  /* purple-600 @22% — glow principal  */
+  --l-a20: rgba(83,  74, 183, 0.20);  /* purple-600 @20% — ring card        */
+  --l-a18: rgba(83,  74, 183, 0.18);  /* purple-600 @18% — focus ring input */
+  --l-a35: rgba(83,  74, 183, 0.35);  /* purple-600 @35% — sombra btn       */
+  --l-a50: rgba(127,119, 221, 0.50);  /* purple-400 @50% — borde btn        */
+  --l-a40: rgba(127,119, 221, 0.40);  /* purple-400 @40% — drop-shadow logo */
+  --l-a50h:rgba(83,  74, 183, 0.50);  /* purple-600 @50% — hover btn shadow */
+}
+.page[data-theme="studio"] {
+  --l-a22: rgba(255,114,  0, 0.22);
+  --l-a20: rgba(255,114,  0, 0.20);
+  --l-a18: rgba(255,114,  0, 0.18);
+  --l-a35: rgba(255,114,  0, 0.35);
+  --l-a50: rgba(255,154, 60, 0.50);
+  --l-a40: rgba(255,154, 60, 0.40);
+  --l-a50h:rgba(255,114,  0, 0.50);
+}
+.page[data-theme="forest"] {
+  --l-a22: rgba( 29,185, 84, 0.22);
+  --l-a20: rgba( 29,185, 84, 0.20);
+  --l-a18: rgba( 29,185, 84, 0.18);
+  --l-a35: rgba( 29,185, 84, 0.35);
+  --l-a50: rgba( 30,215, 96, 0.50);
+  --l-a40: rgba( 30,215, 96, 0.40);
+  --l-a50h:rgba( 29,185, 84, 0.50);
+}
+.page[data-theme="ocean"] {
+  --l-a22: rgba(  0,198,232, 0.22);
+  --l-a20: rgba(  0,198,232, 0.20);
+  --l-a18: rgba(  0,198,232, 0.18);
+  --l-a35: rgba(  0,198,232, 0.35);
+  --l-a50: rgba( 51,214,245, 0.50);
+  --l-a40: rgba( 51,214,245, 0.40);
+  --l-a50h:rgba(  0,198,232, 0.50);
+}
+
 .page {
   min-height: 100vh;
-  background-color: var(--kairos-bg-app);
+  background: transparent; /* StarField pinta el fondo */
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
+  position: relative;
+  font-family: var(--kairos-font);
 }
 
+/* Halo radial detrás de la card */
+.glow {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 600px;
+  height: 600px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, var(--l-a22) 0%, transparent 65%);
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Card ── */
 .card {
-  background: var(--kairos-purple-800);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--kairos-radius-lg);
-  padding: 40px 36px;
+  position: relative;
+  z-index: 10;
   width: 100%;
   max-width: 400px;
-  box-shadow: var(--kairos-shadow-modal);
+  background: linear-gradient(160deg, rgba(30,22,65,0.65), rgba(14,10,38,0.75));
+  -webkit-backdrop-filter: blur(28px);
+  backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 40px 36px;
+  box-shadow:
+    0 40px 90px rgba(0, 0, 0, 0.55),
+    0 0 0 1px var(--l-a20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
 }
 
 /* ── Marca ── */
@@ -22,30 +95,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 28px;
-}
-
-.logo {
-  color: var(--kairos-purple-400);
-  font-size: 24px;
-  line-height: 1;
+  filter: drop-shadow(0 0 18px var(--l-a40));
 }
 
 .name {
+  font-size: 22px;
   font-weight: 800;
-  font-size: 20px;
   color: var(--kairos-purple-100);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
 }
 
-/* ── Encabezado ── */
+/* ── Cabecera ── */
 .title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--kairos-text-primary);
   text-align: center;
   margin-bottom: 6px;
+  letter-spacing: -0.01em;
 }
 
 .subtitle {
@@ -70,42 +139,40 @@
 
 .label {
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--kairos-text-secondary);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
 }
 
 .input {
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--kairos-radius-sm);
-  padding: 10px 12px;
+  padding: 11px 14px;
   font-size: 14px;
   color: var(--kairos-text-primary);
   font-family: var(--kairos-font);
   outline: none;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
   width: 100%;
 }
-
-.input::placeholder {
-  color: var(--kairos-text-muted);
-}
-
+.input::placeholder { color: var(--kairos-text-muted); }
 .input:focus {
   border-color: var(--kairos-purple-400);
   background: rgba(255, 255, 255, 0.09);
+  box-shadow: 0 0 0 3px var(--l-a18);
 }
 
-/* ── Error ── */
+/* ── Error / mensaje ── */
 .error {
-  font-size: 13px;
+  font-size: 12px;
   color: #f87171;
-  background: rgba(248, 113, 113, 0.1);
-  border: 1px solid rgba(248, 113, 113, 0.2);
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.22);
   border-radius: var(--kairos-radius-sm);
-  padding: 8px 12px;
+  padding: 9px 12px;
   text-align: center;
+  line-height: 1.5;
 }
 
 /* ── Botón principal ── */
@@ -113,29 +180,27 @@
   background: var(--kairos-purple-600);
   color: #fff;
   font-size: 14px;
-  font-weight: 600;
-  padding: 11px;
+  font-weight: 700;
+  padding: 13px;
   border-radius: var(--kairos-radius-sm);
-  border: none;
+  border: 1px solid var(--l-a50);
   cursor: pointer;
-  transition: background 0.15s, opacity 0.15s;
+  transition: background 0.15s, transform 0.12s, box-shadow 0.15s, opacity 0.15s;
   margin-top: 4px;
   font-family: var(--kairos-font);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 20px var(--l-a35);
 }
-
 .submitBtn:hover:not(:disabled) {
   background: var(--kairos-purple-400);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px var(--l-a50h);
 }
-
-.submitBtn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
+.submitBtn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
 /* ── Toggle login/registro ── */
 .toggle {
-  margin-top: 20px;
+  margin-top: 22px;
   text-align: center;
   font-size: 13px;
   color: var(--kairos-text-secondary);
@@ -144,15 +209,35 @@
 .toggleBtn {
   color: var(--kairos-purple-200);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
   font-family: var(--kairos-font);
-  transition: color 0.15s;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: color 0.15s, text-decoration-color 0.15s;
 }
-
 .toggleBtn:hover {
   color: var(--kairos-purple-100);
+  text-decoration-color: var(--kairos-purple-200);
 }
+
+/* ── Volver al landing ── */
+.backBtn {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 7px;
+  background: none;
+  border: none;
+  color: var(--kairos-text-muted);
+  font-size: 12px;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  text-align: center;
+  transition: color 0.15s;
+}
+.backBtn:hover { color: var(--kairos-text-secondary); }

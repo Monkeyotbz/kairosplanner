@@ -15,12 +15,14 @@ export const useBoardStore = create((set, get) => ({
   // ── Carga inicial ───────────────────────────────────────────
   loadBoard: async (proyectoId = null) => {
     set({ loading: true, error: null })
+    // Memoria: si no se indica proyecto, retomar el último activo
+    const targetId = proyectoId || localStorage.getItem('kairos-last-project')
     try {
       let proyecto, boardData
 
-      if (proyectoId) {
+      if (targetId) {
         const proyectos = await getMisProyectos()
-        proyecto = proyectos.find(p => p.id === proyectoId) || proyectos[0]
+        proyecto = proyectos.find(p => p.id === targetId) || proyectos[0]
         boardData = await getBoardByProject(proyecto.id)
       } else {
         const data = await getMyBoard()
@@ -29,6 +31,9 @@ export const useBoardStore = create((set, get) => ({
       }
 
       if (!boardData) { set({ loading: false, error: 'empty' }); return }
+
+      // Persistir el proyecto activo para la próxima sesión
+      if (proyecto?.id) localStorage.setItem('kairos-last-project', proyecto.id)
 
       const cardsByColumn = {}
       boardData.columns.forEach(col => { cardsByColumn[col.id] = [] })

@@ -49,6 +49,17 @@ export function getProjectData(sessions) {
     .map(p => ({ ...p, horas: parseFloat(p.horas.toFixed(1)) }))
 }
 
+// Segundos de enfoque acumulados por hora del día (0..23)
+export function getHourlyFocus(sessions) {
+  const hours = new Array(24).fill(0)
+  sessions.forEach(s => {
+    if (!s.segundos_reales) return
+    const h = new Date(s.inicio).getHours()
+    hours[h] += s.segundos_reales
+  })
+  return hours
+}
+
 export function getThisMonthStats(sessions) {
   const now = new Date()
   const thisMonth = sessions.filter(s => {

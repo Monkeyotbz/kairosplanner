@@ -6,6 +6,7 @@ import { useAuthStore } from '../../store/authStore'
 import { useBoardStore } from '../../store/boardStore'
 import ThemeSwitcher from './ThemeSwitcher'
 import InfinityLogo from './InfinityLogo'
+import NotificationBell from './NotificationBell'
 import styles from './Topbar.module.css'
 
 export default function Topbar() {
@@ -57,7 +58,7 @@ export default function Topbar() {
     setShowUserMenu(false)
     await signOut()
     clearUser()
-    navigate('/login')
+    navigate('/')
   }
 
   return (
@@ -86,6 +87,8 @@ export default function Topbar() {
             placeholder="Buscar tarjetas..."
             onChange={e => setSearchQuery(e.target.value)}
           />
+
+          <NotificationBell />
 
           {/* Selector de tema — solo visible en móvil (en desktop está en BoardNav) */}
           <div className={styles.themeMobileWrap}>

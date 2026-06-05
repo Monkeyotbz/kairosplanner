@@ -1,128 +1,250 @@
+/* ══════════════════════════════════════════════════
+   CalendarPage — layout 2 paneles estilo Trello
+   ══════════════════════════════════════════════════ */
+
 .page {
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  background: var(--kairos-page-bg);
-  color: var(--kairos-text-primary);
+  background: var(--kairos-page-bg, transparent);
 }
 
-/* ── Header ──────────────────────────────────────────────── */
+/* ── Header ── */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px 16px;
+  padding: 10px 18px;
   flex-shrink: 0;
+  border-bottom: 1px solid var(--kairos-border-1);
+  background: var(--kairos-glass-nav-bg, var(--kairos-bg-boardnav));
+  -webkit-backdrop-filter: var(--kairos-glass-filter);
+  backdrop-filter: var(--kairos-glass-filter);
   gap: 12px;
   flex-wrap: wrap;
 }
 
 .headerLeft {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
 }
 
 .title {
-  font-size: 1.4rem;
+  font-size: 15px;
   font-weight: 700;
   color: var(--kairos-text-primary);
-  margin: 0;
 }
 
 .monthLabel {
-  font-size: 0.95rem;
+  font-size: 13px;
   color: var(--kairos-text-secondary);
+  font-weight: 500;
   text-transform: capitalize;
 }
 
-/* ── Controls ────────────────────────────────────────────── */
 .controls {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
+/* Tabs de vista */
 .viewToggle {
   display: flex;
-  background: var(--kairos-bg-col);
+  background: var(--kairos-surface-1);
+  border: 1px solid var(--kairos-border-1);
   border-radius: var(--kairos-radius-sm);
   padding: 3px;
   gap: 2px;
 }
 
 .viewBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--kairos-text-muted);
   background: none;
   border: none;
-  padding: 5px 14px;
-  border-radius: calc(var(--kairos-radius-sm) - 2px);
-  font-size: 0.82rem;
   cursor: pointer;
-  color: var(--kairos-text-secondary);
-  transition: background 0.15s, color 0.15s;
+  font-family: var(--kairos-font);
+  transition: all 0.15s;
+  white-space: nowrap;
 }
-
-.viewBtn:hover { color: var(--kairos-text-primary); }
+.viewBtn i { font-size: 13px; }
+.viewBtn:hover { color: var(--kairos-text-primary); background: var(--kairos-surface-2); }
 
 .viewBtnActive {
+  color: var(--kairos-text-primary);
   background: var(--kairos-purple-600);
-  color: #fff;
 }
+.viewBtnActive:hover { background: var(--kairos-purple-400); }
 
 .todayBtn {
-  background: none;
-  border: 1px solid var(--kairos-bg-col);
-  border-color: rgba(255,255,255,0.12);
-  padding: 5px 14px;
+  padding: 6px 14px;
   border-radius: var(--kairos-radius-sm);
-  font-size: 0.82rem;
-  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--kairos-text-secondary);
-  transition: border-color 0.15s, color 0.15s;
+  background: var(--kairos-surface-2);
+  border: 1px solid var(--kairos-border-1);
+  cursor: pointer;
+  font-family: var(--kairos-font);
+  transition: all 0.15s;
 }
+.todayBtn:hover { color: var(--kairos-text-primary); background: var(--kairos-surface-3); }
 
-.todayBtn:hover {
-  border-color: var(--kairos-purple-400);
-  color: var(--kairos-text-primary);
+.navBtns { display: flex; gap: 2px; }
+.navBtn {
+  width: 28px; height: 28px;
+  border-radius: var(--kairos-radius-sm);
+  font-size: 16px;
+  color: var(--kairos-text-muted);
+  background: var(--kairos-surface-1);
+  border: 1px solid var(--kairos-border-1);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  font-family: var(--kairos-font);
 }
+.navBtn:hover { color: var(--kairos-text-primary); background: var(--kairos-surface-2); }
 
-.navBtns {
+/* ── Body ── */
+.body {
   display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Sidebar: mini calendario ── */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--kairos-border-1);
+  background: var(--kairos-glass-chrome-bg, var(--kairos-bg-sidebar));
+  -webkit-backdrop-filter: var(--kairos-glass-filter);
+  backdrop-filter: var(--kairos-glass-filter);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px;
+  overflow-y: auto;
+}
+
+/* ── Mini Calendar ── */
+.mini { display: flex; flex-direction: column; gap: 10px; }
+
+.miniHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.miniMonth {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--kairos-text-primary);
+  text-transform: capitalize;
+  flex: 1;
+  text-align: center;
+}
+
+.miniNav {
+  width: 24px; height: 24px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--kairos-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.12s;
+  font-family: var(--kairos-font);
+}
+.miniNav:hover { color: var(--kairos-text-primary); background: var(--kairos-surface-2); }
+
+.miniGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
   gap: 2px;
 }
 
-.navBtn {
-  background: none;
-  border: 1px solid rgba(255,255,255,0.12);
-  width: 30px;
-  height: 30px;
-  border-radius: var(--kairos-radius-sm);
-  font-size: 1.1rem;
-  cursor: pointer;
+.miniWeekDay {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--kairos-text-muted);
+  text-align: center;
+  padding: 3px 0 5px;
+  letter-spacing: 0.04em;
+}
+
+.miniDay {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
   color: var(--kairos-text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.15s, color 0.15s;
-  line-height: 1;
+  transition: all 0.12s;
+  font-family: var(--kairos-font);
+  flex-direction: column;
+  gap: 1px;
+}
+.miniDay:hover { background: var(--kairos-surface-2); color: var(--kairos-text-primary); }
+
+.miniDayDim { opacity: 0.3; }
+.miniDayToday { color: var(--kairos-purple-400) !important; font-weight: 800; }
+.miniDaySelected {
+  background: var(--kairos-purple-600) !important;
+  color: #fff !important;
+  font-weight: 700;
 }
 
-.navBtn:hover {
-  border-color: var(--kairos-purple-400);
-  color: var(--kairos-text-primary);
+.miniDot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--kairos-purple-400);
+  position: absolute;
+  bottom: 3px;
 }
 
-/* ── Content ─────────────────────────────────────────────── */
-.content {
+.miniTodayBtn {
+  margin-top: 4px;
+  padding: 6px;
+  border-radius: var(--kairos-radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--kairos-text-muted);
+  background: var(--kairos-surface-1);
+  border: 1px solid var(--kairos-border-1);
+  cursor: pointer;
+  font-family: var(--kairos-font);
+  transition: all 0.15s;
+  width: 100%;
+}
+.miniTodayBtn:hover { color: var(--kairos-text-primary); background: var(--kairos-surface-2); }
+
+/* ── Main content ── */
+.main {
   flex: 1;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 0 16px 16px;
 }
 
-/* ── Empty state ─────────────────────────────────────────── */
+/* ── Estado vacío ── */
 .empty {
   flex: 1;
   display: flex;
@@ -130,29 +252,18 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  color: var(--kairos-text-muted);
+  color: var(--kairos-text-secondary);
+  font-size: 14px;
   text-align: center;
+  padding: 40px 24px;
 }
+.emptyIcon { font-size: 32px; color: var(--kairos-text-muted); opacity: 0.5; }
+.emptyHint { font-size: 12px; color: var(--kairos-text-muted); }
 
-.emptyIcon {
-  font-size: 2.5rem;
-  opacity: 0.4;
-}
+@media (max-width: 900px) { .viewBtnLabel { display: none; } }
 
-.emptyHint {
-  font-size: 0.82rem;
-  opacity: 0.6;
-}
-
-/* ── Mobile ──────────────────────────────────────────────── */
-@media (max-width: 640px) {
-  .header {
-    padding: 14px 16px 12px;
-  }
-  .title {
-    font-size: 1.2rem;
-  }
-  .content {
-    padding: 0 8px 8px;
-  }
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .header { padding: 8px 12px; }
+  .viewBtn { padding: 5px 8px; font-size: 11px; }
 }

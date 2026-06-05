@@ -6,6 +6,7 @@ import QuoteStrip from '../entorno/QuoteStrip'
 import MusicPlayer from '../music/MusicPlayer'
 import StarField from './StarField'
 import ChatPanel from '../chat/ChatPanel'
+import ToastContainer from './ToastContainer'
 import { useChatStore } from '../../store/chatStore'
 import styles from './AppShell.module.css'
 
@@ -26,6 +27,7 @@ export default function AppShell() {
       <MusicPlayer />
       <KairosAssistant />
       {chatOpen && <ChatPanel onClose={closeChat} />}
+      <ToastContainer />
     </div>
   )
 }

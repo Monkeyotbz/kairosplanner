@@ -1,0 +1,335 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.overlay{background:rgba(15,12,30,.75);border-radius:12px;padding:24px 16px;display:flex;justify-content:center;min-height:700px}
+.modal{background:var(--color-background-secondary);border-radius:12px;border:0.5px solid var(--color-border-tertiary);width:100%;max-width:660px;overflow:hidden;display:flex;flex-direction:column}
+
+.modal-cover{height:100px;background:#1D9E75;display:flex;align-items:center;justify-content:center;position:relative}
+.modal-cover i{font-size:48px;color:rgba(255,255,255,.2)}
+.cover-btn{position:absolute;bottom:8px;right:12px;background:rgba(0,0,0,.3);color:#fff;font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.cover-btn i{font-size:13px}
+
+.modal-body{display:grid;grid-template-columns:1fr 168px;gap:0;flex:1}
+
+.main-col{padding:20px 24px;display:flex;flex-direction:column;gap:18px;border-right:0.5px solid var(--color-border-tertiary)}
+
+.card-labels{display:flex;gap:6px;flex-wrap:wrap}
+.lbl{font-size:11px;font-weight:500;padding:4px 12px;border-radius:4px;cursor:pointer}
+.lbl:hover{filter:brightness(.92)}
+
+.card-title-input{font-size:18px;font-weight:500;color:var(--color-text-primary);background:transparent;border:none;width:100%;resize:none;outline:none;line-height:1.4;border-radius:6px;padding:4px 6px;margin:-4px -6px}
+.card-title-input:focus{background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary)}
+
+.meta-row{display:flex;gap:20px;flex-wrap:wrap}
+.meta-item{display:flex;flex-direction:column;gap:4px}
+.meta-label{font-size:11px;color:var(--color-text-tertiary);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.meta-val{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--color-text-primary)}
+.meta-val i{font-size:15px;color:var(--color-text-secondary)}
+.av-sm{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500}
+.due-chip{background:#FAECE7;color:#712B13;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:4px}
+.due-chip i{font-size:13px}
+
+.timer-block{background:var(--color-background-primary);border:1px solid #378ADD;border-radius:10px;padding:14px 16px}
+.timer-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.timer-head i{font-size:16px;color:#185FA5}
+.timer-head span{font-size:13px;font-weight:500;color:var(--color-text-primary);flex:1}
+.timer-total{font-size:11px;color:var(--color-text-tertiary)}
+.timer-display{font-size:32px;font-weight:500;color:#0C447C;font-family:var(--font-mono);text-align:center;padding:8px 0;letter-spacing:2px}
+.timer-pulse{width:8px;height:8px;border-radius:50%;background:#378ADD;display:inline-block;margin-right:8px;animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.timer-btns{display:flex;gap:8px;margin-top:10px}
+.t-btn{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:5px}
+.t-btn i{font-size:14px}
+.t-stop{background:#D85A30;color:#fff}
+.t-stop:hover{background:#993C1D}
+.t-pause{background:var(--color-background-secondary);color:var(--color-text-primary);border:0.5px solid var(--color-border-secondary)}
+.t-pause:hover{background:var(--color-background-tertiary)}
+.timer-log{margin-top:10px;padding-top:10px;border-top:0.5px solid var(--color-border-tertiary)}
+.tlog-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:11px;color:var(--color-text-secondary)}
+.tlog-av{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:500;flex-shrink:0}
+.tlog-time{margin-left:auto;color:var(--color-text-tertiary);font-family:var(--font-mono)}
+
+.section-title{font-size:13px;font-weight:500;color:var(--color-text-primary);display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.section-title i{font-size:16px;color:var(--color-text-secondary)}
+
+.checklist{display:flex;flex-direction:column;gap:6px}
+.progress-bar{height:6px;background:var(--color-background-tertiary);border-radius:3px;margin-bottom:10px;overflow:hidden}
+.progress-fill{height:100%;background:#3B6D11;border-radius:3px;transition:width .3s}
+.check-item{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--color-text-primary)}
+.check-item input[type=checkbox]{width:15px;height:15px;accent-color:#3B6D11;cursor:pointer}
+.check-item.done span{text-decoration:line-through;color:var(--color-text-tertiary)}
+
+.desc-area{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--color-text-secondary);min-height:60px;cursor:pointer;line-height:1.6}
+.desc-area:hover{border-color:var(--color-border-secondary)}
+
+.comment-box{display:flex;gap:10px;align-items:flex-start}
+.comment-input{flex:1;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--color-text-primary);resize:none;outline:none;font-family:var(--font-sans)}
+.comment-input:focus{border-color:#378ADD}
+
+.activity{display:flex;flex-direction:column;gap:10px}
+.act-item{display:flex;gap:10px;align-items:flex-start}
+.act-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
+.act-bubble{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:8px 12px;flex:1}
+.act-header{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+.act-name{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.act-time{font-size:11px;color:var(--color-text-tertiary)}
+.act-text{font-size:13px;color:var(--color-text-secondary);line-height:1.5}
+.act-event{display:flex;gap:10px;align-items:center}
+.act-event-text{font-size:12px;color:var(--color-text-tertiary)}
+.act-event-text b{color:var(--color-text-secondary);font-weight:500}
+
+.side-col{padding:16px 14px;display:flex;flex-direction:column;gap:6px;background:var(--color-background-tertiary)}
+.side-label{font-size:10px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.8px;font-weight:500;margin-top:10px;margin-bottom:2px}
+.side-label:first-child{margin-top:0}
+.side-btn{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-size:12px;color:var(--color-text-secondary);cursor:pointer;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary)}
+.side-btn:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.side-btn i{font-size:15px;color:var(--color-text-tertiary)}
+.side-btn.danger:hover{background:#FCEBEB;color:#A32D2D;border-color:#F09595}
+.side-btn.danger:hover i{color:#A32D2D}
+.members-list{display:flex;flex-direction:column;gap:4px}
+.member-row{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;cursor:pointer}
+.member-row:hover{background:var(--color-background-secondary)}
+.member-name{font-size:12px;color:var(--color-text-primary)}
+.member-role{font-size:10px;color:var(--color-text-tertiary)}
+
+.modal-close{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:6px;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:16px}
+.modal-close:hover{background:rgba(0,0,0,.5)}
+</style>
+
+<h2 class="sr-only">Modal de detalle de tarjeta — Refactor módulo de autenticación con JWT, con temporizador activo, checklist, descripción, comentarios e historial de actividad.</h2>
+
+<div class="overlay">
+<div class="modal">
+
+  <div class="modal-cover" style="position:relative">
+    <i class="ti ti-code" aria-hidden="true"></i>
+    <div class="cover-btn"><i class="ti ti-photo" aria-hidden="true"></i>Cambiar portada</div>
+    <div class="modal-close" onclick="this.closest('.overlay').style.opacity='.5'" aria-label="Cerrar modal"><i class="ti ti-x"></i></div>
+  </div>
+
+  <div class="modal-body">
+    <div class="main-col">
+
+      <div>
+        <div class="card-labels">
+          <span class="lbl" style="background:#E6F1FB;color:#0C447C">Dev</span>
+          <span class="lbl" style="background:#FAECE7;color:#712B13">Alta prioridad</span>
+          <span class="lbl" style="background:#EEEDFE;color:#3C3489">Sprint 3</span>
+          <span class="lbl" style="background:#E1F5EE;color:#085041">+ Etiqueta</span>
+        </div>
+        <textarea class="card-title-input" rows="2">Refactor módulo de autenticación con JWT</textarea>
+      </div>
+
+      <div class="meta-row">
+        <div class="meta-item">
+          <span class="meta-label">Asignado a</span>
+          <div class="meta-val">
+            <div class="av-sm" style="background:#EEEDFE;color:#3C3489">JS</div>
+            <span style="font-size:13px">Juan Salazar</span>
+          </div>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Fecha límite</span>
+          <div class="meta-val">
+            <span class="due-chip"><i class="ti ti-calendar-x" aria-hidden="true"></i>3 jun · vence hoy</span>
+          </div>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Columna</span>
+          <div class="meta-val"><i class="ti ti-layout-kanban" aria-hidden="true"></i><span>En progreso</span></div>
+        </div>
+      </div>
+
+      <div class="timer-block">
+        <div class="timer-head">
+          <i class="ti ti-clock-play" aria-hidden="true"></i>
+          <span>Temporizador de sesión</span>
+          <span class="timer-total">Total acumulado: 3h 12m</span>
+        </div>
+        <div class="timer-display">
+          <span class="timer-pulse"></span><span id="t-display">01:24:07</span>
+        </div>
+        <div class="timer-btns">
+          <button class="t-btn t-pause" onclick="togglePause(this)"><i class="ti ti-player-pause" id="pause-icon" aria-hidden="true"></i><span id="pause-label">Pausar</span></button>
+          <button class="t-btn t-stop" onclick="stopTimer()"><i class="ti ti-player-stop" aria-hidden="true"></i>Detener y guardar</button>
+        </div>
+        <div class="timer-log">
+          <div class="tlog-row">
+            <div class="tlog-av" style="background:#EEEDFE;color:#3C3489">JS</div>
+            <span>Juan Salazar — hoy</span>
+            <span class="tlog-time">01:24:07 ↑</span>
+          </div>
+          <div class="tlog-row">
+            <div class="tlog-av" style="background:#EEEDFE;color:#3C3489">JS</div>
+            <span>Juan Salazar — ayer</span>
+            <span class="tlog-time">01:48:22</span>
+          </div>
+          <div class="tlog-row">
+            <div class="tlog-av" style="background:#E6F1FB;color:#0C447C">PR</div>
+            <span>Pedro Ruiz — 30 may</span>
+            <span class="tlog-time">00:55:10</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title"><i class="ti ti-checklist" aria-hidden="true"></i>Checklist <span style="font-size:11px;color:var(--color-text-tertiary);font-weight:400;margin-left:4px">2/4</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="prog" style="width:50%"></div></div>
+        <div class="checklist">
+          <label class="check-item done"><input type="checkbox" checked onchange="updateProgress()"><span>Analizar estructura actual del módulo</span></label>
+          <label class="check-item done"><input type="checkbox" checked onchange="updateProgress()"><span>Migrar a librería jose para JWT</span></label>
+          <label class="check-item"><input type="checkbox" onchange="updateProgress()"><span>Implementar refresh token con rotación</span></label>
+          <label class="check-item"><input type="checkbox" onchange="updateProgress()"><span>Tests unitarios para nuevos endpoints</span></label>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title"><i class="ti ti-align-left" aria-hidden="true"></i>Descripción</div>
+        <div class="desc-area">Refactorizar el módulo de autenticación para reemplazar el sistema de sesiones por JWT stateless. Incluye soporte para refresh tokens con rotación automática y blacklist en Redis para invalidación segura. Ver ticket relacionado #198.</div>
+      </div>
+
+      <div>
+        <div class="section-title"><i class="ti ti-message" aria-hidden="true"></i>Comentarios</div>
+        <div class="comment-box">
+          <div class="av-sm" style="background:#EEEDFE;color:#3C3489;width:28px;height:28px;flex-shrink:0">JS</div>
+          <textarea class="comment-input" rows="2" placeholder="Escribe un comentario…"></textarea>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title"><i class="ti ti-activity" aria-hidden="true"></i>Actividad</div>
+        <div class="activity">
+          <div class="act-item">
+            <div class="act-av" style="background:#E6F1FB;color:#0C447C">PR</div>
+            <div class="act-bubble">
+              <div class="act-header"><span class="act-name">Pedro Ruiz</span><span class="act-time">hace 2 horas</span></div>
+              <div class="act-text">Revisé la implementación de jose. El tipo <code style="background:var(--color-background-tertiary);padding:1px 5px;border-radius:4px;font-size:11px">JWTExpired</code> ya incluye el campo <code style="background:var(--color-background-tertiary);padding:1px 5px;border-radius:4px;font-size:11px">expiredAt</code>, podemos usarlo directamente en el middleware.</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-av" style="background:#EEEDFE;color:#3C3489">JS</div>
+            <div style="flex:1">
+              <div class="act-event">
+                <span class="act-event-text"><b>Juan Salazar</b> inició el temporizador · hace 1h 24m</span>
+              </div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-av" style="background:#E1F5EE;color:#085041">AM</div>
+            <div class="act-bubble">
+              <div class="act-header"><span class="act-name">Ana Martín</span><span class="act-time">ayer, 16:42</span></div>
+              <div class="act-text">Moví esta tarjeta de Backlog a En progreso. Prioridad alta confirmada con el equipo.</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-av" style="background:#EEEDFE;color:#3C3489">JS</div>
+            <div style="flex:1">
+              <div class="act-event">
+                <span class="act-event-text"><b>Juan Salazar</b> completó "Migrar a librería jose para JWT" · ayer</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="side-col">
+
+      <span class="side-label" style="margin-top:0">Miembros</span>
+      <div class="members-list">
+        <div class="member-row">
+          <div class="av-sm" style="background:#EEEDFE;color:#3C3489;width:26px;height:26px;flex-shrink:0">JS</div>
+          <div><div class="member-name">Juan Salazar</div><div class="member-role">Asignado</div></div>
+        </div>
+        <div class="member-row">
+          <div class="av-sm" style="background:#E6F1FB;color:#0C447C;width:26px;height:26px;flex-shrink:0">PR</div>
+          <div><div class="member-name">Pedro Ruiz</div><div class="member-role">Revisor</div></div>
+        </div>
+      </div>
+
+      <span class="side-label">Acciones</span>
+      <div class="side-btn"><i class="ti ti-user-plus" aria-hidden="true"></i>Asignar miembro</div>
+      <div class="side-btn"><i class="ti ti-tag" aria-hidden="true"></i>Editar etiquetas</div>
+      <div class="side-btn"><i class="ti ti-checklist" aria-hidden="true"></i>Añadir checklist</div>
+      <div class="side-btn"><i class="ti ti-calendar" aria-hidden="true"></i>Fecha límite</div>
+      <div class="side-btn"><i class="ti ti-paperclip" aria-hidden="true"></i>Adjunto</div>
+      <div class="side-btn"><i class="ti ti-photo" aria-hidden="true"></i>Portada</div>
+
+      <span class="side-label">Tiempo registrado</span>
+      <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:10px 12px">
+        <div style="font-size:22px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-mono)" id="total-time">4h 36m</div>
+        <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:2px">en esta tarjeta</div>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;justify-content:space-between;font-size:11px">
+            <span style="color:var(--color-text-tertiary)">JS</span>
+            <span style="color:var(--color-text-secondary);font-family:var(--font-mono)">3h 12m</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px">
+            <span style="color:var(--color-text-tertiary)">PR</span>
+            <span style="color:var(--color-text-secondary);font-family:var(--font-mono)">0h 55m</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px">
+            <span style="color:var(--color-text-tertiary)">Est.</span>
+            <span style="color:var(--color-text-tertiary)">8h 00m</span>
+          </div>
+          <div style="height:4px;background:var(--color-background-tertiary);border-radius:2px;margin-top:4px;overflow:hidden">
+            <div style="height:100%;width:57%;background:#378ADD;border-radius:2px"></div>
+          </div>
+        </div>
+      </div>
+
+      <span class="side-label">Peligro</span>
+      <div class="side-btn danger"><i class="ti ti-trash" aria-hidden="true"></i>Archivar tarjeta</div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+let secs=5047, paused=false;
+function pad(n){return String(n).padStart(2,'0')}
+function fmt(s){return pad(Math.floor(s/3600))+':'+pad(Math.floor((s%3600)/60))+':'+pad(s%60)}
+const disp=document.getElementById('t-display');
+setInterval(()=>{if(!paused){secs++;disp.textContent=fmt(secs)}},1000);
+
+function togglePause(btn){
+  paused=!paused;
+  const icon=document.getElementById('pause-icon');
+  const lbl=document.getElementById('pause-label');
+  const dot=document.querySelector('.timer-pulse');
+  if(paused){
+    icon.className='ti ti-player-play';
+    lbl.textContent='Reanudar';
+    dot.style.animation='none';
+    dot.style.background='#EF9F27';
+  } else {
+    icon.className='ti ti-player-pause';
+    lbl.textContent='Pausar';
+    dot.style.animation='blink 1.2s ease-in-out infinite';
+    dot.style.background='#378ADD';
+  }
+}
+
+function stopTimer(){
+  paused=true;
+  disp.textContent=fmt(secs);
+  disp.style.color='var(--color-text-tertiary)';
+  document.querySelector('.timer-pulse').style.animation='none';
+  document.querySelector('.timer-pulse').style.background='#B4B2A9';
+  document.querySelector('.t-stop').textContent='✓ Tiempo guardado';
+  document.querySelector('.t-stop').style.background='#3B6D11';
+  document.querySelector('.t-pause').style.display='none';
+}
+
+function updateProgress(){
+  const boxes=document.querySelectorAll('.checklist input[type=checkbox]');
+  const total=boxes.length, done=[...boxes].filter(b=>b.checked).length;
+  document.getElementById('prog').style.width=Math.round(done/total*100)+'%';
+  boxes.forEach((b,i)=>{
+    b.closest('.check-item').classList.toggle('done',b.checked);
+  });
+}
+</script>

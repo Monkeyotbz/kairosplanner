@@ -38,8 +38,9 @@ const BASE_GRADIENTS = {
   ocean:  ['#060a10', '#020408'],
 }
 
-export default function StarField() {
-  const theme = useThemeStore(s => s.theme)
+export default function StarField({ theme: forcedTheme }) {
+  const storeTheme = useThemeStore(s => s.theme)
+  const theme = forcedTheme ?? storeTheme
   const canvasRef = useRef(null)
 
   useEffect(() => {

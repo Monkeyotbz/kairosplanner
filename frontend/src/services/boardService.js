@@ -214,6 +214,18 @@ export async function getSubtareas(tarjetaId) {
   return data || []
 }
 
+// Subtareas de varias tarjetas en una sola consulta (para el planner)
+export async function getSubtareasForCards(cardIds) {
+  if (!cardIds.length) return []
+  const { data, error } = await supabase
+    .from('subtareas')
+    .select('id, tarjeta_id, titulo, completada, orden')
+    .in('tarjeta_id', cardIds)
+    .order('orden')
+  if (error) throw error
+  return data || []
+}
+
 export async function createSubtarea(tarjetaId, titulo) {
   const { data, error } = await supabase
     .from('subtareas')
