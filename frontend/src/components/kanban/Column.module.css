@@ -33,7 +33,12 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  flex: 1;
 }
+
+.dragHandle { cursor: grab; touch-action: none; }
+.dragHandle:active { cursor: grabbing; }
 
 .dot {
   width: 8px;
@@ -165,6 +170,32 @@
   background: var(--kairos-border-1);
   margin: 6px 4px;
 }
+
+.menuRow {
+  display: flex;
+  gap: 6px;
+  padding: 2px 9px 8px;
+}
+
+.menuChip {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--kairos-text-secondary);
+  background: var(--kairos-surface-1);
+  border: 1px solid var(--kairos-border-1);
+  font-family: var(--kairos-font);
+  transition: background 0.12s, color 0.12s;
+}
+.menuChip:hover { background: var(--kairos-surface-2); color: var(--kairos-text-primary); }
+.menuChip i { font-size: 13px; }
 
 /* ── Cards area ── */
 .cards {

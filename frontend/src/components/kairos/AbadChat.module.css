@@ -1,11 +1,11 @@
 .panel {
   position: fixed;
-  left: 50%;
+  right: 18px;
+  left: auto;
   bottom: calc(var(--kairos-entorno-h, 58px) + 14px);
-  transform: translateX(-50%);
   z-index: 1300;
-  width: min(400px, 94vw);
-  height: min(560px, 68vh);
+  width: min(380px, 92vw);
+  height: min(560px, 70vh);
   display: flex;
   flex-direction: column;
   border-radius: 18px;
@@ -19,8 +19,12 @@
 }
 
 @keyframes abadIn {
-  from { opacity: 0; transform: translate(-50%, 16px); }
-  to   { opacity: 1; transform: translate(-50%, 0); }
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 560px) {
+  .panel { right: 8px; left: 8px; width: auto; }
 }
 
 /* ── Header ── */

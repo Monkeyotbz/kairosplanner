@@ -167,6 +167,71 @@ export const useBoardStore = create((set, get) => ({
     catch (err) { console.error('Error al eliminar columna:', err) }
   },
 
+  // Reordenar columnas por lista de ids (drag o menú)
+  reorderColumns: async (orderedIds) => {
+    set(s => {
+      const byId = Object.fromEntries(s.columns.map(c => [c.id, c]))
+      return { columns: orderedIds.map(id => byId[id]).filter(Boolean) }
+    })
+    try { await Promise.all(orderedIds.map((id, i) => updateColumn(id, { orden: i }))) }
+    catch (err) { console.error('Error al reordenar columnas:', err) }
+  },
+
+  // Mover una columna una posición (-1 izquierda, +1 derecha)
+  moveColumn: (colId, dir) => {
+    const { columns, reorderColumns } = get()
+    const idx = columns.findIndex(c => c.id === colId)
+    const j = idx + dir
+    if (idx < 0 || j < 0 || j >= columns.length) return
+    const ids = columns.map(c => c.id)
+    ;[ids[idx], ids[j]] = [ids[j], ids[idx]]
+    reorderColumns(ids)
+  },
+
+  // Duplicar una columna con sus tarjetas
+  duplicateColumn: async (colId) => {
+    const { board, columns, cardsByColumn } = get()
+    const src = columns.find(c => c.id === colId)
+    if (!board || !src) return
+    try {
+      const col = await createColumn({ tablero_id: board.id, nombre: `${src.nombre} (copia)`, color: src.color, orden: columns.length })
+      const newCards = []
+      for (const c of (cardsByColumn[colId] || [])) {
+        const card = await createCard({ columna_id: col.id, titulo: c.titulo })
+        const fields = {}
+        if (c.descripcion)  fields.descripcion = c.descripcion
+        if (c.prioridad)    fields.prioridad = c.prioridad
+        if (c.fecha_limite) fields.fecha_limite = c.fecha_limite
+        let final = card
+        if (Object.keys(fields).length) { try { final = await updateCard(card.id, fields) } catch (_) {} }
+        newCards.push(final)
+      }
+      set(s => ({
+        columns: [...s.columns, col],
+        cardsByColumn: { ...s.cardsByColumn, [col.id]: newCards },
+      }))
+    } catch (err) { console.error('Error al copiar lista:', err) }
+  },
+
+  // Ordenar las tarjetas de una columna (fecha | prioridad | nombre)
+  sortColumnCards: async (colId, by) => {
+    const PRIO = { alta: 0, normal: 1, baja: 2 }
+    set(s => {
+      const cards = [...(s.cardsByColumn[colId] || [])]
+      cards.sort((a, b) => {
+        if (by === 'nombre')    return (a.titulo || '').localeCompare(b.titulo || '')
+        if (by === 'prioridad') return (PRIO[a.prioridad] ?? 1) - (PRIO[b.prioridad] ?? 1)
+        if (by === 'fecha')     return (a.fecha_limite || '9999-99-99').localeCompare(b.fecha_limite || '9999-99-99')
+        return 0
+      })
+      return { cardsByColumn: { ...s.cardsByColumn, [colId]: cards } }
+    })
+    try {
+      const cards = get().cardsByColumn[colId] || []
+      await Promise.all(cards.map((c, i) => updateCard(c.id, { orden: i })))
+    } catch (err) { console.error('Error al ordenar tarjetas:', err) }
+  },
+
   setCardsByColumn: (cardsByColumn) => set({ cardsByColumn }),
 
   persistMove: async (cardId, newColId) => {

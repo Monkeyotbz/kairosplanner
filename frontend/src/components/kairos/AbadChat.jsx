@@ -24,7 +24,7 @@ export default function AbadChat() {
   const [rank, setRank]   = useState(null)
   const listRef = useRef(null)
 
-  const { isListening, transcript, toggleListening } = useKairosVoice({
+  const { isListening, transcript, toggleListening, startListening, stopListening } = useKairosVoice({
     onResult: (text) => submit(text),
   })
 
@@ -34,6 +34,25 @@ export default function AbadChat() {
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
   }, [messages, thinking, isOpen])
+
+  // Al ABRIR el panel: empezar a escuchar al instante. Al cerrar: detener todo.
+  useEffect(() => {
+    if (isOpen) {
+      const t = setTimeout(() => startListening(), 350)
+      return () => clearTimeout(t)
+    }
+    stopListening()
+    try { window.speechSynthesis?.cancel() } catch (_) {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
+
+  // Auto-pensar: si dejas de hablar (~2s sin cambios en la transcripción), se detiene y envía.
+  useEffect(() => {
+    if (!isListening || !transcript.trim()) return
+    const t = setTimeout(() => stopListening(), 2000)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transcript, isListening])
 
   if (!isOpen) return null
 

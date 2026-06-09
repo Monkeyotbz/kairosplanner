@@ -19,7 +19,7 @@ function getPriorityColor(prioridad) {
 export default function Card({ card, columnaId, isOverlay = false }) {
   const { removeCard, selectCard } = useBoardStore()
   const [hovered, setHovered] = useState(false)
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card.id, data: { type: 'card' } })
   const pointerPos = useRef(null)
 
   // Modo Kairós (spotlight): sesión minimizada → resalta la tarea enfocada, atenúa el resto.

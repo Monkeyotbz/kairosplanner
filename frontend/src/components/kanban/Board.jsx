@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { DndContext, DragOverlay, closestCorners, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { SortableContext, horizontalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 import { useBoardStore } from '../../store/boardStore'
 import Column from './Column'
 import Card from './Card'
 import styles from './Board.module.css'
 
 export default function Board() {
-  const { columns, cardsByColumn, setCardsByColumn, persistMove, searchQuery, addColumn } = useBoardStore()
+  const { columns, cardsByColumn, setCardsByColumn, persistMove, searchQuery, addColumn, reorderColumns } = useBoardStore()
   const [activeCard, setActiveCard] = useState(null)
   const [workingCards, setWorkingCards] = useState(null)
 
@@ -25,11 +26,13 @@ export default function Board() {
   }
 
   function handleDragStart({ active }) {
+    if (active.data.current?.type === 'column') { setActiveCard(null); return }
     const card = Object.values(getCards()).flat().find(c => c.id === active.id)
     setActiveCard(card || null)
   }
 
   function handleDragOver({ active, over }) {
+    if (active.data.current?.type === 'column') return  // las columnas se reordenan al soltar
     if (!over) return
     const current = getCards()
     const srcColId = findColOfCard(active.id, current)
@@ -50,7 +53,23 @@ export default function Board() {
     })
   }
 
-  async function handleDragEnd({ active }) {
+  async function handleDragEnd({ active, over }) {
+    // ── Reordenar columnas ──
+    if (active.data.current?.type === 'column') {
+      setActiveCard(null)
+      setWorkingCards(null)
+      if (!over) return
+      const ids = columns.map(c => c.id)
+      const oldIndex = ids.indexOf(active.id)
+      const overColId = columns.find(c => c.id === over.id)?.id || findColOfCard(over.id, cardsByColumn)
+      const newIndex = ids.indexOf(overColId)
+      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+        reorderColumns(arrayMove(ids, oldIndex, newIndex))
+      }
+      return
+    }
+
+    // ── Mover tarjeta entre columnas ──
     const finalCards = workingCards
     const originalCards = cardsByColumn
     setActiveCard(null)
@@ -89,13 +108,15 @@ export default function Board() {
       onDragEnd={handleDragEnd}
     >
       <div className={styles.board}>
-        {columns.map(col => (
-          <Column
-            key={col.id}
-            column={col}
-            cards={displayCards[col.id] || []}
-          />
-        ))}
+        <SortableContext items={columns.map(c => c.id)} strategy={horizontalListSortingStrategy}>
+          {columns.map(col => (
+            <Column
+              key={col.id}
+              column={col}
+              cards={displayCards[col.id] || []}
+            />
+          ))}
+        </SortableContext>
         <AddList onAdd={addColumn} />
       </div>
 
