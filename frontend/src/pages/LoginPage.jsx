@@ -52,7 +52,6 @@ export default function LoginPage() {
         {/* Marca */}
         <div className={styles.brand}>
           <InfinityLogo size={56} state="idle" />
-          <span className={styles.name}>KAIROS</span>
         </div>
 
         {/* Cabecera */}

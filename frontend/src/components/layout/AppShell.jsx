@@ -1,7 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import Topbar from './Topbar'
 import Sidebar from './Sidebar'
-import KairosAssistant from '../kairos/KairosAssistant'
 import Dock from './Dock'
 import MusicPlayer from '../music/MusicPlayer'
 import StarField from './StarField'
@@ -33,7 +32,6 @@ export default function AppShell() {
       </div>
       <Dock />
       <MusicPlayer />
-      <KairosAssistant />
       {chatOpen && <ChatPanel onClose={closeChat} />}
       <ToastContainer />
       <ImmersiveFocus />

@@ -65,7 +65,6 @@ export default function Topbar() {
       <header className={styles.topbar}>
         <div className={styles.brand}>
           <InfinityLogo size={38} state="idle" />
-          <span className={styles.name}>KAIROS</span>
         </div>
 
         <nav className={styles.nav}>

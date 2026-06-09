@@ -263,6 +263,15 @@
   z-index: 40;
 }
 
+.transcriptAnswer {
+  max-width: min(520px, 88vw);
+  max-height: 40vh;
+  overflow-y: auto;
+  font-style: normal;
+  background: color-mix(in srgb, var(--kairos-purple-600) 22%, var(--kairos-modal-bg));
+  border-color: color-mix(in srgb, var(--kairos-purple-600) 45%, transparent);
+}
+
 @media (max-width: 860px) {
   .left { display: none; }
   .right .mini { display: none; }
