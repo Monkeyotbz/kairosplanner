@@ -1,0 +1,234 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 10vh 20px 20px;
+  background: rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  animation: bsFade 0.2s ease;
+}
+
+@keyframes bsFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal {
+  width: min(720px, 96vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  background: var(--kairos-modal-bg);
+  border: 1px solid var(--kairos-border-2);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  animation: bsPop 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+
+@keyframes bsPop {
+  from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--kairos-border-1);
+}
+
+.searchWrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 13px;
+  border-radius: 11px;
+  background: var(--kairos-input-bg);
+  border: 1px solid var(--kairos-input-border);
+}
+.searchWrap i { font-size: 16px; color: var(--kairos-text-muted); }
+
+.search {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: var(--kairos-text-primary);
+  font-family: var(--kairos-font);
+}
+.search::placeholder { color: var(--kairos-text-muted); }
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  font-size: 17px;
+  color: var(--kairos-text-muted);
+  background: var(--kairos-surface-1);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.close:hover { background: var(--kairos-surface-2); color: var(--kairos-text-primary); }
+
+/* ── Body ── */
+.body {
+  padding: 18px;
+  overflow-y: auto;
+}
+
+.section { margin-bottom: 22px; }
+.section:last-child { margin-bottom: 0; }
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--kairos-text-muted);
+}
+.sectionTitle i { font-size: 15px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+/* ── Tarjeta de tablero ── */
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid var(--kairos-border-1);
+  background: var(--kairos-surface-1);
+  text-align: left;
+  transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+}
+.card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35); }
+.cardActive { border-color: var(--kairos-purple-400); box-shadow: 0 0 0 2px var(--kairos-purple-400); }
+
+.cover {
+  position: relative;
+  height: 84px;
+  width: 100%;
+}
+
+.activeBadge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 3px 8px;
+  border-radius: 999px;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.cardName {
+  padding: 9px 11px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--kairos-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Crear tablero ── */
+.newCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 125px;
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--kairos-text-secondary);
+  background: var(--kairos-surface-1);
+  border: 1px dashed var(--kairos-border-dashed);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--kairos-font);
+  transition: background 0.15s, color 0.15s;
+}
+.newCard:hover { background: var(--kairos-surface-2); color: var(--kairos-purple-200); }
+.newCard i { font-size: 22px; }
+
+.createCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 125px;
+  justify-content: center;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--kairos-surface-2);
+  border: 1px solid var(--kairos-border-2);
+}
+
+.createInput {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--kairos-text-primary);
+  background: var(--kairos-input-bg);
+  border: 1px solid var(--kairos-purple-400);
+  outline: none;
+  font-family: var(--kairos-font);
+}
+
+.createActions { display: flex; gap: 6px; align-items: center; }
+
+.createConfirm {
+  flex: 1;
+  background: var(--kairos-purple-600);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+}
+.createConfirm:disabled { opacity: 0.5; }
+
+.createCancel {
+  font-size: 14px;
+  color: var(--kairos-text-muted);
+  padding: 6px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.createCancel:hover { color: #f87171; background: rgba(248,113,113,0.1); }
+
+.empty {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  color: var(--kairos-text-muted);
+  padding: 12px 0;
+}

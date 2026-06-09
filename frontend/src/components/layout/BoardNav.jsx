@@ -3,11 +3,13 @@ import { useBoardStore } from '../../store/boardStore'
 import { useChatStore } from '../../store/chatStore'
 import { createProject, searchUsuarios, addMemberToProject, getProjectMembers } from '../../services/boardService'
 import ThemeSwitcher from './ThemeSwitcher'
+import BoardSwitcher from '../kanban/BoardSwitcher'
 import styles from './BoardNav.module.css'
 
 export default function BoardNav({ proyecto, panelOpen, onTogglePanel }) {
   const { isOpen: chatOpen, toggle: toggleChat } = useChatStore()
   const { proyectos, loadBoard, loadProyectos } = useBoardStore()
+  const [showSwitcher, setShowSwitcher]       = useState(false)
   const [showProjectMenu, setShowProjectMenu] = useState(false)
   const [showNewProject, setShowNewProject]   = useState(false)
   const [showInvite, setShowInvite]           = useState(false)
@@ -78,37 +80,11 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel }) {
   return (
     <div className={styles.boardnav}>
       <div className={styles.left}>
-        <div className={styles.projectSelector} ref={menuRef}>
-          <button className={styles.projectBtn} onClick={() => setShowProjectMenu(v => !v)}>
+        <div className={styles.projectSelector}>
+          <button className={styles.projectBtn} onClick={() => setShowSwitcher(true)} title="Cambiar de tablero">
             <span className={styles.projectName}>{proyecto?.nombre ?? 'Cargando...'}</span>
-            <span className={styles.chevron}>{showProjectMenu ? '▲' : '▼'}</span>
+            <span className={styles.chevron}>▾</span>
           </button>
-
-          {showProjectMenu && (
-            <div className={styles.projectMenu}>
-              <p className={styles.menuLabel}>Mis proyectos</p>
-              {proyectos.map(p => (
-                <button
-                  key={p.id}
-                  className={`${styles.menuItem} ${p.id === proyecto?.id ? styles.menuItemActive : ''}`}
-                  onClick={() => { setShowProjectMenu(false); loadBoard(p.id) }}
-                >
-                  <span className={styles.menuItemDot} />
-                  {p.nombre}
-                </button>
-              ))}
-              <div className={styles.menuDivider} />
-              {showNewProject
-                ? (
-                  <form className={styles.newProjectForm} onSubmit={handleCreateProject}>
-                    <input className={styles.newProjectInput} placeholder="Nombre del proyecto" value={newNombre} onChange={e => setNewNombre(e.target.value)} autoFocus />
-                    <button className={styles.newProjectSave} type="submit" disabled={saving}>{saving ? '...' : 'Crear'}</button>
-                  </form>
-                )
-                : <button className={styles.menuItemNew} onClick={() => setShowNewProject(true)}>+ Nuevo proyecto</button>
-              }
-            </div>
-          )}
         </div>
 
         <span className={styles.divider}>|</span>
@@ -217,6 +193,8 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel }) {
           </div>
         </div>
       )}
+
+      {showSwitcher && <BoardSwitcher onClose={() => setShowSwitcher(false)} />}
     </div>
   )
 }

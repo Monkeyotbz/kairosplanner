@@ -62,6 +62,25 @@ export const useBoardStore = create((set, get) => ({
         [columnaId]: [...(s.cardsByColumn[columnaId] || []), card],
       },
     }))
+    return card
+  },
+
+  // Mover una tarjeta entre columnas por id (usado por ABAD y futuras acciones)
+  moveCardToColumn: async (cardId, fromCol, toCol) => {
+    if (fromCol === toCol) return
+    set(s => {
+      const card = (s.cardsByColumn[fromCol] || []).find(c => c.id === cardId)
+      if (!card) return {}
+      return {
+        cardsByColumn: {
+          ...s.cardsByColumn,
+          [fromCol]: (s.cardsByColumn[fromCol] || []).filter(c => c.id !== cardId),
+          [toCol]: [...(s.cardsByColumn[toCol] || []), { ...card, columna_id: toCol }],
+        },
+      }
+    })
+    try { await updateCardColumn(cardId, toCol) }
+    catch (err) { console.error('Error al mover tarjeta:', err) }
   },
 
   removeCard: async (cardId, columnaId) => {

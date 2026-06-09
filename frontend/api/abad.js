@@ -9,14 +9,64 @@ const MODEL = 'claude-haiku-4-5'
 const SYSTEM = `Eres ABAD, el asistente de inteligencia de KAIROS, una app de productividad
 personal basada en la filosofía griega del Kairós (el momento oportuno).
 
+Puedes hacer dos cosas:
+1) RESPONDER consultas sobre los datos del usuario (tareas, vencimientos, enfoque, rango)
+   con base en el CONTEXTO que se te entrega. En español, breve y cálido (1-3 frases).
+2) EJECUTAR acciones con las herramientas disponibles: crear tarjetas (con prioridad, fecha,
+   descripción, subtareas y participante), mover tarjetas de lista, y registrar gastos.
+
 Reglas:
-- Respondes SIEMPRE en español, breve y cálido (1 a 3 frases), pensado para leerse en voz alta.
-- Solo respondes con base en el CONTEXTO del usuario que se te entrega (tareas, vencimientos,
-  enfoque, rango). No inventes datos que no estén en el contexto.
-- Si te piden modificar algo (crear/mover tarjetas, registrar gastos), responde amablemente que
-  esa acción por voz llegará muy pronto, y ofrece la información que sí tengas.
-- Si no hay datos relevantes, dilo con naturalidad y anima a la persona.
-- Responde solo con la respuesta final: sin razonamiento, sin preámbulos, sin listas largas.`
+- Si el usuario pide CREAR/MOVER una tarjeta o REGISTRAR un gasto, usa la herramienta adecuada.
+- Para fechas relativas ("mañana", "el viernes", "en 3 días") calcula la fecha real en formato
+  YYYY-MM-DD usando "fecha_hoy" del contexto.
+- Usa los nombres EXACTOS de columnas y miembros que aparecen en el contexto cuando existan.
+- Si solo es una pregunta, responde con texto (sin herramientas), en español y breve.
+- No inventes datos que no estén en el contexto.`
+
+const TOOLS = [
+  {
+    name: 'crear_tarjeta',
+    description: 'Crea una nueva tarjeta/tarea en el tablero Kanban. Úsala cuando el usuario pida crear, agregar o añadir una tarjeta, tarea o pendiente.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        titulo:       { type: 'string', description: 'Título de la tarjeta' },
+        columna:      { type: 'string', description: 'Nombre de la lista/columna destino (ej. Backlog, En progreso). Opcional; si no, va a la primera.' },
+        prioridad:    { type: 'string', enum: ['baja', 'normal', 'alta'], description: 'Prioridad de la tarjeta. Opcional.' },
+        fecha_limite: { type: 'string', description: 'Fecha límite en formato YYYY-MM-DD. Opcional.' },
+        descripcion:  { type: 'string', description: 'Descripción o detalles de la tarjeta. Opcional.' },
+        subtareas:    { type: 'array', items: { type: 'string' }, description: 'Lista de subtareas. Opcional.' },
+        participante: { type: 'string', description: 'Nombre del miembro del proyecto a asignar. Opcional.' },
+      },
+      required: ['titulo'],
+    },
+  },
+  {
+    name: 'mover_tarjeta',
+    description: 'Mueve una tarjeta existente a otra lista/columna del tablero.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        titulo_tarjeta:  { type: 'string', description: 'Título (o parte) de la tarjeta a mover' },
+        columna_destino: { type: 'string', description: 'Nombre de la lista/columna destino' },
+      },
+      required: ['titulo_tarjeta', 'columna_destino'],
+    },
+  },
+  {
+    name: 'registrar_gasto',
+    description: 'Registra un gasto personal en el módulo de Finanzas.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        concepto:  { type: 'string', description: 'Concepto o descripción del gasto' },
+        monto:     { type: 'number', description: 'Monto del gasto (número)' },
+        categoria: { type: 'string', description: 'Categoría del gasto. Opcional.' },
+      },
+      required: ['concepto', 'monto'],
+    },
+  },
+]
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -37,15 +87,24 @@ export default async function handler(req, res) {
 
     const userContent =
       `CONTEXTO del usuario (JSON):\n${JSON.stringify(context ?? {}, null, 2)}\n\n` +
-      `PREGUNTA: ${question.trim()}`
+      `PETICIÓN: ${question.trim()}`
 
     const message = await client.messages.create({
       model: MODEL,
-      max_tokens: 400,
+      max_tokens: 600,
       system: SYSTEM,
+      tools: TOOLS,
       messages: [{ role: 'user', content: userContent }],
     })
 
+    // ¿Decidió ejecutar una acción?
+    const toolUse = message.content.find(b => b.type === 'tool_use')
+    if (toolUse) {
+      res.status(200).json({ action: toolUse.name, args: toolUse.input || {} })
+      return
+    }
+
+    // Si no, respuesta de texto (consulta)
     const answer = message.content
       .filter(b => b.type === 'text')
       .map(b => b.text)

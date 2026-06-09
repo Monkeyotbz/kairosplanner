@@ -12,12 +12,20 @@
   overflow: hidden;
 }
 
+/* ── Barra de color de la lista (estilo Trello) ── */
+.colorBar {
+  height: 5px;
+  width: 100%;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
 /* ── Header ── */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px 8px;
+  padding: 10px 14px 8px;
   flex-shrink: 0;
 }
 

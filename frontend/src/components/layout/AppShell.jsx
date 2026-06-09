@@ -8,6 +8,7 @@ import ChatPanel from '../chat/ChatPanel'
 import ToastContainer from './ToastContainer'
 import ImmersiveFocus from '../focus/ImmersiveFocus'
 import FocusCapsule from '../focus/FocusCapsule'
+import AbadChat from '../kairos/AbadChat'
 import { useChatStore } from '../../store/chatStore'
 import { useFocusStore } from '../../store/focusStore'
 import styles from './AppShell.module.css'
@@ -36,6 +37,7 @@ export default function AppShell() {
       <ToastContainer />
       <ImmersiveFocus />
       <FocusCapsule />
+      <AbadChat />
     </div>
   )
 }

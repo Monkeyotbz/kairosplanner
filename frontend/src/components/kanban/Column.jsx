@@ -65,6 +65,7 @@ export default function Column({ column, cards }) {
 
   return (
     <div className={styles.column}>
+      <div className={styles.colorBar} style={{ background: column.color }} />
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <span className={styles.dot} style={{ background: column.color }} />
