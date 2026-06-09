@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { getMisProyectos, getBoardByProject, getMyBoard, updateCardColumn, updateCard, createCard, deleteCard } from '../services/boardService'
+import { getMisProyectos, getBoardByProject, getMyBoard, updateCardColumn, updateCard, createCard, deleteCard, createColumn, updateColumn, deleteColumn } from '../services/boardService'
 
 export const useBoardStore = create((set, get) => ({
   proyectos: [],
@@ -116,6 +116,36 @@ export const useBoardStore = create((set, get) => ({
     } catch (err) {
       console.error('Error al editar tarjeta:', err)
     }
+  },
+
+  // ── Columnas (listas) ───────────────────────────────────────
+  addColumn: async (nombre) => {
+    const { board, columns } = get()
+    if (!board || !nombre?.trim()) return
+    try {
+      const col = await createColumn({ tablero_id: board.id, nombre: nombre.trim(), orden: columns.length })
+      set(s => ({
+        columns: [...s.columns, col],
+        cardsByColumn: { ...s.cardsByColumn, [col.id]: [] },
+      }))
+    } catch (err) { console.error('Error al crear columna:', err) }
+  },
+
+  editColumn: async (id, fields) => {
+    // Optimista
+    set(s => ({ columns: s.columns.map(c => c.id === id ? { ...c, ...fields } : c) }))
+    try { await updateColumn(id, fields) }
+    catch (err) { console.error('Error al editar columna:', err) }
+  },
+
+  removeColumn: async (id) => {
+    set(s => {
+      const next = { ...s.cardsByColumn }
+      delete next[id]
+      return { columns: s.columns.filter(c => c.id !== id), cardsByColumn: next }
+    })
+    try { await deleteColumn(id) }
+    catch (err) { console.error('Error al eliminar columna:', err) }
   },
 
   setCardsByColumn: (cardsByColumn) => set({ cardsByColumn }),

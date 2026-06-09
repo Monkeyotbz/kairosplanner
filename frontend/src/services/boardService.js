@@ -139,6 +139,33 @@ export async function updateCardColumn(cardId, columnId) {
   if (error) throw error
 }
 
+// ── Columnas (listas) ────────────────────────────────────────
+export async function createColumn({ tablero_id, nombre, color = '#534AB7', orden = 9999 }) {
+  const { data, error } = await supabase
+    .from('columnas')
+    .insert({ tablero_id, nombre, color, orden })
+    .select('*')
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function updateColumn(id, fields) {
+  const { data, error } = await supabase
+    .from('columnas')
+    .update(fields)
+    .eq('id', id)
+    .select('*')
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteColumn(id) {
+  const { error } = await supabase.from('columnas').delete().eq('id', id)
+  if (error) throw error
+}
+
 // ── Etiquetas ────────────────────────────────────────────────
 export async function getProyectoEtiquetas(proyectoId) {
   const { data, error } = await supabase

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { DndContext, DragOverlay, closestCorners, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { useBoardStore } from '../../store/boardStore'
 import Column from './Column'
@@ -6,7 +6,7 @@ import Card from './Card'
 import styles from './Board.module.css'
 
 export default function Board() {
-  const { columns, cardsByColumn, setCardsByColumn, persistMove, searchQuery } = useBoardStore()
+  const { columns, cardsByColumn, setCardsByColumn, persistMove, searchQuery, addColumn } = useBoardStore()
   const [activeCard, setActiveCard] = useState(null)
   const [workingCards, setWorkingCards] = useState(null)
 
@@ -96,11 +96,56 @@ export default function Board() {
             cards={displayCards[col.id] || []}
           />
         ))}
+        <AddList onAdd={addColumn} />
       </div>
 
       <DragOverlay dropAnimation={null}>
         {activeCard ? <Card card={activeCard} isOverlay /> : null}
       </DragOverlay>
     </DndContext>
+  )
+}
+
+function AddList({ onAdd }) {
+  const [open, setOpen]   = useState(false)
+  const [nombre, setNombre] = useState('')
+  const inputRef = useRef(null)
+
+  useEffect(() => { if (open) inputRef.current?.focus() }, [open])
+
+  function submit() {
+    const v = nombre.trim()
+    if (v) onAdd(v)
+    setNombre('')
+    setOpen(false)
+  }
+
+  if (!open) {
+    return (
+      <button className={styles.addList} onClick={() => setOpen(true)}>
+        <span>+</span> Añadir otra lista
+      </button>
+    )
+  }
+
+  return (
+    <div className={styles.addListForm}>
+      <input
+        ref={inputRef}
+        className={styles.addListInput}
+        placeholder="Nombre de la lista..."
+        value={nombre}
+        onChange={e => setNombre(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === 'Enter') submit()
+          if (e.key === 'Escape') { setNombre(''); setOpen(false) }
+        }}
+        onBlur={() => { if (!nombre.trim()) setOpen(false) }}
+      />
+      <div className={styles.addListActions}>
+        <button className={styles.addListConfirm} onMouseDown={e => e.preventDefault()} onClick={submit}>Añadir lista</button>
+        <button className={styles.addListCancel} onClick={() => { setNombre(''); setOpen(false) }}>✕</button>
+      </div>
+    </div>
   )
 }
