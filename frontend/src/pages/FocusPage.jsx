@@ -1,40 +1,51 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useFocusStore } from '../store/focusStore'
-import ModeSelector from '../components/focus/ModeSelector'
-import ActiveTimer from '../components/focus/ActiveTimer'
-import BreakScreen from '../components/focus/BreakScreen'
-import SessionComplete from '../components/focus/SessionComplete'
+import FocusStart from '../components/focus/FocusStart'
+import FocusCelebration from '../components/focus/FocusCelebration'
 import styles from './FocusPage.module.css'
 
 export default function FocusPage() {
-  const { phase, tipo, duracion_plan_min, elapsedSeconds, tick, tickBreak, startBreak } = useFocusStore()
+  const { phase, immersive, session, elapsedSeconds, totalBreaks, enterImmersive, reset } = useFocusStore()
+  const mounted = useRef(false)
 
-  // Tick del timer de trabajo
+  // Al ABRIR Enfoque con una sesión viva, entrar al inmersivo (solo en el montaje:
+  // si luego minimizas, te dejamos ver la cápsula sin re-inmersar a la fuerza).
   useEffect(() => {
-    if (phase !== 'active') return
-    const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
-  }, [phase, tick])
+    if (!mounted.current && (phase === 'active' || phase === 'break') && !immersive) enterImmersive()
+    mounted.current = true
+  }, [phase, immersive, enterImmersive])
 
-  // Tick del timer de pausa
-  useEffect(() => {
-    if (phase !== 'break') return
-    const id = setInterval(tickBreak, 1000)
-    return () => clearInterval(id)
-  }, [phase, tickBreak])
+  // El overlay inmersivo global cubre todo.
+  if (immersive) return null
 
-  // Pomodoro: pausa automática al completar el bloque
-  useEffect(() => {
-    if (phase !== 'active' || tipo !== 'pomodoro' || !duracion_plan_min) return
-    if (elapsedSeconds >= duracion_plan_min * 60) startBreak()
-  }, [elapsedSeconds, phase, tipo, duracion_plan_min, startBreak])
+  // Sesión en curso pero minimizada (la cápsula flota): ofrecemos volver.
+  if (phase === 'active' || phase === 'break') {
+    return (
+      <div className={styles.page}>
+        <div className={styles.resume}>
+          <span className={styles.resumeDot} />
+          <p className={styles.resumeText}>Tienes una sesión de enfoque en curso.</p>
+          <button className={styles.resumeBtn} onClick={() => enterImmersive()}>
+            ⛶ Volver al enfoque
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.page}>
-      {phase === 'idle'     && <ModeSelector />}
-      {phase === 'active'   && <ActiveTimer />}
-      {phase === 'break'    && <BreakScreen />}
-      {phase === 'complete' && <SessionComplete />}
+      {phase === 'complete' ? (
+        <FocusCelebration
+          elapsedSeconds={elapsedSeconds}
+          sessionId={session?.id}
+          totalBreaks={totalBreaks}
+          onDone={reset}
+          doneLabel="Nueva sesión"
+        />
+      ) : (
+        <FocusStart />
+      )}
     </div>
   )
 }

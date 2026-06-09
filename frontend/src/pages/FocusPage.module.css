@@ -2,5 +2,49 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: auto;
 }
+
+.resume {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 32px;
+  border-radius: 20px;
+  background: var(--kairos-surface-1);
+  border: 1px solid var(--kairos-border-1);
+}
+
+.resumeDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #86efac;
+  box-shadow: 0 0 0 6px rgba(134, 239, 172, 0.18);
+  animation: resumePulse 1.8s ease-in-out infinite;
+}
+
+@keyframes resumePulse {
+  0%, 100% { box-shadow: 0 0 0 6px rgba(134, 239, 172, 0.18); }
+  50%      { box-shadow: 0 0 0 12px rgba(134, 239, 172, 0.06); }
+}
+
+.resumeText { margin: 0; font-size: 15px; color: var(--kairos-text-secondary); }
+
+.resumeBtn {
+  padding: 11px 22px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  color: #fff;
+  background: linear-gradient(135deg, #534AB7, #378ADD);
+  font-family: var(--kairos-font);
+  transition: transform 0.12s ease;
+}
+.resumeBtn:active { transform: scale(0.97); }

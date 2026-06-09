@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useBoardStore } from '../../store/boardStore'
+import { useFocusStore } from '../../store/focusStore'
 import styles from './Card.module.css'
 
 function formatDate(dateStr) {
@@ -21,10 +22,17 @@ export default function Card({ card, columnaId, isOverlay = false }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card.id })
   const pointerPos = useRef(null)
 
+  // Modo Kairós (spotlight): sesión minimizada → resalta la tarea enfocada, atenúa el resto.
+  const immersive  = useFocusStore(s => s.immersive)
+  const focusPhase = useFocusStore(s => s.phase)
+  const activeTask = useFocusStore(s => s.activeTask)
+  const spotlight    = !isOverlay && !immersive && (focusPhase === 'active' || focusPhase === 'break') && !!activeTask
+  const isFocusTask  = spotlight && activeTask.id === card.id
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition: transition || undefined,
-    opacity: isDragging ? 0.3 : 1,
+    opacity: isDragging ? 0.3 : (spotlight && !isFocusTask ? 0.32 : 1),
     cursor: isOverlay ? 'grabbing' : 'grab',
   }
 
@@ -51,7 +59,7 @@ export default function Card({ card, columnaId, isOverlay = false }) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`${styles.card} ${isDragging ? styles.dragging : ''}`}
+      className={`${styles.card} ${isDragging ? styles.dragging : ''} ${spotlight ? styles.spotlight : ''} ${isFocusTask ? styles.focusTask : ''}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onPointerDown={handlePointerDown}

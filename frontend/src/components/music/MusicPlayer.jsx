@@ -303,14 +303,20 @@ export default function MusicPlayer() {
               {ytPlaylists.map(pl => {
                 const info = extractYtInfo(pl.url)
                 const thumb = info?.type === 'video'
-                  ? `https://img.youtube.com/vi/${info.id}/mqdefault.jpg`
+                  ? `https://img.youtube.com/vi/${info.id}/hqdefault.jpg`
                   : null
                 const isPlaying = ytCurrent?.id === pl.id
                 return (
                   <div key={pl.id} className={`${styles.ytCard} ${isPlaying ? styles.ytCardActive : ''}`}>
                     <div className={styles.ytThumbWrap} onClick={() => setYtCurrent(isPlaying ? null : pl)}>
                       {thumb
-                        ? <img src={thumb} className={styles.ytThumb} alt={pl.nombre} />
+                        ? <img
+                            src={thumb}
+                            className={styles.ytThumb}
+                            alt={pl.nombre}
+                            loading="lazy"
+                            onError={e => { e.currentTarget.onerror = null; e.currentTarget.style.display = 'none' }}
+                          />
                         : <div className={styles.ytThumbFallback}><i className="ti ti-playlist" /></div>
                       }
                       <div className={styles.ytThumbOverlay}>

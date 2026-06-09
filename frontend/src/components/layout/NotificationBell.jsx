@@ -12,7 +12,7 @@ function getDateStr(date) {
 
 const PRIORITY_COLOR = { alta: '#f87171', normal: '#facc15', baja: '#6ee7b7' }
 
-export default function NotificationBell() {
+export default function NotificationBell({ openUp = false }) {
   const navigate = useNavigate()
   const { cardsByColumn, selectCard } = useBoardStore()
   const [open, setOpen] = useState(false)
@@ -70,7 +70,7 @@ export default function NotificationBell() {
       </button>
 
       {open && (
-        <div className={styles.panel}>
+        <div className={`${styles.panel} ${openUp ? styles.panelUp : ''}`}>
           <div className={styles.panelHeader}>
             <span className={styles.panelTitle}>Vencimientos</span>
             <button className={styles.closeBtn} onClick={() => setOpen(false)}>✕</button>

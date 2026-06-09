@@ -39,6 +39,19 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
 }
 
+/* ── Modo Kairós: spotlight ── */
+.spotlight {
+  transition: opacity 0.45s ease, box-shadow 0.45s ease, filter 0.45s ease, transform 0.2s ease;
+}
+
+.spotlight:not(.focusTask) {
+  filter: grayscale(0.4) brightness(0.82);
+}
+
+.focusTask {
+  box-shadow: 0 0 0 2px var(--kairos-purple-400), 0 10px 30px rgba(83, 74, 183, 0.45);
+}
+
 .dragging {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }

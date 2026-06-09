@@ -1,0 +1,214 @@
+.card {
+  position: relative;
+  width: min(440px, 92vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 34px 30px 28px;
+  border-radius: 22px;
+  background: rgba(18, 14, 45, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  animation: celIn 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+@keyframes celIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.glowRing {
+  position: absolute;
+  top: -40%;
+  left: 50%;
+  width: 130%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(83, 74, 183, 0.28), transparent 60%);
+  pointer-events: none;
+}
+
+.levelUp {
+  position: relative;
+  z-index: 1;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.14);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  padding: 5px 14px;
+  border-radius: 999px;
+  animation: levelPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes levelPulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+
+.emoji {
+  position: relative;
+  z-index: 1;
+  font-size: 46px;
+  line-height: 1;
+  animation: celPop 0.6s ease;
+}
+
+@keyframes celPop {
+  0%   { transform: scale(0.4); opacity: 0; }
+  70%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.title {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #f5f3ff;
+}
+
+.phrase {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(207, 203, 246, 0.78);
+  max-width: 340px;
+  font-style: italic;
+}
+
+/* ── Tiempo grande ── */
+.timeBig {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 6px 0 2px;
+}
+
+.timeValue {
+  font-size: 38px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  line-height: 1;
+}
+
+.timeLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--kairos-text-muted);
+}
+
+/* ── Rango + XP ── */
+.rankBox {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rankHead {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.rankIcon { font-size: 26px; line-height: 1; flex-shrink: 0; }
+
+.rankNames {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.rankName { font-size: 15px; font-weight: 700; color: #f0eeff; }
+.rankNext { font-size: 11.5px; color: var(--kairos-text-muted); }
+
+.xpGain {
+  font-size: 14px;
+  font-weight: 700;
+  color: #86efac;
+  flex-shrink: 0;
+  animation: celPop 0.5s ease;
+}
+
+.xpBar {
+  width: 100%;
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.xpFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 1.1s cubic-bezier(0.3, 0.8, 0.3, 1);
+  box-shadow: 0 0 12px rgba(83, 74, 183, 0.6);
+}
+
+.xpMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11.5px;
+  color: rgba(207, 203, 246, 0.6);
+}
+
+.streak {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fca07a;
+}
+
+.rankLoading {
+  position: relative;
+  z-index: 1;
+  font-size: 13px;
+  color: var(--kairos-text-muted);
+  padding: 14px 0;
+}
+
+/* ── Acción ── */
+.doneBtn {
+  position: relative;
+  z-index: 1;
+  margin-top: 6px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  color: #fff;
+  background: linear-gradient(135deg, #534AB7, #378ADD);
+  box-shadow: 0 8px 24px rgba(83, 74, 183, 0.4);
+  transition: box-shadow 0.15s ease, transform 0.12s ease;
+  font-family: var(--kairos-font);
+}
+
+.doneBtn:hover { box-shadow: 0 10px 30px rgba(83, 74, 183, 0.55); }
+.doneBtn:active { transform: scale(0.98); }

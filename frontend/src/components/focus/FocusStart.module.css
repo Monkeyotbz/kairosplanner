@@ -1,0 +1,170 @@
+.wrap {
+  position: relative;
+  width: min(440px, 92vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 36px 30px;
+  border-radius: 24px;
+  background: var(--kairos-modal-bg, rgba(18, 14, 45, 0.6));
+  border: 1px solid var(--kairos-border-1);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  text-align: center;
+}
+
+.aura {
+  position: absolute;
+  top: -30%;
+  left: 50%;
+  width: 120%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(83, 74, 183, 0.22), transparent 60%);
+  pointer-events: none;
+  animation: startBreathe 8s ease-in-out infinite;
+}
+
+@keyframes startBreathe {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.9; }
+}
+
+/* ── Rango ── */
+.rankTeaser {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--kairos-surface-1);
+  border: 1px solid var(--kairos-border-1);
+}
+
+.rankIcon { font-size: 26px; line-height: 1; flex-shrink: 0; }
+
+.rankInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.rankName { font-size: 14px; font-weight: 700; color: var(--kairos-text-primary); }
+
+.rankBar {
+  width: 100%;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--kairos-surface-3);
+  overflow: hidden;
+}
+
+.rankFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.8s ease;
+}
+
+.rankMeta { font-size: 11px; color: var(--kairos-text-muted); }
+
+/* ── Hero ── */
+.hero {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.symbol {
+  font-size: 42px;
+  color: var(--kairos-purple-200);
+  animation: startBreathe 5s ease-in-out infinite;
+}
+
+.title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--kairos-text-primary);
+}
+
+.sub {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--kairos-text-secondary);
+  max-width: 320px;
+}
+
+/* ── Campo ── */
+.field {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  text-align: left;
+}
+
+.label { font-size: 13px; font-weight: 500; color: var(--kairos-text-secondary); }
+.optional { color: var(--kairos-text-muted); font-weight: 400; }
+
+.select {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: var(--kairos-font);
+  /* Fondo SÓLIDO para que el desplegable nativo sea legible (no translúcido) */
+  background-color: var(--kairos-modal-bg);
+  border: 1px solid var(--kairos-input-border, var(--kairos-border-2));
+  color: var(--kairos-text-primary);
+  cursor: pointer;
+}
+
+/* Opciones del desplegable nativo — Edge/Chrome respetan estos colores */
+.select option {
+  background-color: var(--kairos-modal-bg);
+  color: var(--kairos-text-primary);
+}
+
+.error { position: relative; z-index: 1; color: #f87171; font-size: 13px; margin: 0; }
+
+.enterBtn {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  color: #fff;
+  background: linear-gradient(135deg, #534AB7, #378ADD);
+  box-shadow: 0 10px 28px rgba(83, 74, 183, 0.4);
+  transition: box-shadow 0.15s ease, transform 0.12s ease;
+  font-family: var(--kairos-font);
+}
+
+.enterBtn:hover:not(:disabled) { box-shadow: 0 12px 34px rgba(83, 74, 183, 0.55); }
+.enterBtn:active:not(:disabled) { transform: scale(0.98); }
+.enterBtn:disabled { opacity: 0.6; cursor: default; }
+
+.hint {
+  position: relative;
+  z-index: 1;
+  margin: -6px 0 0;
+  font-size: 12px;
+  color: var(--kairos-text-muted);
+}

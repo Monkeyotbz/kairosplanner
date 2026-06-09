@@ -7,7 +7,7 @@ function getVideoId(url) {
 
 export default function VideoCard({ video, onSelect, isPlaying }) {
   const videoId = getVideoId(video.url_youtube)
-  const thumb = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : null
+  const thumb = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null
 
   return (
     <div
@@ -16,7 +16,13 @@ export default function VideoCard({ video, onSelect, isPlaying }) {
     >
       <div className={styles.thumb}>
         {thumb
-          ? <img src={thumb} alt={video.titulo} draggable={false} />
+          ? <img
+              src={thumb}
+              alt={video.titulo}
+              draggable={false}
+              loading="lazy"
+              onError={e => { e.currentTarget.onerror = null; e.currentTarget.style.display = 'none' }}
+            />
           : <div className={styles.thumbFallback}>▶</div>
         }
         <div className={styles.playOverlay}>▶</div>

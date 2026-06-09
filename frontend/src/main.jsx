@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import '@tabler/icons-webfont/dist/tabler-icons.min.css' // iconos auto-alojados (sin CDN)
 import './styles/globals.css'
 import './store/themeStore' // side-effect: aplica el tema guardado antes del primer render
 import App from './App.jsx'

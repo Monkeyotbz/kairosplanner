@@ -13,7 +13,7 @@ function formatTime(seconds) {
 }
 
 export default function ActiveTimer() {
-  const { tipo, duracion_plan_min, elapsedSeconds, startBreak, finishSession, abandonSession } = useFocusStore()
+  const { tipo, duracion_plan_min, elapsedSeconds, startBreak, finishSession, abandonSession, enterImmersive } = useFocusStore()
 
   const isPomodoro = tipo === 'pomodoro'
   const totalSeconds = isPomodoro ? duracion_plan_min * 60 : null
@@ -80,6 +80,10 @@ export default function ActiveTimer() {
           ✓ Terminar
         </button>
       </div>
+
+      <button className={styles.immersiveBtn} onClick={() => enterImmersive()}>
+        ⛶ Modo inmersivo
+      </button>
 
       <button className={styles.abandonBtn} onClick={abandonSession}>
         Abandonar sesión

@@ -19,6 +19,25 @@
   overflow: hidden;
 }
 
+/* ── Modo Kairós: la interfaz se aquieta cuando hay enfoque minimizado ── */
+.quiet :global(header),
+.quiet :global(aside) {
+  opacity: 0.4;
+  filter: saturate(0.65);
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+.quiet :global(header):hover,
+.quiet :global(aside):hover {
+  opacity: 1;
+  filter: none;
+}
+
+.quiet :global(canvas) {
+  opacity: 0.45;
+  transition: opacity 0.6s ease;
+}
+
 .main {
   flex: 1;
   overflow: hidden;

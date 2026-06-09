@@ -45,7 +45,7 @@ const PRIORITY_BTNS = [
 export default function CardDetailModal() {
   const navigate = useNavigate()
   const { selectedCard, clearSelectedCard, editCard, removeCard, columns, proyecto } = useBoardStore()
-  const { phase, tipo, duracion_plan_min, elapsedSeconds, startBreak, finishSession } = useFocusStore()
+  const { phase, tipo, duracion_plan_min, elapsedSeconds, startBreak, finishSession, startSession, enterImmersive } = useFocusStore()
 
   const [localTitle,    setLocalTitle]    = useState('')
   const [localDesc,     setLocalDesc]     = useState('')
@@ -171,6 +171,24 @@ export default function CardDetailModal() {
     if (!confirm(`¿Eliminar la tarjeta "${selectedCard.titulo}"? Esta acción no se puede deshacer.`)) return
     clearSelectedCard()
     await removeCard(selectedCard.id, selectedCard.columna_id)
+  }
+
+  // Modo Enfoque Inmersivo: enfoca esta tarjeta ocultando todo el chrome.
+  // Si no hay sesión activa, arranca una sesión libre ligada al proyecto.
+  async function handleImmersive() {
+    const task = {
+      id: selectedCard.id,
+      titulo: localTitle.trim() || selectedCard.titulo,
+      descripcion: localDesc.trim() || selectedCard.descripcion || null,
+      prioridad: selectedCard.prioridad || null,
+    }
+    if (phase !== 'active') {
+      try {
+        await startSession({ tipo: 'libre', duracion_plan_min: null, proyecto_id: proyecto?.id || null })
+      } catch (_) { /* aun sin sesión, permitimos el modo inmersivo */ }
+    }
+    enterImmersive(task)
+    clearSelectedCard()
   }
 
   return (
@@ -341,11 +359,19 @@ export default function CardDetailModal() {
                       <i className="ti ti-player-stop" aria-hidden="true" /> Detener y guardar
                     </button>
                   </div>
+                  <button className={styles.timerImmersiveBtn} style={{ marginTop: 10 }} onClick={handleImmersive}>
+                    <i className="ti ti-maximize" aria-hidden="true" /> Modo inmersivo
+                  </button>
                 </>
               ) : (
-                <button className={styles.timerStartBtn} onClick={() => { clearSelectedCard(); navigate('/focus') }}>
-                  <i className="ti ti-clock-play" aria-hidden="true" /> Iniciar sesión de enfoque
-                </button>
+                <div className={styles.timerBtns}>
+                  <button className={styles.timerStartBtn} onClick={() => { clearSelectedCard(); navigate('/focus') }}>
+                    <i className="ti ti-clock-play" aria-hidden="true" /> Iniciar sesión
+                  </button>
+                  <button className={styles.timerImmersiveBtn} onClick={handleImmersive}>
+                    <i className="ti ti-maximize" aria-hidden="true" /> Modo inmersivo
+                  </button>
+                </div>
               )}
             </div>
 

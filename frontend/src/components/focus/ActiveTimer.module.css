@@ -113,6 +113,26 @@
 
 .finishBtn:hover { background: var(--kairos-purple-400); }
 
+/* ── Modo inmersivo ── */
+.immersiveBtn {
+  margin-top: -16px;
+  padding: 9px 20px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(83,74,183,0.2), rgba(55,138,221,0.2));
+  border: 1px solid rgba(83,74,183,0.4);
+  color: var(--kairos-purple-100);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--kairos-font);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.immersiveBtn:hover {
+  background: linear-gradient(135deg, rgba(83,74,183,0.34), rgba(55,138,221,0.34));
+  color: #fff;
+}
+
 /* ── Abandonar ── */
 .abandonBtn {
   font-size: 12px;

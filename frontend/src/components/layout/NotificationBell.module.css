@@ -58,6 +58,15 @@
   top: calc(100% + 8px);
   right: 0;
   width: 300px;
+}
+
+/* Variante que abre hacia arriba (para el dock inferior) */
+.panelUp {
+  top: auto;
+  bottom: calc(100% + 10px);
+}
+
+.panel {
   background: var(--kairos-purple-800);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--kairos-radius-md);
