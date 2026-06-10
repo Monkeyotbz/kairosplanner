@@ -4,6 +4,7 @@ import FinanceSummary from '../components/finanzas/FinanceSummary'
 import FinanceChart from '../components/finanzas/FinanceChart'
 import TransactionList from '../components/finanzas/TransactionList'
 import TransactionForm from '../components/finanzas/TransactionForm'
+import BudgetPanel from '../components/finanzas/BudgetPanel'
 import ProyectoFinanzas from '../components/finanzas/ProyectoFinanzas'
 import styles from './FinanzasPage.module.css'
 
@@ -73,6 +74,7 @@ export default function FinanzasPage() {
                   <FinanceChart data={byCategoria} />
                   <TransactionList transacciones={transacciones} onDeleted={load} />
                 </div>
+                <BudgetPanel transacciones={transacciones} />
               </>
             )
           }

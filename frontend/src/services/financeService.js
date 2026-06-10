@@ -53,6 +53,57 @@ export async function deleteTransaccion(id) {
   if (error) throw error
 }
 
+// ── Presupuestos (Zero-Based Budgeting) ──────────────────────
+export async function getPresupuestos() {
+  const userId = await getUserId()
+  const { data } = await supabase
+    .from('presupuestos')
+    .select('*, categorias_finanzas(nombre, color, icono)')
+    .eq('usuario_id', userId)
+  return data || []
+}
+
+// Upsert: crea o actualiza el límite de una categoría
+export async function setPresupuesto({ categoria_id, monto_limite }) {
+  const userId = await getUserId()
+  const { data, error } = await supabase
+    .from('presupuestos')
+    .upsert(
+      { usuario_id: userId, categoria_id, monto_limite },
+      { onConflict: 'usuario_id,categoria_id' }
+    )
+    .select('*, categorias_finanzas(nombre, color, icono)')
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function deletePresupuesto(id) {
+  const { error } = await supabase.from('presupuestos').delete().eq('id', id)
+  if (error) throw error
+}
+
+// Cruza presupuestos con los gastos del mes para calcular progreso.
+// estado: 'ok' (<75%), 'warn' (75-99%), 'over' (>=100%)
+export function calcBudgetProgress(presupuestos, transacciones) {
+  const spentByCat = {}
+  transacciones
+    .filter(t => t.tipo === 'gasto' && t.categoria_id)
+    .forEach(t => {
+      spentByCat[t.categoria_id] = (spentByCat[t.categoria_id] || 0) + Number(t.monto)
+    })
+
+  return presupuestos
+    .map(p => {
+      const limite  = Number(p.monto_limite)
+      const gastado = spentByCat[p.categoria_id] || 0
+      const pct     = limite > 0 ? (gastado / limite) * 100 : 0
+      const estado  = pct >= 100 ? 'over' : pct >= 75 ? 'warn' : 'ok'
+      return { ...p, limite, gastado, restante: limite - gastado, pct, estado }
+    })
+    .sort((a, b) => b.pct - a.pct)
+}
+
 // ── Finanzas por proyecto ─────────────────────────────────────
 export async function getFinanzasProyecto(proyectoId, year, month) {
   const from = `${year}-${String(month).padStart(2, '0')}-01`
