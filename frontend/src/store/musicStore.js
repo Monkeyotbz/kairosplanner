@@ -24,6 +24,11 @@ function loadActiveTab() {
   return localStorage.getItem('kairos-music-tab') || 'youtube'
 }
 
+function loadYtVolume() {
+  const raw = localStorage.getItem('kairos-yt-volume')
+  return raw == null ? 65 : Number(raw)
+}
+
 export const useMusicStore = create((set) => ({
   // Panel
   showPlayer: false,
@@ -41,6 +46,7 @@ export const useMusicStore = create((set) => ({
   ytPlaylists: loadYtPlaylists(),
   ytCurrent:   null,
   ytPlaying:   false,
+  ytVolume:    loadYtVolume(),
 
   // ── Actions ───────────────────────────────────────────────
   setShowPlayer: (v)           => set({ showPlayer: v }),
@@ -66,6 +72,7 @@ export const useMusicStore = create((set) => ({
   // YouTube
   setYtCurrent: (playlist) => set({ ytCurrent: playlist, ytPlaying: !!playlist }),
   setYtPlaying: (v)        => set({ ytPlaying: v }),
+  setYtVolume:  (v)        => { try { localStorage.setItem('kairos-yt-volume', String(v)) } catch (_) {}; set({ ytVolume: v }) },
   addYtPlaylist: (p) =>
     set(s => {
       const next = [...s.ytPlaylists, p]

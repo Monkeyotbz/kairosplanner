@@ -18,9 +18,10 @@ function extractYtInfo(url) {
 }
 function ytEmbedUrl(info) {
   if (!info) return ''
+  const origin = typeof window !== 'undefined' ? `&origin=${encodeURIComponent(window.location.origin)}` : ''
   if (info.type === 'playlist')
-    return `https://www.youtube.com/embed/videoseries?list=${info.id}&autoplay=1&loop=1`
-  return `https://www.youtube.com/embed/${info.id}?autoplay=1&loop=1&playlist=${info.id}`
+    return `https://www.youtube.com/embed/videoseries?list=${info.id}&autoplay=1&loop=1&enablejsapi=1${origin}`
+  return `https://www.youtube.com/embed/${info.id}?autoplay=1&loop=1&playlist=${info.id}&enablejsapi=1${origin}`
 }
 
 // ── Spotify track helpers ─────────────────────────────────────
@@ -39,6 +40,7 @@ export default function MusicPlayer() {
     spotifyTrack, spotifyPlaying, spotifyDeviceId, spotifyError,
     setSpotifyPlayback, setSpotifyPlaying, setSpotifyDeviceId, setSpotifyError, clearSpotify,
     ytPlaylists, ytCurrent, setYtCurrent, addYtPlaylist, removeYtPlaylist,
+    ytVolume, setYtVolume,
   } = useMusicStore()
 
   const [sdkReady,   setSdkReady]   = useState(false)
@@ -48,6 +50,42 @@ export default function MusicPlayer() {
   const [ytAddErr,   setYtAddErr]   = useState('')
   const [volume,     setVolume]     = useState(65)
   const playerRef = useRef(null)
+
+  // ── YouTube IFrame API (para control de volumen) ──
+  const ytPlayerRef = useRef(null)
+  const ytIframeRef = useRef(null)
+
+  // Cargar la API una sola vez
+  useEffect(() => {
+    if (window.YT || document.getElementById('yt-iframe-api')) return
+    const tag = document.createElement('script')
+    tag.id = 'yt-iframe-api'
+    tag.src = 'https://www.youtube.com/iframe_api'
+    document.head.appendChild(tag)
+  }, [])
+
+  // (Re)crear el player al cambiar de pista; aplicar volumen al estar listo
+  useEffect(() => {
+    if (!ytCurrent || !ytIframeRef.current) { ytPlayerRef.current = null; return }
+    let cancelled = false
+    const build = () => {
+      if (cancelled) return
+      if (!window.YT?.Player) { setTimeout(build, 250); return }
+      try { ytPlayerRef.current?.destroy?.() } catch (_) {}
+      try {
+        ytPlayerRef.current = new window.YT.Player(ytIframeRef.current, {
+          events: { onReady: e => { try { e.target.setVolume(ytVolume) } catch (_) {} } },
+        })
+      } catch (_) {}
+    }
+    build()
+    return () => { cancelled = true }
+  }, [ytCurrent?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Aplicar cambios de volumen
+  useEffect(() => {
+    try { ytPlayerRef.current?.setVolume?.(ytVolume) } catch (_) {}
+  }, [ytVolume])
 
   // Auto-init Spotify SDK when connected + panel opens
   useEffect(() => {
@@ -281,6 +319,8 @@ export default function MusicPlayer() {
             <div className={styles.ytPlayerWrap}>
               <iframe
                 key={embedUrl}
+                id="kairos-yt-iframe"
+                ref={ytIframeRef}
                 src={embedUrl}
                 className={styles.ytIframe}
                 title={ytCurrent.nombre}
@@ -293,6 +333,14 @@ export default function MusicPlayer() {
                   <i className="ti ti-player-stop" />
                 </button>
               </p>
+              <div className={styles.volWrap}>
+                <i className="ti ti-volume" style={{ fontSize: 13, color: 'var(--kairos-text-muted)' }} />
+                <input
+                  type="range" min="0" max="100" value={ytVolume}
+                  className={styles.volSlider}
+                  onChange={e => setYtVolume(Number(e.target.value))}
+                />
+              </div>
             </div>
           )}
 
