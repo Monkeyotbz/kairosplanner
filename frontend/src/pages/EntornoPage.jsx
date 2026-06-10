@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { useThemeStore, THEMES } from '../store/themeStore'
+import { useOnboardingStore } from '../store/onboardingStore'
 import { signOut, changePassword, sendPasswordReset } from '../services/authService'
 import { updateProfileName, uploadAvatar, updateAvatarUrl } from '../services/profileService'
 import styles from './EntornoPage.module.css'
@@ -10,6 +11,7 @@ export default function EntornoPage() {
   const navigate = useNavigate()
   const { user, profile, setProfile, clearUser } = useAuthStore()
   const { theme, setTheme } = useThemeStore()
+  const openOnboarding = useOnboardingStore(s => s.open)
   const fileInputRef = useRef(null)
   const avatarMenuRef = useRef(null)
 
@@ -367,6 +369,22 @@ export default function EntornoPage() {
                   </>
                 )
               }
+            </div>
+          </div>
+        </section>
+
+        {/* ── Ayuda ── */}
+        <section className={styles.section}>
+          <p className={styles.sectionLabel}>Ayuda</p>
+          <div className={styles.card}>
+            <div className={styles.accountRow}>
+              <div>
+                <p className={styles.accountRowTitle}>Recorrido de bienvenida</p>
+                <p className={styles.accountRowSub}>Vuelve a ver la introducción a KAIROS.</p>
+              </div>
+              <button className={styles.resetBtn} onClick={openOnboarding}>
+                <i className="ti ti-route" /> Ver recorrido
+              </button>
             </div>
           </div>
         </section>
