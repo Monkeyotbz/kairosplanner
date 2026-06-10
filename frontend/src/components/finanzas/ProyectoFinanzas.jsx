@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { getMisProyectos } from '../../services/focusService'
 import { getFinanzasProyecto, addFinanzaProyecto, deleteFinanzaProyecto, calcSummary, formatMoney } from '../../services/financeService'
 import FinanceSummary from './FinanceSummary'
+import ProjectBudgetBar from './ProjectBudgetBar'
+import ProjectROI from './ProjectROI'
 import styles from './ProyectoFinanzas.module.css'
 
 const today = new Date().toISOString().slice(0, 10)
@@ -17,6 +19,7 @@ export default function ProyectoFinanzas({ year, month }) {
   const [showForm, setShowForm]     = useState(false)
   const [form, setForm]             = useState({ concepto: '', monto: '', tipo: 'ingreso', fecha: today })
   const [loading, setLoading]       = useState(false)
+  const [version, setVersion]       = useState(0)  // bump → recalcula ROI
 
   useEffect(() => {
     getMisProyectos().then(ps => {
@@ -41,6 +44,7 @@ export default function ProyectoFinanzas({ year, month }) {
       setForm({ concepto: '', monto: '', tipo: 'ingreso', fecha: today })
       setShowForm(false)
       getFinanzasProyecto(proyectoId, year, month).then(setItems)
+      setVersion(v => v + 1)
     } finally {
       setLoading(false)
     }
@@ -50,6 +54,7 @@ export default function ProyectoFinanzas({ year, month }) {
     if (!confirm('¿Eliminar?')) return
     await deleteFinanzaProyecto(id)
     getFinanzasProyecto(proyectoId, year, month).then(setItems)
+    setVersion(v => v + 1)
   }
 
   return (
@@ -69,6 +74,12 @@ export default function ProyectoFinanzas({ year, month }) {
           </span>
         </div>
       </div>
+
+      {/* Tiempo = Dinero: ROI del proyecto */}
+      <ProjectROI proyectoId={proyectoId} version={version} />
+
+      {/* Tope de costos del proyecto */}
+      <ProjectBudgetBar proyectoId={proyectoId} gastado={summary.gastos} />
 
       {/* Lista */}
       <div className={styles.listCard}>

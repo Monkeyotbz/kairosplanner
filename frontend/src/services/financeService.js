@@ -83,8 +83,14 @@ export async function deletePresupuesto(id) {
   if (error) throw error
 }
 
+// Estado de un presupuesto. 'ok' (<75%), 'warn' (75-99%), 'over' (>=100%)
+export function budgetState(gastado, limite) {
+  const pct    = limite > 0 ? (gastado / limite) * 100 : 0
+  const estado = pct >= 100 ? 'over' : pct >= 75 ? 'warn' : 'ok'
+  return { pct, estado, restante: limite - gastado }
+}
+
 // Cruza presupuestos con los gastos del mes para calcular progreso.
-// estado: 'ok' (<75%), 'warn' (75-99%), 'over' (>=100%)
 export function calcBudgetProgress(presupuestos, transacciones) {
   const spentByCat = {}
   transacciones
@@ -97,11 +103,64 @@ export function calcBudgetProgress(presupuestos, transacciones) {
     .map(p => {
       const limite  = Number(p.monto_limite)
       const gastado = spentByCat[p.categoria_id] || 0
-      const pct     = limite > 0 ? (gastado / limite) * 100 : 0
-      const estado  = pct >= 100 ? 'over' : pct >= 75 ? 'warn' : 'ok'
-      return { ...p, limite, gastado, restante: limite - gastado, pct, estado }
+      return { ...p, limite, gastado, ...budgetState(gastado, limite) }
     })
     .sort((a, b) => b.pct - a.pct)
+}
+
+// ── Tope de costos por proyecto ──────────────────────────────
+export async function getPresupuestoProyecto(proyectoId) {
+  const { data } = await supabase
+    .from('presupuestos_proyecto')
+    .select('*')
+    .eq('proyecto_id', proyectoId)
+    .maybeSingle()
+  return data || null
+}
+
+export async function setPresupuestoProyecto({ proyecto_id, monto_limite }) {
+  const userId = await getUserId()
+  const { data, error } = await supabase
+    .from('presupuestos_proyecto')
+    .upsert({ proyecto_id, usuario_id: userId, monto_limite }, { onConflict: 'proyecto_id' })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function deletePresupuestoProyecto(proyectoId) {
+  const { error } = await supabase.from('presupuestos_proyecto').delete().eq('proyecto_id', proyectoId)
+  if (error) throw error
+}
+
+// ── Tiempo = Dinero: ROI del proyecto ────────────────────────
+// Cruza las horas de Modo Enfoque (sesiones completadas) con los
+// ingresos/costos del proyecto para calcular la tarifa real $/hora.
+// Acumulado (all-time), no mensual: así refleja la rentabilidad real.
+export async function getProyectoROI(proyectoId) {
+  // Horas de enfoque completadas
+  const { data: sesiones } = await supabase
+    .from('sesiones_enfoque')
+    .select('segundos_reales')
+    .eq('proyecto_id', proyectoId)
+    .eq('estado', 'completada')
+  const segundos = (sesiones || []).reduce((s, x) => s + (x.segundos_reales || 0), 0)
+  const horas    = segundos / 3600
+
+  // Ingresos y costos del proyecto (acumulado)
+  const { data: fin } = await supabase
+    .from('finanzas_proyecto')
+    .select('monto, tipo')
+    .eq('proyecto_id', proyectoId)
+  const ingreso = (fin || []).filter(f => f.tipo === 'ingreso').reduce((s, f) => s + Number(f.monto), 0)
+  const costo   = (fin || []).filter(f => f.tipo === 'costo').reduce((s, f) => s + Number(f.monto), 0)
+
+  const ganancia        = ingreso - costo
+  const tarifaReal      = horas > 0 ? ingreso / horas : 0   // $/hora bruto
+  const gananciaPorHora = horas > 0 ? ganancia / horas : 0  // $/hora neto
+
+  return { segundos, horas, ingreso, costo, ganancia, tarifaReal, gananciaPorHora }
 }
 
 // ── Finanzas por proyecto ─────────────────────────────────────
