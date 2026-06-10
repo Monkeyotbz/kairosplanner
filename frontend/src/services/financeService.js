@@ -10,6 +10,16 @@ export function formatMoney(amount) {
   return new Intl.NumberFormat('es', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)
 }
 
+// Rango [primer día del mes, primer día del mes siguiente) — seguro para
+// meses de 28/29/30 días (evita fechas inválidas como 2026-06-31).
+function monthRange(year, month) {
+  const from      = `${year}-${String(month).padStart(2, '0')}-01`
+  const nextYear  = month === 12 ? year + 1 : year
+  const nextMonth = month === 12 ? 1 : month + 1
+  const toExcl    = `${nextYear}-${String(nextMonth).padStart(2, '0')}-01`
+  return { from, toExcl }
+}
+
 // ── Categorías ───────────────────────────────────────────────
 export async function getCategorias() {
   const userId = await getUserId()
@@ -25,14 +35,13 @@ export async function getCategorias() {
 // ── Transacciones personales ─────────────────────────────────
 export async function getTransacciones(year, month) {
   const userId = await getUserId()
-  const from = `${year}-${String(month).padStart(2, '0')}-01`
-  const to   = `${year}-${String(month).padStart(2, '0')}-31`
+  const { from, toExcl } = monthRange(year, month)
   const { data } = await supabase
     .from('transacciones')
     .select('*, categorias_finanzas(nombre, color, icono)')
     .eq('usuario_id', userId)
     .gte('fecha', from)
-    .lte('fecha', to)
+    .lt('fecha', toExcl)
     .order('fecha', { ascending: false })
   return data || []
 }
@@ -53,24 +62,39 @@ export async function deleteTransaccion(id) {
   if (error) throw error
 }
 
-// ── Presupuestos (Zero-Based Budgeting) ──────────────────────
-export async function getPresupuestos() {
+// ── Presupuestos (Zero-Based Budgeting) — por mes con herencia ─
+// Devuelve, para cada categoría, el presupuesto EFECTIVO del mes:
+// el valor propio del mes, o el del mes anterior más reciente
+// (heredado). Marca `heredado: true` cuando no es propio del mes.
+export async function getPresupuestos(year, month) {
   const userId = await getUserId()
   const { data } = await supabase
     .from('presupuestos')
     .select('*, categorias_finanzas(nombre, color, icono)')
     .eq('usuario_id', userId)
-  return data || []
+
+  const target = year * 12 + month
+  const byCat = {}
+  for (const r of data || []) {
+    const ord = r.anio * 12 + r.mes
+    if (ord > target) continue // definido en un mes futuro → no aplica aún
+    const cur = byCat[r.categoria_id]
+    if (!cur || ord > (cur.anio * 12 + cur.mes)) byCat[r.categoria_id] = r
+  }
+  return Object.values(byCat).map(r => ({
+    ...r,
+    heredado: !(r.anio === year && r.mes === month),
+  }))
 }
 
-// Upsert: crea o actualiza el límite de una categoría
-export async function setPresupuesto({ categoria_id, monto_limite }) {
+// Upsert del valor para UN mes concreto (crea override de ese mes)
+export async function setPresupuesto({ categoria_id, monto_limite, anio, mes }) {
   const userId = await getUserId()
   const { data, error } = await supabase
     .from('presupuestos')
     .upsert(
-      { usuario_id: userId, categoria_id, monto_limite },
-      { onConflict: 'usuario_id,categoria_id' }
+      { usuario_id: userId, categoria_id, monto_limite, anio, mes },
+      { onConflict: 'usuario_id,categoria_id,anio,mes' }
     )
     .select('*, categorias_finanzas(nombre, color, icono)')
     .single()
@@ -78,8 +102,14 @@ export async function setPresupuesto({ categoria_id, monto_limite }) {
   return data
 }
 
-export async function deletePresupuesto(id) {
-  const { error } = await supabase.from('presupuestos').delete().eq('id', id)
+// Eliminar = quita la categoría del presupuesto por completo (todos los meses)
+export async function deletePresupuestoCategoria(categoria_id) {
+  const userId = await getUserId()
+  const { error } = await supabase
+    .from('presupuestos')
+    .delete()
+    .eq('usuario_id', userId)
+    .eq('categoria_id', categoria_id)
   if (error) throw error
 }
 
@@ -108,27 +138,36 @@ export function calcBudgetProgress(presupuestos, transacciones) {
     .sort((a, b) => b.pct - a.pct)
 }
 
-// ── Tope de costos por proyecto ──────────────────────────────
-export async function getPresupuestoProyecto(proyectoId) {
+// ── Tope de costos por proyecto — por mes con herencia ───────
+export async function getPresupuestoProyecto(proyectoId, year, month) {
   const { data } = await supabase
     .from('presupuestos_proyecto')
     .select('*')
     .eq('proyecto_id', proyectoId)
-    .maybeSingle()
-  return data || null
+
+  const target = year * 12 + month
+  let efectivo = null
+  for (const r of data || []) {
+    const ord = r.anio * 12 + r.mes
+    if (ord > target) continue
+    if (!efectivo || ord > (efectivo.anio * 12 + efectivo.mes)) efectivo = r
+  }
+  if (!efectivo) return null
+  return { ...efectivo, heredado: !(efectivo.anio === year && efectivo.mes === month) }
 }
 
-export async function setPresupuestoProyecto({ proyecto_id, monto_limite }) {
+export async function setPresupuestoProyecto({ proyecto_id, monto_limite, anio, mes }) {
   const userId = await getUserId()
   const { data, error } = await supabase
     .from('presupuestos_proyecto')
-    .upsert({ proyecto_id, usuario_id: userId, monto_limite }, { onConflict: 'proyecto_id' })
+    .upsert({ proyecto_id, usuario_id: userId, monto_limite, anio, mes }, { onConflict: 'proyecto_id,anio,mes' })
     .select()
     .single()
   if (error) throw error
   return data
 }
 
+// Eliminar = quita el tope del proyecto por completo (todos los meses)
 export async function deletePresupuestoProyecto(proyectoId) {
   const { error } = await supabase.from('presupuestos_proyecto').delete().eq('proyecto_id', proyectoId)
   if (error) throw error
@@ -165,14 +204,13 @@ export async function getProyectoROI(proyectoId) {
 
 // ── Finanzas por proyecto ─────────────────────────────────────
 export async function getFinanzasProyecto(proyectoId, year, month) {
-  const from = `${year}-${String(month).padStart(2, '0')}-01`
-  const to   = `${year}-${String(month).padStart(2, '0')}-31`
+  const { from, toExcl } = monthRange(year, month)
   const { data } = await supabase
     .from('finanzas_proyecto')
     .select('*')
     .eq('proyecto_id', proyectoId)
     .gte('fecha', from)
-    .lte('fecha', to)
+    .lt('fecha', toExcl)
     .order('fecha', { ascending: false })
   return data || []
 }

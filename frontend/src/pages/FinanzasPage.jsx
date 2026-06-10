@@ -74,7 +74,11 @@ export default function FinanzasPage() {
                   <FinanceChart data={byCategoria} />
                   <TransactionList transacciones={transacciones} onDeleted={load} />
                 </div>
-                <BudgetPanel transacciones={transacciones} />
+                <BudgetPanel
+                  transacciones={transacciones}
+                  year={year} month={month}
+                  monthLabel={`${MONTHS[month - 1]} ${year}`}
+                />
               </>
             )
           }

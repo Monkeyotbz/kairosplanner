@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  getPresupuestos, setPresupuesto, deletePresupuesto,
+  getPresupuestos, setPresupuesto, deletePresupuestoCategoria,
   getCategorias, calcBudgetProgress, formatMoney,
 } from '../../services/financeService'
 import styles from './BudgetPanel.module.css'
@@ -11,34 +11,38 @@ const ESTADO_LABEL = {
   over: 'Excedido',
 }
 
-export default function BudgetPanel({ transacciones }) {
+export default function BudgetPanel({ transacciones, year, month, monthLabel }) {
   const [presupuestos, setPresupuestos] = useState([])
   const [loading, setLoading]   = useState(true)
   const [formFor, setFormFor]   = useState(null) // null = cerrado | {} nuevo | presupuesto a editar
 
   async function load() {
     setLoading(true)
-    const data = await getPresupuestos()
+    const data = await getPresupuestos(year, month)
     setPresupuestos(data)
     setLoading(false)
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [year, month])
 
   const progreso = calcBudgetProgress(presupuestos, transacciones)
 
-  async function handleDelete(id) {
-    // Optimista
-    setPresupuestos(prev => prev.filter(p => p.id !== id))
-    try { await deletePresupuesto(id) } catch (e) { console.error(e); load() }
+  async function handleDelete(categoriaId) {
+    setPresupuestos(prev => prev.filter(p => p.categoria_id !== categoriaId))
+    try { await deletePresupuestoCategoria(categoriaId) } catch (e) { console.error(e); load() }
   }
 
   return (
     <section className={styles.section}>
       <div className={styles.head}>
-        <h2 className={styles.heading}>
-          <i className="ti ti-target" /> Presupuestos
-        </h2>
+        <div className={styles.headTitles}>
+          <h2 className={styles.heading}>
+            <i className="ti ti-target" /> Presupuestos
+          </h2>
+          <span className={styles.subtitle}>
+            <i className="ti ti-repeat" /> Cada mes hereda el valor anterior · {monthLabel}
+          </span>
+        </div>
         <button className={styles.addBtn} onClick={() => setFormFor({})}>
           + Presupuesto
         </button>
@@ -61,17 +65,22 @@ export default function BudgetPanel({ transacciones }) {
             const cat  = p.categorias_finanzas || {}
             const fill = Math.min(p.pct, 100)
             return (
-              <div key={p.id} className={`${styles.card} ${styles[p.estado]}`}>
+              <div key={p.categoria_id} className={`${styles.card} ${styles[p.estado]}`}>
                 <div className={styles.cardTop}>
                   <span className={styles.catName}>
                     <span className={styles.catIcon}>{cat.icono || '◈'}</span>
                     {cat.nombre || 'Categoría'}
+                    {p.heredado && (
+                      <span className={styles.heredado} title="Valor heredado de un mes anterior. Edítalo para fijar uno propio.">
+                        <i className="ti ti-arrow-down-right" /> heredado
+                      </span>
+                    )}
                   </span>
                   <div className={styles.cardActions}>
-                    <button className={styles.iconBtn} title="Editar" onClick={() => setFormFor(p)}>
+                    <button className={styles.iconBtn} title="Editar este mes" onClick={() => setFormFor(p)}>
                       <i className="ti ti-pencil" />
                     </button>
-                    <button className={styles.iconBtn} title="Eliminar" onClick={() => handleDelete(p.id)}>
+                    <button className={styles.iconBtn} title="Eliminar (todos los meses)" onClick={() => handleDelete(p.categoria_id)}>
                       <i className="ti ti-trash" />
                     </button>
                   </div>
@@ -102,8 +111,9 @@ export default function BudgetPanel({ transacciones }) {
 
       {formFor && (
         <BudgetForm
-          editing={formFor.id ? formFor : null}
+          editing={formFor.categoria_id ? formFor : null}
           existentes={presupuestos.map(p => p.categoria_id)}
+          year={year} month={month} monthLabel={monthLabel}
           onSaved={() => { setFormFor(null); load() }}
           onClose={() => setFormFor(null)}
         />
@@ -113,7 +123,7 @@ export default function BudgetPanel({ transacciones }) {
 }
 
 // ── Formulario (modal) ───────────────────────────────────────
-function BudgetForm({ editing, existentes, onSaved, onClose }) {
+function BudgetForm({ editing, existentes, year, month, monthLabel, onSaved, onClose }) {
   const [categorias, setCategorias] = useState([])
   const [categoriaId, setCatId]     = useState(editing?.categoria_id || '')
   const [monto, setMonto]           = useState(editing ? String(editing.monto_limite) : '')
@@ -133,7 +143,7 @@ function BudgetForm({ editing, existentes, onSaved, onClose }) {
     setLoading(true)
     setError('')
     try {
-      await setPresupuesto({ categoria_id: categoriaId, monto_limite: parseFloat(monto) })
+      await setPresupuesto({ categoria_id: categoriaId, monto_limite: parseFloat(monto), anio: year, mes: month })
       onSaved()
     } catch (err) {
       setError(err.message)
@@ -172,13 +182,16 @@ function BudgetForm({ editing, existentes, onSaved, onClose }) {
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>Límite mensual</label>
+            <label className={styles.label}>Límite para {monthLabel}</label>
             <input
               className={styles.input}
               type="number" min="0.01" step="0.01" placeholder="0.00"
               value={monto}
               onChange={e => setMonto(e.target.value)}
             />
+            <p className={styles.hint}>
+              Aplica desde {monthLabel} en adelante; los meses anteriores no cambian.
+            </p>
           </div>
 
           {error && <p className={styles.error}>{error}</p>}

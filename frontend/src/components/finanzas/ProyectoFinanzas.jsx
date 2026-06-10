@@ -24,7 +24,11 @@ export default function ProyectoFinanzas({ year, month }) {
   useEffect(() => {
     getMisProyectos().then(ps => {
       setProyectos(ps)
-      if (ps.length) setProyectoId(ps[0].id)
+      if (ps.length) {
+        // Arranca con el proyecto activo del dashboard, no con el primero
+        const last = localStorage.getItem('kairos-last-project')
+        setProyectoId(last && ps.some(p => p.id === last) ? last : ps[0].id)
+      }
     })
   }, [])
 
@@ -79,7 +83,12 @@ export default function ProyectoFinanzas({ year, month }) {
       <ProjectROI proyectoId={proyectoId} version={version} />
 
       {/* Tope de costos del proyecto */}
-      <ProjectBudgetBar proyectoId={proyectoId} gastado={summary.gastos} />
+      <ProjectBudgetBar
+        proyectoId={proyectoId}
+        gastado={summary.gastos}
+        year={year} month={month}
+        monthLabel={new Date(year, month - 1, 1).toLocaleDateString('es', { month: 'long', year: 'numeric' })}
+      />
 
       {/* Lista */}
       <div className={styles.listCard}>

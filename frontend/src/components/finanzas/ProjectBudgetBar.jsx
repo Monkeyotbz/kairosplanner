@@ -11,7 +11,7 @@ const ESTADO_LABEL = {
   over: 'Tope excedido',
 }
 
-export default function ProjectBudgetBar({ proyectoId, gastado }) {
+export default function ProjectBudgetBar({ proyectoId, gastado, year, month, monthLabel }) {
   const [budget, setBudget]   = useState(null)
   const [editing, setEditing] = useState(false)
   const [val, setVal]         = useState('')
@@ -20,11 +20,11 @@ export default function ProjectBudgetBar({ proyectoId, gastado }) {
   useEffect(() => {
     if (!proyectoId) return
     setEditing(false)
-    getPresupuestoProyecto(proyectoId).then(b => {
+    getPresupuestoProyecto(proyectoId, year, month).then(b => {
       setBudget(b)
       setVal(b ? String(b.monto_limite) : '')
     })
-  }, [proyectoId])
+  }, [proyectoId, year, month])
 
   if (!proyectoId) return null
 
@@ -37,8 +37,8 @@ export default function ProjectBudgetBar({ proyectoId, gastado }) {
     if (!val) return
     setLoading(true)
     try {
-      const b = await setPresupuestoProyecto({ proyecto_id: proyectoId, monto_limite: parseFloat(val) })
-      setBudget(b)
+      const b = await setPresupuestoProyecto({ proyecto_id: proyectoId, monto_limite: parseFloat(val), anio: year, mes: month })
+      setBudget({ ...b, heredado: false })
       setEditing(false)
     } catch (err) {
       console.error(err)
@@ -68,7 +68,7 @@ export default function ProjectBudgetBar({ proyectoId, gastado }) {
   if (editing) {
     return (
       <form className={styles.editCard} onSubmit={save}>
-        <label className={styles.editLabel}>Tope de costos mensual</label>
+        <label className={styles.editLabel}>Tope de costos para {monthLabel}</label>
         <div className={styles.editRow}>
           <input
             className={styles.input}
@@ -94,6 +94,9 @@ export default function ProjectBudgetBar({ proyectoId, gastado }) {
       <div className={styles.top}>
         <span className={styles.label}>
           <i className="ti ti-target" /> Tope de costos
+          {budget?.heredado
+            ? <span className={styles.recurr}><i className="ti ti-arrow-down-right" /> heredado</span>
+            : <span className={styles.recurr}><i className="ti ti-repeat" /> cada mes</span>}
         </span>
         <div className={styles.actions}>
           <button className={styles.iconBtn} title="Editar" onClick={() => setEditing(true)}>

@@ -11,6 +11,8 @@
   gap: 12px;
 }
 
+.headTitles { display: flex; flex-direction: column; gap: 3px; }
+
 .heading {
   display: flex;
   align-items: center;
@@ -20,6 +22,16 @@
   color: var(--kairos-text-primary);
 }
 .heading i { color: var(--kairos-purple-400); font-size: 18px; }
+
+.subtitle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-left: 26px;
+  font-size: 11.5px;
+  color: var(--kairos-text-muted);
+}
+.subtitle i { font-size: 13px; }
 
 .addBtn {
   padding: 7px 14px;
@@ -69,6 +81,20 @@
   color: var(--kairos-text-primary);
 }
 .catIcon { font-size: 15px; }
+
+.heredado {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--kairos-text-muted);
+  background: rgba(255,255,255,0.06);
+}
+.heredado i { font-size: 11px; }
 
 .cardActions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s; }
 .card:hover .cardActions { opacity: 1; }
