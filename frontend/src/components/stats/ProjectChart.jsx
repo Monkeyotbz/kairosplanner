@@ -35,17 +35,18 @@ export default function ProjectChart({ data }) {
       {!data.length
         ? <p className={styles.empty}>Sin datos aún</p>
         : (
-          <ResponsiveContainer width="100%" height={220}>
-            <PieChart>
+          <ResponsiveContainer width="100%" height={210}>
+            <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
               <Pie
                 data={data}
                 dataKey="horas"
                 nameKey="name"
-                cx="40%"
+                cx="42%"
                 cy="50%"
-                innerRadius={55}
-                outerRadius={85}
+                innerRadius={52}
+                outerRadius={80}
                 paddingAngle={3}
+                stroke="none"
               >
                 {data.map((_, i) => (
                   <Cell key={i} fill={COLORS[i % COLORS.length]} />

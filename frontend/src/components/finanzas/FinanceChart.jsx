@@ -23,7 +23,7 @@ export default function FinanceChart({ data }) {
           <div className={styles.inner}>
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
-                <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3}>
+                <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} stroke="none">
                   {data.map((entry, i) => (
                     <Cell key={i} fill={entry.color} />
                   ))}

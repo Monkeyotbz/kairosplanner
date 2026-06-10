@@ -1,9 +1,10 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useBoardStore } from '../store/boardStore'
 import CalendarGrid from '../components/calendar/CalendarGrid'
-import AgendaList   from '../components/calendar/AgendaList'
+import DayBlocks    from '../components/calendar/DayBlocks'
 import KairosFlow   from '../components/calendar/KairosFlow'
 import CardDetailModal from '../components/kanban/CardDetailModal'
+import AgendaMusic from '../components/calendar/AgendaMusic'
 import styles from './CalendarPage.module.css'
 
 /* ─── helpers de fecha ─────────────────────────────────────── */
@@ -143,8 +144,10 @@ export default function CalendarPage() {
   const VIEW_TABS = [
     { id: 'planner', label: 'Flujo', icon: 'ti-infinity' },
     { id: 'month',   label: 'Mes',   icon: 'ti-calendar-month' },
-    { id: 'list',    label: 'Lista', icon: 'ti-list' },
+    { id: 'day',     label: 'Día',   icon: 'ti-layout-list' },
   ]
+
+  const isDayView = view === 'planner' || view === 'day'
 
   const monthLabel = currentDate.toLocaleString('es-ES', { month: 'long', year: 'numeric' })
 
@@ -154,7 +157,7 @@ export default function CalendarPage() {
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>Agenda</h1>
-          {view !== 'planner' && (
+          {view === 'month' && (
             <span className={styles.monthLabel}>{monthLabel}</span>
           )}
         </div>
@@ -177,7 +180,7 @@ export default function CalendarPage() {
           <button className={styles.todayBtn} onClick={goToToday}>Hoy</button>
 
           {/* Navegación contextual */}
-          {view === 'planner' ? (
+          {isDayView ? (
             <div className={styles.navBtns}>
               <button className={styles.navBtn} onClick={goToPrevDay}>‹</button>
               <button className={styles.navBtn} onClick={goToNextDay}>›</button>
@@ -193,15 +196,18 @@ export default function CalendarPage() {
 
       {/* ── Body (sidebar + main) ───────────────────────────── */}
       <div className={styles.body}>
-        {/* Sidebar: mini calendario */}
+        {/* Sidebar: mini calendario + ABAD */}
         <aside className={styles.sidebar}>
           <MiniCalendar
             miniDate={miniDate}
             setMiniDate={setMiniDate}
             selectedDay={selectedDay}
-            setSelectedDay={d => { setSelectedDay(d); setView('planner') }}
+            setSelectedDay={d => { setSelectedDay(d); setView(v => v === 'month' ? 'day' : v) }}
             cardKeys={cardKeys}
           />
+
+          {/* Mini-reproductor de música — llena el espacio del sidebar */}
+          <AgendaMusic />
         </aside>
 
         {/* Main: vista activa */}
@@ -214,16 +220,14 @@ export default function CalendarPage() {
               cards={allCards}
               columnMap={columnMap}
             />
-          ) : allCards.length === 0 ? (
-            <div className={styles.empty}>
-              <span className={styles.emptyIcon}>◫</span>
-              <p>Ninguna tarjeta tiene fecha límite todavía.</p>
-              <p className={styles.emptyHint}>Ábrelas desde el Tablero y asígnales una fecha.</p>
-            </div>
-          ) : view === 'month' ? (
-            <CalendarGrid currentDate={currentDate} cards={allCards} columnMap={columnMap} />
+          ) : view === 'day' ? (
+            <DayBlocks
+              selectedDay={selectedDay}
+              cards={allCards}
+              columnMap={columnMap}
+            />
           ) : (
-            <AgendaList cards={allCards} columnMap={columnMap} />
+            <CalendarGrid currentDate={currentDate} cards={allCards} columnMap={columnMap} />
           )}
         </div>
       </div>
