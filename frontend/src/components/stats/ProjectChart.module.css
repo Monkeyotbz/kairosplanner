@@ -1,7 +1,10 @@
 .card {
-  background: var(--kairos-purple-800);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: var(--kairos-radius-md);
+  background: var(--kairos-glass-card-bg);
+  -webkit-backdrop-filter: var(--kairos-glass-card-filter);
+  backdrop-filter: var(--kairos-glass-card-filter);
+  border: 1px solid var(--kairos-glass-border);
+  box-shadow: var(--kairos-shadow-card);
+  border-radius: var(--kairos-radius-lg);
   padding: 20px;
   width: 340px;
   flex-shrink: 0;

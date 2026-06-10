@@ -7,9 +7,12 @@
 .card {
   flex: 1;
   min-width: 160px;
-  background: var(--kairos-purple-800);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: var(--kairos-radius-md);
+  background: var(--kairos-glass-card-bg);
+  -webkit-backdrop-filter: var(--kairos-glass-card-filter);
+  backdrop-filter: var(--kairos-glass-card-filter);
+  border: 1px solid var(--kairos-glass-border);
+  box-shadow: var(--kairos-shadow-card);
+  border-radius: var(--kairos-radius-lg);
   padding: 18px 20px;
   display: flex;
   align-items: center;
@@ -17,8 +20,10 @@
 }
 
 .balanceCard {
-  border-color: rgba(83,74,183,0.3);
-  background: rgba(83,74,183,0.12);
+  border-color: color-mix(in srgb, var(--kairos-purple-400) 38%, transparent);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--kairos-purple-600) 14%, transparent), transparent),
+    var(--kairos-glass-card-bg);
 }
 
 .icon {

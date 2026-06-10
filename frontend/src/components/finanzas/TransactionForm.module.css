@@ -10,13 +10,15 @@
 }
 
 .modal {
-  background: var(--kairos-purple-800);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--kairos-modal-bg);
+  border: 1px solid var(--kairos-border-2);
   border-radius: var(--kairos-radius-lg);
   padding: 28px;
   width: 100%;
   max-width: 420px;
   box-shadow: var(--kairos-shadow-modal);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 
 .modalHeader {
@@ -81,7 +83,7 @@
 }
 .input:focus, .select:focus { border-color: var(--kairos-purple-400); }
 .input::placeholder { color: var(--kairos-text-muted); }
-.select option { background: var(--kairos-purple-800); }
+.select option { background: var(--kairos-modal-bg); color: var(--kairos-text-primary); }
 
 .error {
   font-size: 12px;

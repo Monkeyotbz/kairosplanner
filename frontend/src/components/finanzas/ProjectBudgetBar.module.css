@@ -59,6 +59,16 @@
   color: var(--kairos-text-secondary);
 }
 .label i { color: var(--kairos-purple-400); font-size: 16px; }
+.recurr {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--kairos-text-muted);
+}
+.recurr i { color: var(--kairos-text-muted); font-size: 12px; }
 
 .actions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s; }
 .card:hover .actions { opacity: 1; }
