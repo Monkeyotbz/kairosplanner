@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { useThemeStore, THEMES } from '../store/themeStore'
 import { useOnboardingStore } from '../store/onboardingStore'
+import { useSubscriptionStore } from '../store/subscriptionStore'
 import { signOut, changePassword, sendPasswordReset } from '../services/authService'
 import { updateProfileName, uploadAvatar, updateAvatarUrl } from '../services/profileService'
 import styles from './EntornoPage.module.css'
@@ -12,6 +13,7 @@ export default function EntornoPage() {
   const { user, profile, setProfile, clearUser } = useAuthStore()
   const { theme, setTheme } = useThemeStore()
   const openOnboarding = useOnboardingStore(s => s.open)
+  const { info: subInfo } = useSubscriptionStore()
   const fileInputRef = useRef(null)
   const avatarMenuRef = useRef(null)
 
@@ -385,6 +387,55 @@ export default function EntornoPage() {
               <button className={styles.resetBtn} onClick={openOnboarding}>
                 <i className="ti ti-route" /> Ver recorrido
               </button>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Suscripción ── */}
+        <section className={styles.section}>
+          <p className={styles.sectionLabel}>Suscripción</p>
+          <div className={styles.card}>
+            <div className={styles.accountRow}>
+              <div className={styles.subInfo}>
+                {subInfo?.status === 'active' && (
+                  <>
+                    <p className={styles.accountRowTitle}>
+                      <span className={styles.subBadgeActive}>● KAIROS Pro</span>
+                    </p>
+                    <p className={styles.accountRowSub}>Suscripción activa — gracias por apoyar el proyecto.</p>
+                  </>
+                )}
+                {subInfo?.status === 'trialing' && (
+                  <>
+                    <p className={styles.accountRowTitle}>
+                      <span className={styles.subBadgeTrial}>◌ Prueba gratuita</span>
+                    </p>
+                    <p className={styles.accountRowSub}>
+                      {subInfo.trialDaysLeft > 0
+                        ? `Te quedan ${subInfo.trialDaysLeft} día${subInfo.trialDaysLeft !== 1 ? 's' : ''} de prueba.`
+                        : 'Tu prueba termina hoy.'}
+                    </p>
+                  </>
+                )}
+                {(subInfo?.status === 'expired' || subInfo?.status === 'canceled' || subInfo?.status === 'past_due') && (
+                  <>
+                    <p className={styles.accountRowTitle}>
+                      <span className={styles.subBadgeExpired}>✕ Sin acceso activo</span>
+                    </p>
+                    <p className={styles.accountRowSub}>Activa tu plan para seguir usando KAIROS.</p>
+                  </>
+                )}
+                {!subInfo && (
+                  <>
+                    <p className={styles.accountRowTitle}>Plan</p>
+                    <p className={styles.accountRowSub}>Cargando información…</p>
+                  </>
+                )}
+              </div>
+              <Link to="/upgrade" className={styles.resetBtn} style={{ textDecoration: 'none' }}>
+                <i className="ti ti-crown" />
+                {subInfo?.status === 'active' ? 'Gestionar' : 'Ver plan'}
+              </Link>
             </div>
           </div>
         </section>

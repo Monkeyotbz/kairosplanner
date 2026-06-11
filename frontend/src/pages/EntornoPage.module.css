@@ -503,6 +503,36 @@
 .logoutBtn:hover { background: rgba(216,90,48,0.2); }
 .logoutBtn i { font-size: 15px; }
 
+/* ── Subscription badges ── */
+.subInfo { display: flex; flex-direction: column; gap: 2px; }
+
+.subBadgeActive {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #a78bfa;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.subBadgeTrial {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #fbbf24;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.subBadgeExpired {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #fca07a;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
 /* ── Mobile ── */
 @media (max-width: 640px) {
   .page { padding: 20px 16px 56px; }
