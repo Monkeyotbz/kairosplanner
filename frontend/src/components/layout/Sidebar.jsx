@@ -23,6 +23,17 @@ export default function Sidebar() {
           <span className={styles.label}>{label}</span>
         </NavLink>
       ))}
+
+      {/* Separador + acceso dev al onboarding */}
+      <div className={styles.spacer} />
+      <NavLink
+        to="/onboarding-preview"
+        className={({ isActive }) => `${styles.item} ${styles.devItem} ${isActive ? styles.devActive : ''}`}
+        title="Vista previa del Onboarding"
+      >
+        <span className={styles.icon}>✦</span>
+        <span className={styles.label}>Dev</span>
+      </NavLink>
     </aside>
   )
 }

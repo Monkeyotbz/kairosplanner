@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBoardStore } from '../../store/boardStore'
+import { getUpcomingDeadlines } from '../../services/boardService'
 import styles from './NotificationBell.module.css'
 
 function getDateStr(date) {
@@ -16,24 +17,57 @@ export default function NotificationBell({ openUp = false }) {
   const navigate = useNavigate()
   const { cardsByColumn, selectCard } = useBoardStore()
   const [open, setOpen] = useState(false)
+  const [fetchedCards, setFetchedCards] = useState([])
   const panelRef = useRef(null)
 
   const today    = getDateStr(new Date())
   const tomorrow = (() => { const d = new Date(); d.setDate(d.getDate() + 1); return getDateStr(d) })()
 
+  // Carga independiente del boardStore — funciona desde cualquier página
+  const loadDeadlines = useCallback(async () => {
+    // Si el boardStore ya tiene datos (usuario en /board), usarlos directamente
+    if (Object.keys(cardsByColumn).length > 0) {
+      setFetchedCards(Object.values(cardsByColumn).flat())
+      return
+    }
+    try {
+      const cards = await getUpcomingDeadlines()
+      setFetchedCards(cards)
+    } catch (_) {}
+  }, [cardsByColumn])
+
+  // Carga inicial
+  useEffect(() => { loadDeadlines() }, [])
+
+  // Si el boardStore se puebla (usuario navegó a /board), sincronizar
+  useEffect(() => {
+    if (Object.keys(cardsByColumn).length > 0) {
+      setFetchedCards(Object.values(cardsByColumn).flat())
+    }
+  }, [cardsByColumn])
+
+  // Refresco periódico: cada 5 minutos cuando no está en el board
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (Object.keys(cardsByColumn).length === 0) {
+        getUpcomingDeadlines().then(setFetchedCards).catch(() => {})
+      }
+    }, 5 * 60 * 1000)
+    return () => clearInterval(id)
+  }, [cardsByColumn])
+
   const { overdue, dueToday, dueTomorrow } = useMemo(() => {
-    const allCards = Object.values(cardsByColumn).flat()
-    const overdue    = []
-    const dueToday   = []
+    const overdue     = []
+    const dueToday    = []
     const dueTomorrow = []
-    allCards.forEach(card => {
+    fetchedCards.forEach(card => {
       if (!card.fecha_limite) return
-      if (card.fecha_limite < today)        overdue.push(card)
-      else if (card.fecha_limite === today)  dueToday.push(card)
+      if (card.fecha_limite < today)           overdue.push(card)
+      else if (card.fecha_limite === today)    dueToday.push(card)
       else if (card.fecha_limite === tomorrow) dueTomorrow.push(card)
     })
     return { overdue, dueToday, dueTomorrow }
-  }, [cardsByColumn, today, tomorrow])
+  }, [fetchedCards, today, tomorrow])
 
   const total = overdue.length + dueToday.length + dueTomorrow.length
 
@@ -46,10 +80,17 @@ export default function NotificationBell({ openUp = false }) {
     return () => document.removeEventListener('mousedown', handle)
   }, [open])
 
+  function handleOpen() {
+    // Refresco al abrir si no hay datos del board
+    if (Object.keys(cardsByColumn).length === 0) {
+      getUpcomingDeadlines().then(setFetchedCards).catch(() => {})
+    }
+    setOpen(v => !v)
+  }
+
   function handleCardClick(card) {
     setOpen(false)
     navigate('/board')
-    // micro-delay para que BoardPage monte antes de abrir el modal
     setTimeout(() => selectCard(card), 50)
   }
 
@@ -57,7 +98,7 @@ export default function NotificationBell({ openUp = false }) {
     <div className={styles.wrap} ref={panelRef}>
       <button
         className={`${styles.bell} ${total > 0 ? styles.bellActive : ''}`}
-        onClick={() => setOpen(v => !v)}
+        onClick={handleOpen}
         title="Notificaciones de vencimiento"
         aria-label={`Notificaciones${total > 0 ? ` (${total})` : ''}`}
       >

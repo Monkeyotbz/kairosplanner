@@ -36,6 +36,16 @@ export default function FocusCapsule() {
     return () => clearInterval(id)
   }, [minimized, phase, tickBreak])
 
+  // Al volver a la pestaña: forzar re-sync del timer ancla
+  useEffect(() => {
+    if (!minimized) return
+    function onVisible() {
+      if (!document.hidden && phase === 'active') tick()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => document.removeEventListener('visibilitychange', onVisible)
+  }, [minimized, phase, tick])
+
   // Cargar el rango al aparecer
   useEffect(() => {
     if (!minimized) return

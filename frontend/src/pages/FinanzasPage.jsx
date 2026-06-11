@@ -5,6 +5,8 @@ import FinanceChart from '../components/finanzas/FinanceChart'
 import TransactionList from '../components/finanzas/TransactionList'
 import TransactionForm from '../components/finanzas/TransactionForm'
 import BudgetPanel from '../components/finanzas/BudgetPanel'
+import RecurrenciasPanel from '../components/finanzas/RecurrenciasPanel'
+import CashFlowChart from '../components/finanzas/CashFlowChart'
 import ProyectoFinanzas from '../components/finanzas/ProyectoFinanzas'
 import styles from './FinanzasPage.module.css'
 
@@ -16,6 +18,7 @@ export default function FinanzasPage() {
   const [year, setYear]                   = useState(now.getFullYear())
   const [month, setMonth]                 = useState(now.getMonth() + 1)
   const [transacciones, setTransacciones] = useState([])
+  const [recurrencias, setRecurrencias]   = useState([])
   const [showForm, setShowForm]           = useState(false)
   const [loading, setLoading]             = useState(true)
 
@@ -79,6 +82,8 @@ export default function FinanzasPage() {
                   year={year} month={month}
                   monthLabel={`${MONTHS[month - 1]} ${year}`}
                 />
+                <RecurrenciasPanel onChange={setRecurrencias} />
+                <CashFlowChart recurrencias={recurrencias} currentMonthBalance={summary.balance} />
               </>
             )
           }

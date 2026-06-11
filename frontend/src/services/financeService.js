@@ -32,6 +32,17 @@ export async function getCategorias() {
   return data || []
 }
 
+export async function createCategoria({ nombre, tipo, icono = '💰', color = '#534AB7' }) {
+  const userId = await getUserId()
+  const { data, error } = await supabase
+    .from('categorias_finanzas')
+    .insert({ usuario_id: userId, nombre, tipo, icono, color, es_predefinida: false })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
 // ── Transacciones personales ─────────────────────────────────
 export async function getTransacciones(year, month) {
   const userId = await getUserId()
@@ -229,6 +240,105 @@ export async function addFinanzaProyecto({ proyecto_id, concepto, monto, tipo, f
 export async function deleteFinanzaProyecto(id) {
   const { error } = await supabase.from('finanzas_proyecto').delete().eq('id', id)
   if (error) throw error
+}
+
+// ── Recurrencias (pagos / ingresos periódicos) ───────────────
+export async function getRecurrencias() {
+  const userId = await getUserId()
+  const { data } = await supabase
+    .from('recurrencias')
+    .select('*, categorias_finanzas(nombre, icono, color)')
+    .eq('usuario_id', userId)
+    .order('creado_en')
+  return data || []
+}
+
+export async function addRecurrencia(fields) {
+  const userId = await getUserId()
+  const { data, error } = await supabase
+    .from('recurrencias')
+    .insert({ ...fields, usuario_id: userId })
+    .select('*, categorias_finanzas(nombre, icono, color)')
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function updateRecurrencia(id, fields) {
+  const { data, error } = await supabase
+    .from('recurrencias')
+    .update(fields)
+    .eq('id', id)
+    .select('*, categorias_finanzas(nombre, icono, color)')
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteRecurrencia(id) {
+  const { error } = await supabase.from('recurrencias').delete().eq('id', id)
+  if (error) throw error
+}
+
+// ── Cash-flow forecasting (función pura, sin Supabase) ────────
+// Devuelve un array de 91 puntos (hoy + 90 días) con el saldo acumulado.
+// Cada punto incluye `events` — lista de recurrencias que disparan ese día.
+
+function mesOffset(inicio, date) {
+  return (date.getFullYear() - inicio.getFullYear()) * 12 + (date.getMonth() - inicio.getMonth())
+}
+
+function safeDay(date, dia) {
+  const ultimo = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
+  return date.getDate() === Math.min(dia, ultimo)
+}
+
+function firesOn(r, date) {
+  const inicio = new Date(r.fecha_inicio + 'T00:00:00')
+  if (date < inicio) return false
+  if (r.fecha_fin && date > new Date(r.fecha_fin + 'T00:00:00')) return false
+
+  const diaRef = r.dia_del_mes || inicio.getDate()
+  const diffDias = Math.round((date - inicio) / 86400000)
+
+  switch (r.frecuencia) {
+    case 'diaria':      return true
+    case 'semanal':     return diffDias % 7 === 0
+    case 'quincenal':   return diffDias % 14 === 0
+    case 'mensual':     return safeDay(date, diaRef)
+    case 'bimestral':   return mesOffset(inicio, date) % 2 === 0  && safeDay(date, diaRef)
+    case 'trimestral':  return mesOffset(inicio, date) % 3 === 0  && safeDay(date, diaRef)
+    case 'anual':       return date.getMonth() === inicio.getMonth() && safeDay(date, diaRef)
+    default:            return false
+  }
+}
+
+export function projectCashFlow(recurrencias, startBalance = 0, days = 90) {
+  const points = []
+  let balance = startBalance
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const active = recurrencias.filter(r => r.activa)
+
+  for (let i = 0; i <= days; i++) {
+    const date = new Date(today.getTime())
+    date.setDate(today.getDate() + i)
+    date.setHours(0, 0, 0, 0)
+
+    const events = []
+    active.forEach(r => {
+      if (!firesOn(r, date)) return
+      balance += r.tipo === 'ingreso' ? Number(r.monto) : -Number(r.monto)
+      events.push({ concepto: r.concepto, monto: Number(r.monto), tipo: r.tipo })
+    })
+
+    points.push({
+      fecha: date.toISOString().slice(0, 10),
+      balance: Math.round(balance * 100) / 100,
+      events,
+    })
+  }
+  return points
 }
 
 // ── Cálculos ─────────────────────────────────────────────────

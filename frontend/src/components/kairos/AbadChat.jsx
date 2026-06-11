@@ -2,20 +2,25 @@ import { useState, useEffect, useRef } from 'react'
 import { useAbadStore } from '../../store/abadStore'
 import { useBoardStore } from '../../store/boardStore'
 import { useKairosVoice } from '../../hooks/useKairosVoice'
+import { useSpeech } from '../../hooks/useSpeech'
 import { getProjectMembers, createSubtarea } from '../../services/boardService'
-import { addTransaccion, getCategorias } from '../../services/financeService'
+import {
+  addTransaccion, getCategorias,
+  getPresupuestos, getTransacciones, calcBudgetProgress, calcSummary,
+} from '../../services/financeService'
 import { getFocusProgress } from '../../services/rankService'
 import InfinityLogo from '../layout/InfinityLogo'
 import styles from './AbadChat.module.css'
 
 const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 const norm = s => (s || '').toString().trim().toLowerCase()
+const ALERT_KEY = 'kairos-abad-alert-date'
 
 const EXAMPLES = [
   '¿Qué tengo pendiente hoy?',
-  'Crea una tarjeta "Llamar al cliente" para mañana, prioridad alta',
-  'Mueve "Diseñar logo" a Hecho',
-  'Registra un gasto de 50 en herramientas',
+  'Crea "Llamar al cliente" para mañana, prioridad alta',
+  '¿Cómo va mi presupuesto este mes?',
+  'Registra un ingreso de 500 por "Freelance"',
 ]
 
 export default function AbadChat() {
@@ -27,26 +32,49 @@ export default function AbadChat() {
   const { isListening, transcript, toggleListening, startListening, stopListening } = useKairosVoice({
     onResult: (text) => submit(text),
   })
+  const { speak, cancel: cancelSpeech, isMuted, toggleMute } = useSpeech()
 
   useEffect(() => { getFocusProgress().then(setRank).catch(() => {}) }, [])
 
-  // Auto-scroll al último mensaje
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
   }, [messages, thinking, isOpen])
 
-  // Al ABRIR el panel: empezar a escuchar al instante. Al cerrar: detener todo.
+  // Al abrir: escuchar + alerta proactiva de presupuesto (una vez al día)
   useEffect(() => {
     if (isOpen) {
       const t = setTimeout(() => startListening(), 350)
+
+      // Alerta proactiva solo si la conversación está en blanco y no se alertó hoy
+      const today = new Date().toISOString().slice(0, 10)
+      if (messages.length === 0 && localStorage.getItem(ALERT_KEY) !== today) {
+        const now = new Date()
+        Promise.all([
+          getTransacciones(now.getFullYear(), now.getMonth() + 1),
+          getPresupuestos(now.getFullYear(), now.getMonth() + 1),
+        ]).then(([trans, pres]) => {
+          const progress = calcBudgetProgress(pres, trans)
+          const alerts = progress.filter(b => b.estado !== 'ok')
+          if (!alerts.length) return
+          const parts = alerts.slice(0, 3).map(b => {
+            const name = b.categorias_finanzas?.nombre || 'una categoría'
+            const label = b.estado === 'over' ? 'excedida' : 'en alerta'
+            return `${name} al ${Math.round(b.pct)}% (${label})`
+          })
+          const msg = `Hola. Antes de que preguntes: este mes tienes ${parts.join(', ')}.`
+          addMessage('abad', msg)
+          speak(msg)
+          localStorage.setItem(ALERT_KEY, today)
+        }).catch(() => {})
+      }
+
       return () => clearTimeout(t)
     }
     stopListening()
-    try { window.speechSynthesis?.cancel() } catch (_) {}
+    cancelSpeech()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
-  // Auto-pensar: si dejas de hablar (~2s sin cambios en la transcripción), se detiene y envía.
   useEffect(() => {
     if (!isListening || !transcript.trim()) return
     const t = setTimeout(() => stopListening(), 2000)
@@ -55,16 +83,6 @@ export default function AbadChat() {
   }, [transcript, isListening])
 
   if (!isOpen) return null
-
-  function speak(text) {
-    try {
-      if (!('speechSynthesis' in window) || !text) return
-      window.speechSynthesis.cancel()
-      const u = new SpeechSynthesisUtterance(text)
-      u.lang = 'es-ES'
-      window.speechSynthesis.speak(u)
-    } catch (_) {}
-  }
 
   async function buildContext() {
     const { cardsByColumn, columns, proyecto } = useBoardStore.getState()
@@ -80,24 +98,50 @@ export default function AbadChat() {
 
     let miembros = []
     let categorias = []
-    try {
-      if (proyecto?.id) {
-        const m = await getProjectMembers(proyecto.id)
-        miembros = m.map(x => x.usuarios?.nombre || x.usuarios?.email).filter(Boolean)
-      }
-    } catch (_) {}
-    try { categorias = (await getCategorias()).map(c => c.nombre) } catch (_) {}
+    let presupuestosCtx = []
+    let summaryCtx = { ingresos: 0, gastos: 0, balance: 0 }
+
+    const now = new Date()
+    const [miembrosResult, categoriasResult, transResult, presResult] = await Promise.allSettled([
+      proyecto?.id ? getProjectMembers(proyecto.id) : Promise.resolve([]),
+      getCategorias(),
+      getTransacciones(now.getFullYear(), now.getMonth() + 1),
+      getPresupuestos(now.getFullYear(), now.getMonth() + 1),
+    ])
+
+    if (miembrosResult.status === 'fulfilled') {
+      miembros = (miembrosResult.value || []).map(x => x.usuarios?.nombre || x.usuarios?.email).filter(Boolean)
+    }
+    if (categoriasResult.status === 'fulfilled') {
+      categorias = (categoriasResult.value || []).map(c => c.nombre)
+    }
+    if (transResult.status === 'fulfilled' && presResult.status === 'fulfilled') {
+      const trans = transResult.value || []
+      const pres  = presResult.value || []
+      summaryCtx = calcSummary(trans)
+      presupuestosCtx = calcBudgetProgress(pres, trans).map(b => ({
+        categoria: b.categorias_finanzas?.nombre || '?',
+        limite:    b.limite,
+        gastado:   b.gastado,
+        pct:       Math.round(b.pct),
+        estado:    b.estado,
+      }))
+    }
 
     return {
-      fecha_hoy: todayStr,
-      proyecto: proyecto?.nombre || null,
-      columnas: (columns || []).map(c => c.nombre),
+      fecha_hoy:         todayStr,
+      proyecto:          proyecto?.nombre || null,
+      columnas:          (columns || []).map(c => c.nombre),
       miembros,
-      categorias_gasto: categorias,
-      rango: rank?.after?.current?.name || null,
-      racha_dias: rank?.streak ?? 0,
-      xp_total_min: rank?.after?.totalMinutes ?? 0,
-      tareas: { vencidas, hoy, manana },
+      categorias_gasto:  categorias,
+      rango:             rank?.after?.current?.name || null,
+      racha_dias:        rank?.streak ?? 0,
+      xp_total_min:      rank?.after?.totalMinutes ?? 0,
+      tareas:            { vencidas, hoy, manana },
+      ingresos_mes:      summaryCtx.ingresos,
+      gastos_mes:        summaryCtx.gastos,
+      balance_mes:       summaryCtx.balance,
+      presupuestos:      presupuestosCtx,
     }
   }
 
@@ -146,10 +190,10 @@ export default function AbadChat() {
         }
       }
       const extras = []
-      if (args.prioridad)        extras.push(`prioridad ${args.prioridad}`)
-      if (args.fecha_limite)     extras.push(`para el ${args.fecha_limite}`)
+      if (args.prioridad)         extras.push(`prioridad ${args.prioridad}`)
+      if (args.fecha_limite)      extras.push(`para el ${args.fecha_limite}`)
       if (args.subtareas?.length) extras.push(`${args.subtareas.length} subtarea${args.subtareas.length > 1 ? 's' : ''}`)
-      if (fields.asignado_a)     extras.push(`asignada a ${args.participante}`)
+      if (fields.asignado_a)      extras.push(`asignada a ${args.participante}`)
       return `Listo, creé "${args.titulo}" en ${col.nombre}${extras.length ? ' · ' + extras.join(', ') : ''}.`
     }
 
@@ -164,7 +208,8 @@ export default function AbadChat() {
       return `Moví "${found.card.titulo}" a ${toCol.nombre}.`
     }
 
-    if (action === 'registrar_gasto') {
+    if (action === 'registrar_gasto' || action === 'registrar_ingreso') {
+      const tipo = action === 'registrar_gasto' ? 'gasto' : 'ingreso'
       try {
         let categoria_id = null
         if (args.categoria) {
@@ -172,12 +217,13 @@ export default function AbadChat() {
           const n = norm(args.categoria)
           categoria_id = cats.find(c => norm(c.nombre).includes(n) || n.includes(norm(c.nombre)))?.id || null
         }
-        await addTransaccion({ concepto: args.concepto, monto: Number(args.monto), tipo: 'gasto', categoria_id, fecha: ymd(new Date()) })
-        return `Registré un gasto de $${args.monto} en "${args.concepto}".`
+        await addTransaccion({ concepto: args.concepto, monto: Number(args.monto), tipo, categoria_id, fecha: ymd(new Date()) })
+        return `Registré ${tipo === 'gasto' ? 'un gasto' : 'un ingreso'} de $${args.monto} por "${args.concepto}".`
       } catch (_) {
-        return 'No pude registrar el gasto.'
+        return `No pude registrar el ${tipo}.`
       }
     }
+
     return 'No reconocí esa acción.'
   }
 
@@ -185,6 +231,8 @@ export default function AbadChat() {
     const q = (text || '').trim()
     if (!q || thinking) return
     setInput('')
+    // Capturar historial ANTES de agregar el nuevo mensaje
+    const history = messages.slice(-8)
     addMessage('user', q)
     setThinking(true)
     try {
@@ -192,11 +240,11 @@ export default function AbadChat() {
       const res = await fetch('/api/abad', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q, context }),
+        body: JSON.stringify({ question: q, context, history }),
       })
       const data = await res.json().catch(() => ({}))
       let reply
-      if (!res.ok)            reply = data.error || 'ABAD no está disponible ahora mismo.'
+      if (!res.ok)           reply = data.error || 'ABAD no está disponible ahora mismo.'
       else if (data.action)  reply = await executeAction(data.action, data.args || {})
       else                   reply = data.answer || 'No tengo una respuesta para eso.'
       addMessage('abad', reply)
@@ -218,13 +266,21 @@ export default function AbadChat() {
             <p className={styles.sub}>Inteligencia de KAIROS</p>
           </div>
         </div>
+        <button
+          className={styles.muteBtn}
+          onClick={toggleMute}
+          title={isMuted ? 'Activar voz de ABAD' : 'Silenciar voz de ABAD'}
+          aria-label={isMuted ? 'Activar voz' : 'Silenciar voz'}
+        >
+          <i className={isMuted ? 'ti ti-volume-3' : 'ti ti-volume'} />
+        </button>
         <button className={styles.close} onClick={close} aria-label="Cerrar"><i className="ti ti-x" /></button>
       </div>
 
       <div className={styles.messages} ref={listRef}>
         {messages.length === 0 && (
           <div className={styles.welcome}>
-            <p className={styles.welcomeText}>Habla o escribe. Puedo responder sobre tus tareas y también crear/mover tarjetas o registrar gastos.</p>
+            <p className={styles.welcomeText}>Habla o escribe. Puedo responder sobre tus tareas, finanzas y también crear/mover tarjetas o registrar movimientos.</p>
             <div className={styles.examples}>
               {EXAMPLES.map(ex => (
                 <button key={ex} className={styles.example} onClick={() => submit(ex)}>{ex}</button>

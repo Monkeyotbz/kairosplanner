@@ -8,8 +8,25 @@ export default function ToastContainer() {
   return (
     <div className={styles.container}>
       {toasts.map(toast => (
-        <DeadlineToast key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
+        toast._type === 'focus-recovery'
+          ? <FocusRecoveryToast key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
+          : <DeadlineToast      key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
       ))}
+    </div>
+  )
+}
+
+function FocusRecoveryToast({ toast, onClose }) {
+  return (
+    <div className={`${styles.toast} ${styles.recovery}`}>
+      <div className={styles.iconWrap}>
+        <i className="ti ti-clock-check" />
+      </div>
+      <div className={styles.body}>
+        <p className={styles.title}>Sesión de enfoque recuperada</p>
+        <p className={styles.sub}>{toast.minutos} min guardados en tus estadísticas</p>
+      </div>
+      <button className={styles.closeBtn} onClick={onClose} aria-label="Cerrar">✕</button>
     </div>
   )
 }

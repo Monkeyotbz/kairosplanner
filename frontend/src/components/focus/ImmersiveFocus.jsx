@@ -69,6 +69,16 @@ export default function ImmersiveFocus() {
     return () => document.removeEventListener('keydown', onKey)
   }, [immersive, exitImmersive])
 
+  // Al volver a la pestaña: forzar re-sync del timer ancla
+  useEffect(() => {
+    if (!immersive) return
+    function onVisible() {
+      if (!document.hidden && phase === 'active') tick()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => document.removeEventListener('visibilitychange', onVisible)
+  }, [immersive, phase, tick])
+
   if (!immersive) return null
 
   const isPomodoro = tipo === 'pomodoro'

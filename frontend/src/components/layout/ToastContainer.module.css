@@ -44,6 +44,13 @@
   border-left: 3px solid #fb923c;
 }
 
+.recovery {
+  background: rgba(15, 25, 20, 0.92);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-left: 3px solid #34d399;
+}
+.recovery .iconWrap { color: #34d399; }
+
 .iconWrap {
   font-size: 20px;
   line-height: 1;
@@ -65,6 +72,7 @@
   color: var(--kairos-text-primary);
   margin-bottom: 4px;
 }
+.sub { font-size: 12px; color: var(--kairos-text-secondary); margin: 0; }
 
 .groups {
   display: flex;

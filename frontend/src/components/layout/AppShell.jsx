@@ -1,4 +1,5 @@
-import { Outlet } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
 import Topbar from './Topbar'
 import Sidebar from './Sidebar'
 import Dock from './Dock'
@@ -9,12 +10,30 @@ import ToastContainer from './ToastContainer'
 import ImmersiveFocus from '../focus/ImmersiveFocus'
 import FocusCapsule from '../focus/FocusCapsule'
 import AbadChat from '../kairos/AbadChat'
-import Onboarding from './Onboarding'
+import AbadOnboarding from '../kairos/AbadOnboarding'
+import CookieConsent from './CookieConsent'
 import { useChatStore } from '../../store/chatStore'
 import { useFocusStore } from '../../store/focusStore'
+import { useFocusRecovery } from '../../hooks/useFocusRecovery'
+import { useSubscriptionStore } from '../../store/subscriptionStore'
 import styles from './AppShell.module.css'
 
 export default function AppShell() {
+  useFocusRecovery()
+
+  const navigate = useNavigate()
+  const { load, info, loading: subLoading } = useSubscriptionStore()
+
+  // Cargar estado de suscripción al montar
+  useEffect(() => { load() }, [load])
+
+  // Redirigir a /upgrade si el trial expiró y no hay suscripción activa
+  useEffect(() => {
+    if (!subLoading && info !== null && !info.isActive) {
+      navigate('/upgrade', { replace: true })
+    }
+  }, [subLoading, info, navigate])
+
   const { isOpen: chatOpen, close: closeChat } = useChatStore()
   const phase     = useFocusStore(s => s.phase)
   const immersive = useFocusStore(s => s.immersive)
@@ -39,7 +58,8 @@ export default function AppShell() {
       <ImmersiveFocus />
       <FocusCapsule />
       <AbadChat />
-      <Onboarding />
+      <AbadOnboarding />
+      <CookieConsent />
     </div>
   )
 }

@@ -43,6 +43,34 @@ export async function createProject({ nombre, descripcion = '' }) {
   return proyecto
 }
 
+// Versión del onboarding: acepta columnas personalizadas y devuelve IDs
+export async function createProjectForOnboarding({ nombre, descripcion = '', columnas }) {
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const { data: proyecto, error: pe } = await supabase
+    .from('proyectos')
+    .insert({ nombre, descripcion, creado_por: user.id })
+    .select().single()
+  if (pe) throw pe
+
+  await supabase.from('miembros').insert({ proyecto_id: proyecto.id, usuario_id: user.id, rol: 'admin' })
+
+  const { data: board } = await supabase
+    .from('tableros')
+    .insert({ proyecto_id: proyecto.id, nombre: 'Tablero Principal', orden: 0 })
+    .select().single()
+
+  const colRows = columnas.map((col, i) => ({
+    tablero_id: board.id,
+    nombre: col.nombre,
+    color:  col.color,
+    orden:  i,
+  }))
+  const { data: cols } = await supabase.from('columnas').insert(colRows).select()
+
+  return { proyecto, board, columnas: cols || [] }
+}
+
 export async function searchUsuarios(query) {
   const { data } = await supabase
     .from('usuarios')
@@ -102,6 +130,33 @@ export async function getMyBoard() {
   const boardData = await getBoardByProject(proyecto.id)
   if (!boardData) return null
   return { proyecto, ...boardData }
+}
+
+// ── Vencimientos (independiente del boardStore) ──────────────
+export async function getUpcomingDeadlines() {
+  // Paso 1: IDs de columnas del usuario (projects → boards → columns)
+  const { data: memberData } = await supabase
+    .from('miembros')
+    .select('proyectos(tableros(columnas(id)))')
+  const columnIds = []
+  ;(memberData || []).forEach(m => {
+    ;(m.proyectos?.tableros || []).forEach(t => {
+      ;(t.columnas || []).forEach(c => columnIds.push(c.id))
+    })
+  })
+  if (!columnIds.length) return []
+
+  // Paso 2: tarjetas con fecha_limite hasta mañana
+  const d = new Date(); d.setDate(d.getDate() + 1)
+  const tomorrowStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+
+  const { data } = await supabase
+    .from('tarjetas')
+    .select('id, titulo, prioridad, fecha_limite, columna_id')
+    .in('columna_id', columnIds)
+    .not('fecha_limite', 'is', null)
+    .lte('fecha_limite', tomorrowStr)
+  return data || []
 }
 
 // ── Tarjetas ─────────────────────────────────────────────────

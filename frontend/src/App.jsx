@@ -12,6 +12,9 @@ import ProductivityPage from './pages/ProductivityPage'
 import EntornoPage from './pages/EntornoPage'
 import FinanzasPage from './pages/FinanzasPage'
 import SpotifyCallbackPage from './pages/SpotifyCallbackPage'
+import OnboardingPreviewPage from './pages/OnboardingPreviewPage'
+import UpgradePage from './pages/UpgradePage'
+import BillingSuccessPage from './pages/BillingSuccessPage'
 
 export default function App() {
   const init = useAuthStore((s) => s.init)
@@ -35,9 +38,13 @@ export default function App() {
           <Route path="/focus"        element={<FocusPage />} />
           <Route path="/calendar"     element={<CalendarPage />} />
           <Route path="/productivity" element={<ProductivityPage />} />
-          <Route path="/finanzas"     element={<FinanzasPage />} />
-          <Route path="/entorno"      element={<EntornoPage />} />
+          <Route path="/finanzas"          element={<FinanzasPage />} />
+          <Route path="/entorno"           element={<EntornoPage />} />
+          <Route path="/onboarding-preview" element={<OnboardingPreviewPage />} />
         </Route>
+        {/* Páginas de billing: requieren auth pero NO pasan por AppShell ni gate */}
+        <Route path="/upgrade"         element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
+        <Route path="/billing-success" element={<ProtectedRoute><BillingSuccessPage /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )
