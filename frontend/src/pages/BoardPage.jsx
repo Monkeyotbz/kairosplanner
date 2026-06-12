@@ -6,6 +6,7 @@ import Board from '../components/kanban/Board'
 import EmptyBoard from '../components/kanban/EmptyBoard'
 import SidePanel from '../components/layout/SidePanel'
 import CardDetailModal from '../components/kanban/CardDetailModal'
+import FilterPanel from '../components/kanban/FilterPanel'
 import styles from './BoardPage.module.css'
 
 function getTodayStr() {
@@ -20,6 +21,7 @@ export default function BoardPage() {
   const [panelOpen, setPanelOpen] = useState(
     () => localStorage.getItem('kairos-panel') === 'true'
   )
+  const [filterPanelOpen, setFilterPanelOpen] = useState(true)
 
   useEffect(() => { loadBoard() }, [loadBoard])
 
@@ -67,6 +69,7 @@ export default function BoardPage() {
     <div className={styles.page}>
       <BoardNav proyecto={proyecto} panelOpen={panelOpen} onTogglePanel={togglePanel} />
       <div className={styles.content}>
+        <FilterPanel open={filterPanelOpen} />
         <div className={styles.kanbanSide}>
           <div className={styles.boardWrapper}>
             <Board />
