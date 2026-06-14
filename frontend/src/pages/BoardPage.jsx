@@ -69,6 +69,29 @@ export default function BoardPage() {
     <div className={styles.page}>
       <BoardNav proyecto={proyecto} panelOpen={panelOpen} onTogglePanel={togglePanel} />
       <div className={styles.content}>
+        <div style={{ display:'flex', alignItems:'center', gap:'12px', padding:'12px 20px', borderBottom:'1px solid #1e1e3a' }}>
+          <button
+            onClick={() => setFilterPanelOpen(prev => !prev)}
+            style={{
+              marginLeft:'auto',
+              background: filterPanelOpen ? 'rgba(90,79,207,0.3)' : 'rgba(90,79,207,0.1)',
+              border:'1px solid rgba(90,79,207,0.4)',
+              borderRadius:'8px',
+              padding:'6px 12px',
+              color:'#9b8fff',
+              cursor:'pointer',
+              display:'flex',
+              alignItems:'center',
+              gap:'6px',
+              fontSize:'12px'
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="#9b8fff">
+              <path d="M3 4a1 1 0 011-1h12a1 1 0 01.8 1.6L13 10.333V16a1 1 0 01-1.447.894l-2-1A1 1 0 019 15v-4.667L3.2 5.6A1 1 0 013 4z"/>
+            </svg>
+            Filtros
+          </button>
+        </div>
         <FilterPanel open={filterPanelOpen} />
         <div className={styles.kanbanSide}>
           <div className={styles.boardWrapper}>
