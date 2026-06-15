@@ -51,7 +51,12 @@ export function computeStreak(sessions, includeToday = false) {
 // "ganada" para animar la barra de XP de un nivel al siguiente.
 export async function getFocusProgress({ excludeSessionId = null, earnedSeconds = 0 } = {}) {
   let sessions = []
-  try { sessions = await getMySessions() } catch (e) { console.error('[rank] getMySessions falló:', e.message) }
+  try {
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('timeout')), 8000)
+    )
+    sessions = await Promise.race([getMySessions(), timeout])
+  } catch (e) { console.error('[rank] getMySessions falló:', e.message) }
 
   const baseSeconds = sessions
     .filter(s => s.id !== excludeSessionId)

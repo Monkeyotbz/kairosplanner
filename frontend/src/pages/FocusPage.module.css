@@ -48,3 +48,9 @@
   transition: transform 0.12s ease;
 }
 .resumeBtn:active { transform: scale(0.97); }
+
+@media (max-width: 480px) {
+  .page { padding: 16px; }
+  .resume { padding: 20px 16px; gap: 12px; border-radius: 16px; }
+  .resumeText { font-size: 14px; }
+}

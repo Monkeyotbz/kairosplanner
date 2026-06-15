@@ -134,6 +134,13 @@
   opacity: 0.7;
 }
 
+/* ── Móvil: cards más compactas ── */
+@media (max-width: 768px) {
+  .cover { height: 80px; }
+  .body  { padding: 8px 10px; gap: 4px; }
+  .title { font-size: 12px; }
+}
+
 /* ── Avatar ── */
 .avatar {
   width: 22px;

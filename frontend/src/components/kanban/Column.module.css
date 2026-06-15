@@ -302,9 +302,15 @@
 
 @media (max-width: 768px) {
   .column {
-    /* En móvil cada columna ocupa casi toda la pantalla, mostrando el borde de la siguiente */
-    width: calc(100vw - 80px);
-    max-width: var(--kairos-col-w);
-    scroll-snap-align: start;
+    width: 100%;
+    max-width: 100%;
+    max-height: none;
+    scroll-snap-align: none;
+  }
+
+  /* Las cards no se recortan — la columna crece con su contenido */
+  .cards {
+    overflow-y: visible;
+    max-height: none;
   }
 }

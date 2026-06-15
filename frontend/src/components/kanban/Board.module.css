@@ -89,12 +89,15 @@
   .board { padding: 12px 16px 16px; gap: 10px; }
 }
 
-/* ── Móvil ── */
+/* ── Móvil: columnas apiladas verticalmente ── */
 @media (max-width: 768px) {
   .board {
-    padding: 10px 12px 12px;
-    gap: 10px;
-    /* Mostrar borde del siguiente elemento para indicar scroll */
-    scroll-padding-left: 12px;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: visible;
+    height: auto;
+    scroll-snap-type: none;
+    padding: 10px 12px 24px;
+    gap: 12px;
   }
 }

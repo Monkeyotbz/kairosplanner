@@ -154,7 +154,7 @@
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: var(--kairos-radius-md);
   padding: 8px;
-  min-width: 220px;
+  min-width: min(220px, calc(100vw - 24px));
   box-shadow: var(--kairos-shadow-modal);
   z-index: 200;
 }

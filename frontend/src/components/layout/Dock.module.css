@@ -277,7 +277,27 @@
   .right .mini { display: none; }
 }
 
+@media (max-width: 768px) {
+  /* ABAD: reducir para que quede contenido dentro del dock en mobile */
+  .abad {
+    width: 52px;
+    height: 52px;
+    bottom: 0;          /* sin desbordamiento hacia el sidebar superior */
+  }
+  .abadWrap { width: 56px; }
+
+  /* Safe-area iOS (notch / home indicator) */
+  .dock {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 @media (max-width: 560px) {
   .musicBtnLabel { display: none; }
   .vol { display: none; }
+}
+
+@media (max-width: 400px) {
+  /* En pantallas muy pequeñas ocultar el botón de música también */
+  .musicBtn { display: none; }
 }

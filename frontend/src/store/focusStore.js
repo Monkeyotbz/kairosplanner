@@ -82,13 +82,21 @@ export const useFocusStore = create((set, get) => ({
   },
 
   finishSession: async () => {
-    const { session, currentPausa } = get()
+    const { session, currentPausa, elapsedSeconds, startedAtMs, elapsedOffset } = get()
     set({ phase: 'complete', startedAtMs: null })
-    clearCheckpoint()
+    // Guardar checkpoint actualizado ANTES de llamar Supabase.
+    // Si Supabase falla, el checkpoint queda y useFocusRecovery lo recupera en el próximo login.
+    if (session) {
+      const finalElapsed = startedAtMs
+        ? elapsedOffset + Math.floor((Date.now() - startedAtMs) / 1000)
+        : elapsedSeconds
+      saveCheckpoint({ sessionId: session.id, startedAtMs: null, elapsedOffset: finalElapsed, savedAt: Date.now() })
+    }
     try {
       if (currentPausa) await endPausa(currentPausa.id)
       if (session) await completeSession(session.id)
-    } catch (e) { console.error('[focus] completeSession falló:', e.message) }
+      clearCheckpoint() // Solo se borra si Supabase respondió bien
+    } catch (e) { console.error('[focus] completeSession falló, checkpoint preservado para recuperación:', e.message) }
   },
 
   abandonSession: async () => {

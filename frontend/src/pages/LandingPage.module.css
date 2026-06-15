@@ -1093,9 +1093,356 @@
 }
 .musicPlaylistsNote i { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
 
+/* ════════════════════ Nav mobile ════════════════════ */
+.navMobile {
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.navLoginMobile {
+  padding: 7px 14px;
+  border-radius: var(--kairos-radius-sm);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-soft);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.navLoginMobile:hover { background: rgba(255,255,255,0.1); color: var(--c-text); }
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+  border-radius: var(--kairos-radius-sm);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--c-border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.hamburger span {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--c-text-soft);
+  transition: all 0.2s ease;
+  transform-origin: center;
+}
+.hamburger:hover { background: rgba(255,255,255,0.1); }
+.hamburgerOpen span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburgerOpen span:nth-child(2) { opacity: 0; }
+.hamburgerOpen span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(10, 7, 28, 0.97);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--c-border-soft);
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 49;
+  animation: fadeUp 0.2s ease both;
+}
+
+.mobileLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobileLink {
+  display: block;
+  padding: 10px 4px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--c-text-soft);
+  border-bottom: 1px solid var(--c-border-soft);
+  transition: color 0.15s;
+}
+.mobileLink:hover { color: var(--c-text); }
+.mobileLink:last-child { border-bottom: none; }
+
+.mobileDivider { height: 1px; background: var(--c-border-soft); }
+
+.mobileActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ════════════════════ Precios ════════════════════ */
+.pricing {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 96px clamp(20px, 5vw, 56px);
+}
+
+.pricingGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.pricingCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 30px 28px;
+  border-radius: 20px;
+  background: var(--c-glass);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--c-border);
+  overflow: hidden;
+}
+
+.pricingCardPro {
+  background: linear-gradient(165deg, var(--c-accent-bg), var(--c-accent-5));
+  border-color: var(--c-accent-border);
+  box-shadow: 0 24px 60px var(--c-accent-glow-soft), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.pricingGlow {
+  position: absolute;
+  top: -30%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, var(--c-accent-glow) 0%, transparent 70%);
+  filter: blur(30px);
+  pointer-events: none;
+}
+
+.pricingBadge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--c-text-muted);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  padding: 4px 12px;
+  width: fit-content;
+}
+
+.pricingBadgePro {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--c-accent-soft);
+  background: var(--c-accent-bg);
+  border: 1px solid var(--c-accent-border);
+  border-radius: 999px;
+  padding: 4px 12px;
+  width: fit-content;
+  position: relative;
+  z-index: 1;
+}
+
+.pricingPrice {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.pricingAmount {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--c-text);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.pricingPer {
+  font-size: 13px;
+  color: var(--c-text-muted);
+}
+
+.pricingNote {
+  font-size: 11px;
+  color: var(--c-text-muted);
+  margin: -8px 0 0;
+  position: relative;
+  z-index: 1;
+}
+
+.pricingFeats {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+
+.pricingFeats li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--c-text-soft);
+}
+
+.pricingFeats li i {
+  color: var(--c-accent-soft);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.pricingBtnSecondary {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--kairos-radius-md);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-soft);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+  transition: all 0.15s;
+  position: relative;
+  z-index: 1;
+}
+.pricingBtnSecondary:hover { background: rgba(255,255,255,0.1); color: var(--c-text); }
+
+.pricingBtnPro {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--kairos-radius-md);
+  background: var(--c-accent);
+  border: 1px solid var(--c-accent-border);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+  transition: all 0.18s;
+  box-shadow: 0 4px 24px var(--c-accent-glow);
+  position: relative;
+  z-index: 1;
+}
+.pricingBtnPro:hover {
+  background: var(--c-accent-mid);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 30px var(--c-accent-glow);
+}
+
+.pricingDisclaimer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--c-text-muted);
+  text-align: center;
+  margin-top: 20px;
+}
+.pricingDisclaimer i { color: var(--c-accent-soft); font-size: 14px; }
+
+/* ════════════════════ About ════════════════════ */
+.about {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 80px clamp(20px, 5vw, 56px);
+}
+
+.aboutInner {
+  display: flex;
+  align-items: center;
+  gap: clamp(32px, 6vw, 72px);
+  background: var(--c-glass);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--c-border-soft);
+  border-radius: 24px;
+  padding: clamp(28px, 5vw, 48px);
+}
+
+.aboutLogo {
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 24px var(--c-accent-glow));
+}
+
+.aboutContent {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.aboutTitle {
+  font-size: clamp(20px, 2.8vw, 30px);
+  font-weight: 800;
+  color: var(--c-text);
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.aboutText {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--c-text-soft);
+  margin: 0;
+}
+
+.aboutStack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.aboutChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text-muted);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--c-border-soft);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+.aboutChip i { font-size: 13px; color: var(--c-accent-soft); }
+
 /* ════════════════════ Responsive ════════════════════ */
 @media (max-width: 980px) {
   .navLinks { display: none; }
+  .navActions { display: none; }
+  .navMobile { display: flex; }
   .hero { flex-direction: column; text-align: center; padding-top: 110px; gap: 48px; }
   .heroContent { align-items: center; flex-basis: auto; }
   .subheadline { max-width: 100%; }
@@ -1108,15 +1455,63 @@
   .featGrid { grid-template-columns: repeat(2, 1fr); }
   .philoGrid { grid-template-columns: 1fr; }
   .philoVs { justify-self: center; }
+  .musicGrid { grid-template-columns: 1fr; }
+  .pricingGrid { grid-template-columns: 1fr; max-width: 420px; }
+  .aboutInner { gap: 24px; }
 }
 
 @media (max-width: 600px) {
-  .hero { padding: 96px 20px 48px; }
-  .floatVoice { left: -8px; bottom: -16px; max-width: 210px; padding: 10px 12px; }
-  .floatStats { right: -4px; top: 8px; padding: 10px 12px; }
-  .ctaGroup { flex-direction: column; width: 100%; }
-  .ctaPrimary, .ctaSecondary { width: 100%; }
-  .featGrid { grid-template-columns: 1fr; }
+  /* Nav mobile: ajustes finos */
+  .navCta { padding: 8px 14px; font-size: 12px; }
+  .navLoginMobile { padding: 7px 12px; font-size: 12px; }
+
+  /* Hero */
+  .hero { padding: 88px 20px 56px; gap: 36px; }
+  .heroLogo { display: none; }
+
+  /* Float cards: los sacamos del flujo absoluto y los mostramos debajo del mockup en mobile */
+  .floatVoice { display: none; }
+  .floatStats { display: none; }
+
+  /* Mockup: sin perspectiva 3D en pantalla pequeña */
   .mockup { transform: none; }
+  .mockupBoard { grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px; }
+  .mockupCol:last-child { display: none; } /* 2 columnas en mobile, ocultar "Listo" */
   .mockupCardTitle { font-size: 10px; }
+  .mockupColTitle { font-size: 9px; }
+
+  /* CTAs */
+  .ctaGroup { flex-direction: column; width: 100%; }
+  .ctaPrimary, .ctaSecondary { width: 100%; text-align: center; }
+
+  /* Secciones: reducir padding vertical */
+  .philosophy, .voice, .musicSection, .features, .pricing, .about {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  /* About: apilar en mobile */
+  .aboutInner { flex-direction: column; text-align: center; }
+  .aboutStack { justify-content: center; }
+  .aboutLogo { display: none; }
+
+  /* Filosofía: cards más compactas */
+  .philoCardChronos, .philoCardKairos { padding: 24px; min-height: 0; }
+
+  /* Voice: chips con texto más corto */
+  .voiceChips { gap: 8px; }
+  .voiceChip { font-size: 11px; padding: 9px 12px; }
+  .voiceChip i { font-size: 13px; }
+
+  /* Features */
+  .featGrid { grid-template-columns: 1fr; }
+
+  /* Footer */
+  .footer { flex-direction: column; gap: 8px; text-align: center; }
+}
+
+@media (max-width: 400px) {
+  .navCta { padding: 7px 10px; font-size: 11px; }
+  .navName { font-size: 14px; }
+  .headline { font-size: 32px; }
 }
