@@ -60,6 +60,16 @@ export async function getVideos() {
   return data || []
 }
 
+// Escribe fin=now como "última vez visto" mientras la sesión está activa.
+// Si la app crashea, la recuperación usa este timestamp en lugar de estimar con un cap de 8h.
+export async function heartbeatSession(sesionId) {
+  await supabase
+    .from('sesiones_enfoque')
+    .update({ fin: new Date().toISOString() })
+    .eq('id', sesionId)
+    .eq('estado', 'activa')
+}
+
 export async function getMisProyectos() {
   const { data } = await supabase
     .from('miembros')

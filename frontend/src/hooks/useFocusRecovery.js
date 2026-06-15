@@ -1,7 +1,11 @@
 import { useEffect } from 'react'
 import { supabase } from '../services/supabase'
 import { useFocusStore, loadCheckpoint, clearCheckpoint, saveCheckpoint } from '../store/focusStore'
+import { heartbeatSession } from '../services/focusService'
 import { useToastStore } from '../store/toastStore'
+
+const HEARTBEAT_INTERVAL_MS = 60_000 // 60s
+const ORPHAN_CUTOFF_MS      = 3 * 60_000 // sesión cuyo heartbeat tiene > 3min → huérfana
 
 export function useFocusRecovery() {
   const addToast = useToastStore(s => s.addToast)
@@ -37,29 +41,36 @@ export function useFocusRecovery() {
       // Si hay error (Supabase aún offline), dejamos el checkpoint para el próximo intento
     }
 
-    // Recuperación adicional: buscar en DB sesiones activas sin fin que sean del usuario.
-    // Cubre el caso donde finishSession falló Y el checkpoint ya no está (ej: sesión actual de 4h perdida).
+    // Recuperación adicional: buscar sesiones activas cuyo heartbeat (fin) es stale o inexistente.
+    // Con el heartbeat activo, fin = última vez visto → duración real, no estimada.
     async function recoverOrphanedDbSessions() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const cutoff = new Date(Date.now() - 5 * 60 * 1000).toISOString() // más de 5 min de antigüedad
+      const cutoff = new Date(Date.now() - ORPHAN_CUTOFF_MS).toISOString()
+
+      // Sesiones activas donde el heartbeat es stale (fin < cutoff) O nunca hubo heartbeat (fin IS NULL),
+      // Y que además empezaron antes del cutoff (evita tocar sesiones recién iniciadas).
       const { data: orphans } = await supabase
         .from('sesiones_enfoque')
-        .select('id, inicio')
+        .select('id, inicio, fin')
         .eq('usuario_id', user.id)
         .eq('estado', 'activa')
-        .is('fin', null)
         .lt('inicio', cutoff)
+        .or(`fin.is.null,fin.lt.${cutoff}`)
 
       if (!orphans || orphans.length === 0) return
 
-      const MAX_SESSION_MS = 8 * 60 * 60 * 1000 // cap: 8 horas
-
       for (const session of orphans) {
         const inicioMs = new Date(session.inicio).getTime()
-        // Nunca asignar más de 8h — si el crash fue hace días el fin se capa al inicio + 8h
-        const finMs = Math.min(Date.now(), inicioMs + MAX_SESSION_MS)
+
+        // Si hay heartbeat, esa es la duración real (precisión ~60s).
+        // Si no hay heartbeat (crash muy temprano o sesión pre-heartbeat), la sesión es irrecuperable
+        // → fin = inicio (0 segundos), no inflar con estimaciones.
+        const finMs = session.fin
+          ? Math.min(new Date(session.fin).getTime(), Date.now())
+          : inicioMs
+
         const finEstimado = new Date(finMs).toISOString()
         const { error } = await supabase
           .from('sesiones_enfoque')
@@ -77,6 +88,18 @@ export function useFocusRecovery() {
     recoverFromCheckpoint()
     recoverOrphanedDbSessions()
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Heartbeat: cada 60s escribe fin=now mientras la sesión está activa.
+  // Si la app crashea, la recuperación usa este timestamp en vez de estimar duración.
+  useEffect(() => {
+    const id = setInterval(async () => {
+      const { phase, session } = useFocusStore.getState()
+      if ((phase === 'active' || phase === 'break') && session?.id) {
+        try { await heartbeatSession(session.id) } catch (_) {}
+      }
+    }, HEARTBEAT_INTERVAL_MS)
+    return () => clearInterval(id)
   }, [])
 
   // Antes de cerrar/recargar: actualizar checkpoint con el último tiempo conocido

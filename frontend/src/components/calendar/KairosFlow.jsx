@@ -70,6 +70,10 @@ function hourToISO(day, h) {
 
 function guardianMessage({ isToday, isPast, nowHour, win, hasUrgent, plannedCount, isReal }) {
   if (isPast) return 'Un día que ya fluyó. Mira hacia adelante.'
+  if (!win) {
+    if (plannedCount > 0) return `Tienes ${plannedCount} bloque${plannedCount>1?'s':''} reservado${plannedCount>1?'s':''}. Tu día ya tiene forma.`
+    return 'Completa algunas sesiones de enfoque y KAIROS calculará tu ventana de máxima energía.'
+  }
   if (!isToday) {
     if (plannedCount > 0) return `Tienes ${plannedCount} bloque${plannedCount>1?'s':''} reservado${plannedCount>1?'s':''}. Tu día ya tiene forma.`
     return `Planifica este día alrededor de tu ventana Kairos, cerca de las ${fmtHour(win.start)}.`

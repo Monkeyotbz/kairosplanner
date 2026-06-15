@@ -21,8 +21,10 @@ export const useAbadStore = create((set) => ({
   toggle: () => set(s => ({ isOpen: !s.isOpen })),
   setThinking: (v) => set({ thinking: v }),
 
-  addMessage: (role, text) => set(s => {
-    const messages = [...s.messages, { id: `${Date.now()}-${nextId++}`, role, text }]
+  addMessage: (role, text, toolMeta = null) => set(s => {
+    const msg = { id: `${Date.now()}-${nextId++}`, role, text }
+    if (toolMeta) msg.toolMeta = toolMeta
+    const messages = [...s.messages, msg]
     saveMessages(messages)
     return { messages }
   }),

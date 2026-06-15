@@ -128,10 +128,22 @@ export default function AbadChat() {
       }))
     }
 
+    // Todas las tarjetas del tablero por columna (sin filtro de fecha)
+    const tablero_actual = {}
+    for (const col of (columns || [])) {
+      const cards = (cardsByColumn[col.id] || []).map(c => ({
+        titulo: c.titulo,
+        prioridad: c.prioridad || 'normal',
+        ...(c.fecha_limite ? { fecha: c.fecha_limite } : {}),
+      }))
+      if (cards.length) tablero_actual[col.nombre] = cards
+    }
+
     return {
       fecha_hoy:         todayStr,
       proyecto:          proyecto?.nombre || null,
       columnas:          (columns || []).map(c => c.nombre),
+      tablero_actual,
       miembros,
       categorias_gasto:  categorias,
       rango:             rank?.after?.current?.name || null,
@@ -197,6 +209,18 @@ export default function AbadChat() {
       return `Listo, creé "${args.titulo}" en ${col.nombre}${extras.length ? ' · ' + extras.join(', ') : ''}.`
     }
 
+    if (action === 'agregar_subtarea') {
+      if (!columns.length) return 'Primero abre un tablero.'
+      const found = findCard(args.titulo_tarjeta)
+      if (!found) return `No encontré la tarjeta "${args.titulo_tarjeta}".`
+      try {
+        await createSubtarea(found.card.id, (args.subtarea || '').trim())
+        return `Agregué la subtarea "${args.subtarea}" a "${found.card.titulo}".`
+      } catch (_) {
+        return 'No pude agregar la subtarea.'
+      }
+    }
+
     if (action === 'mover_tarjeta') {
       if (!columns.length) return 'Primero abre un tablero.'
       const found = findCard(args.titulo_tarjeta)
@@ -244,10 +268,18 @@ export default function AbadChat() {
       })
       const data = await res.json().catch(() => ({}))
       let reply
-      if (!res.ok)           reply = data.error || 'ABAD no está disponible ahora mismo.'
-      else if (data.action)  reply = await executeAction(data.action, data.args || {})
-      else                   reply = data.answer || 'No tengo una respuesta para eso.'
-      addMessage('abad', reply)
+      let toolMeta = null
+      if (!res.ok) {
+        reply = data.error || 'ABAD no está disponible ahora mismo.'
+      } else if (data.action) {
+        reply = await executeAction(data.action, data.args || {})
+        if (data.toolUseId) {
+          toolMeta = { toolUseId: data.toolUseId, actionName: data.action, actionArgs: data.args || {} }
+        }
+      } else {
+        reply = data.answer || 'No tengo una respuesta para eso.'
+      }
+      addMessage('abad', reply, toolMeta)
       speak(reply)
     } catch (_) {
       addMessage('abad', 'No pude conectar con ABAD. ¿Está desplegado el servidor (Vercel) con la API key?')
