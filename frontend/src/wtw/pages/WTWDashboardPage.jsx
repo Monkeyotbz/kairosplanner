@@ -4,6 +4,7 @@ import { useThemeStore, THEMES } from '../../store/themeStore'
 import InfinityLogo from '../../components/layout/InfinityLogo'
 import WTWKanbanBoard from '../components/WTWKanbanBoard'
 import WTWCalendarPanel from '../components/WTWCalendarPanel'
+import WTWAbadChat from '../components/WTWAbadChat'
 import styles from './WTWDashboardPage.module.css'
 
 const TABS = [
@@ -119,6 +120,8 @@ export default function WTWDashboardPage() {
           )}
         </div>
       </main>
+
+      <WTWAbadChat />
     </div>
   )
 }
