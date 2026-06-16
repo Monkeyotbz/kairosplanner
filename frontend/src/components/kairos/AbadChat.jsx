@@ -5,7 +5,7 @@ import { useKairosVoice } from '../../hooks/useKairosVoice'
 import { useSpeech } from '../../hooks/useSpeech'
 import { getProjectMembers, createSubtarea } from '../../services/boardService'
 import {
-  addTransaccion, getCategorias,
+  addTransaccion, deleteTransaccion, getCategorias,
   getPresupuestos, getTransacciones, calcBudgetProgress, calcSummary,
 } from '../../services/financeService'
 import { getFocusProgress } from '../../services/rankService'
@@ -15,6 +15,9 @@ import styles from './AbadChat.module.css'
 const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 const norm = s => (s || '').toString().trim().toLowerCase()
 const ALERT_KEY = 'kairos-abad-alert-date'
+
+const ACTION_VERBS = ['crear','crea','agregar','agrega','mover','mueve','registra','registrar','elimina','eliminar','añade','añadir','borra','borrar']
+const hasActionVerb = text => ACTION_VERBS.some(v => norm(text).split(/\s+/).includes(v))
 
 const EXAMPLES = [
   '¿Qué tengo pendiente hoy?',
@@ -27,10 +30,20 @@ export default function AbadChat() {
   const { isOpen, close, messages, addMessage, thinking, setThinking } = useAbadStore()
   const [input, setInput] = useState('')
   const [rank, setRank]   = useState(null)
+  const [voicePending, setVoicePending] = useState(null)
+  const [undoVisible, setUndoVisible] = useState(false)
   const listRef = useRef(null)
+  const undoFnRef = useRef(null)
+  const undoTimerRef = useRef(null)
 
   const { isListening, transcript, toggleListening, startListening, stopListening } = useKairosVoice({
-    onResult: (text) => submit(text),
+    onResult: (text, confidence) => {
+      if (confidence < 0.75 || !hasActionVerb(text)) {
+        setVoicePending(text)
+      } else {
+        submit(text)
+      }
+    },
   })
   const { speak, cancel: cancelSpeech, isMuted, toggleMute } = useSpeech()
 
@@ -83,6 +96,30 @@ export default function AbadChat() {
   }, [transcript, isListening])
 
   if (!isOpen) return null
+
+  function armUndo(fn) {
+    undoFnRef.current = fn
+    setUndoVisible(true)
+    clearTimeout(undoTimerRef.current)
+    undoTimerRef.current = setTimeout(() => {
+      setUndoVisible(false)
+      undoFnRef.current = null
+    }, 10000)
+  }
+
+  async function handleUndo() {
+    clearTimeout(undoTimerRef.current)
+    setUndoVisible(false)
+    if (undoFnRef.current) {
+      try {
+        await undoFnRef.current()
+        addMessage('abad', 'Listo, deshice la acción.')
+      } catch (_) {
+        addMessage('abad', 'No pude deshacer la acción.')
+      }
+      undoFnRef.current = null
+    }
+  }
 
   async function buildContext() {
     const { cardsByColumn, columns, proyecto } = useBoardStore.getState()
@@ -183,6 +220,7 @@ export default function AbadChat() {
       if (!col) return 'Primero abre un tablero para poder crear tarjetas.'
       const card = await store.addCard(col.id, args.titulo)
       if (!card) return 'No pude crear la tarjeta.'
+      armUndo(() => store.removeCard(card.id, col.id))
       const fields = {}
       if (args.descripcion)  fields.descripcion = args.descripcion
       if (args.prioridad)    fields.prioridad = args.prioridad
@@ -229,6 +267,7 @@ export default function AbadChat() {
       if (!toCol)  return `No encontré la lista "${args.columna_destino}".`
       if (found.colId === toCol.id) return `"${found.card.titulo}" ya está en ${toCol.nombre}.`
       await store.moveCardToColumn(found.card.id, found.colId, toCol.id)
+      armUndo(() => store.moveCardToColumn(found.card.id, toCol.id, found.colId))
       return `Moví "${found.card.titulo}" a ${toCol.nombre}.`
     }
 
@@ -241,7 +280,8 @@ export default function AbadChat() {
           const n = norm(args.categoria)
           categoria_id = cats.find(c => norm(c.nombre).includes(n) || n.includes(norm(c.nombre)))?.id || null
         }
-        await addTransaccion({ concepto: args.concepto, monto: Number(args.monto), tipo, categoria_id, fecha: ymd(new Date()) })
+        const trans = await addTransaccion({ concepto: args.concepto, monto: Number(args.monto), tipo, categoria_id, fecha: ymd(new Date()) })
+        armUndo(() => deleteTransaccion(trans.id))
         return `Registré ${tipo === 'gasto' ? 'un gasto' : 'un ingreso'} de $${args.monto} por "${args.concepto}".`
       } catch (_) {
         return `No pude registrar el ${tipo}.`
@@ -333,6 +373,23 @@ export default function AbadChat() {
           </div>
         )}
       </div>
+
+      {voicePending && (
+        <div className={styles.voiceConfirm}>
+          <span>¿Dijiste: <em>"{voicePending}"</em>?</span>
+          <div className={styles.voiceConfirmBtns}>
+            <button onClick={() => { submit(voicePending); setVoicePending(null) }}>Sí</button>
+            <button onClick={() => setVoicePending(null)}>No</button>
+          </div>
+        </div>
+      )}
+
+      {undoVisible && (
+        <div className={styles.undoBanner}>
+          <span>Acción ejecutada</span>
+          <button onClick={handleUndo}><i className="ti ti-arrow-back-up" /> Cancelar</button>
+        </div>
+      )}
 
       <div className={styles.inputRow}>
         <button

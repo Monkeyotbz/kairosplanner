@@ -15,11 +15,24 @@ import SpotifyCallbackPage from './pages/SpotifyCallbackPage'
 import OnboardingPreviewPage from './pages/OnboardingPreviewPage'
 import UpgradePage from './pages/UpgradePage'
 import BillingSuccessPage from './pages/BillingSuccessPage'
+import WTWApp from './wtw/WTWApp'
+
+const isWTW = window.location.host.startsWith('wtw.') ||
+              new URLSearchParams(window.location.search).get('wtw') === 'true' ||
+              window.location.pathname.startsWith('/wtw')
 
 export default function App() {
   const init = useAuthStore((s) => s.init)
 
-  useEffect(() => { init() }, [init])
+  useEffect(() => { if (!isWTW) init() }, [init])
+
+  if (isWTW) {
+    return (
+      <BrowserRouter>
+        <WTWApp />
+      </BrowserRouter>
+    )
+  }
 
   return (
     <BrowserRouter>
