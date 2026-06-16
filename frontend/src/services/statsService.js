@@ -1,14 +1,37 @@
 import { supabase } from './supabase'
 
-export async function getMySessions() {
-  const { data: { user } } = await supabase.auth.getUser()
-  const { data } = await supabase
-    .from('sesiones_enfoque')
-    .select('id, inicio, fin, segundos_reales, tipo, estado, duracion_plan_min, proyecto_id, proyectos(nombre)')
-    .eq('usuario_id', user.id)
-    .eq('estado', 'completada')
-    .order('inicio', { ascending: false })
-  return data || []
+// In-flight deduplication + short-lived cache so concurrent callers (Dock,
+// AbadChat, FocusStart, KairosFlow…) share one request instead of flooding
+// the Supabase connection pool.
+let _sessionsCache = null
+let _sessionsCacheAt = 0
+let _sessionsInflight = null
+const CACHE_TTL = 60_000
+
+export async function getMySessions({ bust = false } = {}) {
+  if (!bust && _sessionsCache && Date.now() - _sessionsCacheAt < CACHE_TTL) {
+    return _sessionsCache
+  }
+  if (_sessionsInflight) return _sessionsInflight
+
+  _sessionsInflight = (async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      const { data } = await supabase
+        .from('sesiones_enfoque')
+        .select('id, inicio, fin, segundos_reales, tipo, estado, duracion_plan_min, proyecto_id, proyectos(nombre)')
+        .eq('usuario_id', user.id)
+        .eq('estado', 'completada')
+        .order('inicio', { ascending: false })
+      _sessionsCache = data || []
+      _sessionsCacheAt = Date.now()
+      return _sessionsCache
+    } finally {
+      _sessionsInflight = null
+    }
+  })()
+
+  return _sessionsInflight
 }
 
 // ── Helpers de procesamiento ─────────────────────────────────

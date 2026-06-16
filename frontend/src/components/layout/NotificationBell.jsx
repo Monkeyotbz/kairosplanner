@@ -19,6 +19,10 @@ export default function NotificationBell({ openUp = false }) {
   const [open, setOpen] = useState(false)
   const [fetchedCards, setFetchedCards] = useState([])
   const panelRef = useRef(null)
+  // Ref so the interval closure always sees the latest value without
+  // resetting the timer on every cardsByColumn change.
+  const cardsByColumnRef = useRef(cardsByColumn)
+  useEffect(() => { cardsByColumnRef.current = cardsByColumn }, [cardsByColumn])
 
   const today    = getDateStr(new Date())
   const tomorrow = (() => { const d = new Date(); d.setDate(d.getDate() + 1); return getDateStr(d) })()
@@ -46,15 +50,17 @@ export default function NotificationBell({ openUp = false }) {
     }
   }, [cardsByColumn])
 
-  // Refresco periódico: cada 5 minutos cuando no está en el board
+  // Refresco periódico: cada 5 minutos cuando no está en el board.
+  // Sin [cardsByColumn] en las deps — el timer no debe reiniciarse en cada
+  // cambio del tablero; usamos el ref para leer el valor actual.
   useEffect(() => {
     const id = setInterval(() => {
-      if (Object.keys(cardsByColumn).length === 0) {
+      if (Object.keys(cardsByColumnRef.current).length === 0) {
         getUpcomingDeadlines().then(setFetchedCards).catch(() => {})
       }
     }, 5 * 60 * 1000)
     return () => clearInterval(id)
-  }, [cardsByColumn])
+  }, [])
 
   const { overdue, dueToday, dueTomorrow } = useMemo(() => {
     const overdue     = []
