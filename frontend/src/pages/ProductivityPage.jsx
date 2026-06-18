@@ -11,10 +11,11 @@ export default function ProductivityPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getMySessions().then(data => {
-      setSessions(data)
-      setLoading(false)
-    })
+    let cancelled = false
+    getMySessions()
+      .then(data  => { if (!cancelled) { setSessions(data); setLoading(false) } })
+      .catch(()   => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
   }, [])
 
   if (loading) {

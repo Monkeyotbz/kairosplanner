@@ -1,12 +1,17 @@
 import { supabase } from './supabase'
 
-const CARD_SELECT = 'id, columna_id, titulo, descripcion, prioridad, fecha_limite, cover_url, orden, asignado_a, tarjeta_etiqueta(etiquetas(id, nombre, color))'
+const CARD_SELECT = 'id, columna_id, titulo, descripcion, prioridad, fecha_limite, cover_url, orden, asignado_a, tarjeta_etiqueta(etiquetas(id, nombre, color)), subtareas(id, completada)'
 
 function mapCards(rawCards) {
-  return (rawCards || []).map(card => ({
-    ...card,
-    labels: (card.tarjeta_etiqueta || []).map(te => te.etiquetas).filter(Boolean),
-  }))
+  return (rawCards || []).map(card => {
+    const subs = card.subtareas || []
+    return {
+      ...card,
+      labels: (card.tarjeta_etiqueta || []).map(te => te.etiquetas).filter(Boolean),
+      subtaskTotal: subs.length,
+      subtaskDone:  subs.filter(s => s.completada).length,
+    }
+  })
 }
 
 // ── Proyectos ────────────────────────────────────────────────
@@ -133,7 +138,15 @@ export async function getMyBoard() {
 }
 
 // ── Vencimientos (independiente del boardStore) ──────────────
-export async function getUpcomingDeadlines() {
+let _deadlinesCache = null
+let _deadlinesCacheAt = 0
+const DEADLINES_TTL = 5 * 60_000
+
+export async function getUpcomingDeadlines({ bust = false } = {}) {
+  if (!bust && _deadlinesCache && Date.now() - _deadlinesCacheAt < DEADLINES_TTL) {
+    return _deadlinesCache
+  }
+
   // Paso 1: IDs de columnas del usuario (projects → boards → columns)
   const { data: memberData } = await supabase
     .from('miembros')
@@ -144,7 +157,11 @@ export async function getUpcomingDeadlines() {
       ;(t.columnas || []).forEach(c => columnIds.push(c.id))
     })
   })
-  if (!columnIds.length) return []
+  if (!columnIds.length) {
+    _deadlinesCache = []
+    _deadlinesCacheAt = Date.now()
+    return []
+  }
 
   // Paso 2: tarjetas con fecha_limite hasta mañana
   const d = new Date(); d.setDate(d.getDate() + 1)
@@ -156,7 +173,10 @@ export async function getUpcomingDeadlines() {
     .in('columna_id', columnIds)
     .not('fecha_limite', 'is', null)
     .lte('fecha_limite', tomorrowStr)
-  return data || []
+
+  _deadlinesCache = data || []
+  _deadlinesCacheAt = Date.now()
+  return _deadlinesCache
 }
 
 // ── Tarjetas ─────────────────────────────────────────────────

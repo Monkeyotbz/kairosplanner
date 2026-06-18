@@ -131,6 +131,14 @@
 }
 .btnFinish:hover { background: linear-gradient(135deg, rgba(83, 74, 183, 0.6), rgba(55, 138, 221, 0.6)); }
 
+@media (max-width: 768px) {
+  /* En mobile el sidebar (56px) está ENCIMA del dock (58px), totalidad: 114px.
+     La cápsula debe quedar por encima de ambos. */
+  .capsule {
+    bottom: calc(var(--kairos-entorno-h, 58px) + 56px + 12px);
+  }
+}
+
 @media (max-width: 560px) {
   .capsule { gap: 10px; max-width: 94vw; }
   .music { display: none; }

@@ -59,7 +59,12 @@
   font-size: 13px;
 }
 
-/* ── Móvil: columna única, panel oculto por CSS en SidePanel ── */
+/* ── Móvil: columnas apiladas, scroll vertical ── */
 @media (max-width: 768px) {
   .content { flex-direction: column; }
+
+  .boardWrapper {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 }

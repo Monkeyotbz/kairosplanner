@@ -5,15 +5,24 @@ import { useBoardStore } from '../../store/boardStore'
 import { useFocusStore } from '../../store/focusStore'
 import styles from './Card.module.css'
 
-function formatDate(dateStr) {
-  if (!dateStr) return null
-  return new Date(dateStr + 'T00:00:00').toLocaleDateString('es', { day: 'numeric', month: 'short' })
+const PRIORITY_MAP = {
+  alta: { label: 'Alta', cls: styles.priorityAlta },
+  baja: { label: 'Baja', cls: styles.priorityBaja },
 }
 
-function getPriorityColor(prioridad) {
-  if (prioridad === 'alta') return '#D85A30'
-  if (prioridad === 'baja') return '#639922'
-  return null
+function getDeadlineInfo(dateStr) {
+  if (!dateStr) return null
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  const due   = new Date(dateStr + 'T00:00:00')
+  const diff  = Math.round((due - today) / 86400000)
+  if (diff < 0)   return { label: 'Atrasada',       status: 'overdue' }
+  if (diff === 0) return { label: 'Hoy',             status: 'today' }
+  if (diff === 1) return { label: 'Mañana',          status: 'soon' }
+  if (diff <= 6)  return { label: `En ${diff} días`, status: 'upcoming' }
+  return {
+    label: due.toLocaleDateString('es', { day: 'numeric', month: 'short' }),
+    status: 'normal',
+  }
 }
 
 export default function Card({ card, columnaId, isOverlay = false }) {
@@ -22,12 +31,11 @@ export default function Card({ card, columnaId, isOverlay = false }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card.id, data: { type: 'card' } })
   const pointerPos = useRef(null)
 
-  // Modo Kairós (spotlight): sesión minimizada → resalta la tarea enfocada, atenúa el resto.
   const immersive  = useFocusStore(s => s.immersive)
   const focusPhase = useFocusStore(s => s.phase)
   const activeTask = useFocusStore(s => s.activeTask)
-  const spotlight    = !isOverlay && !immersive && (focusPhase === 'active' || focusPhase === 'break') && !!activeTask
-  const isFocusTask  = spotlight && activeTask.id === card.id
+  const spotlight   = !isOverlay && !immersive && (focusPhase === 'active' || focusPhase === 'break') && !!activeTask
+  const isFocusTask = spotlight && activeTask.id === card.id
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -36,8 +44,10 @@ export default function Card({ card, columnaId, isOverlay = false }) {
     cursor: isOverlay ? 'grabbing' : 'grab',
   }
 
-  const priorityColor = getPriorityColor(card.prioridad)
-  const dateStr = formatDate(card.fecha_limite)
+  const priority    = PRIORITY_MAP[card.prioridad]
+  const deadline    = getDeadlineInfo(card.fecha_limite)
+  const hasSubs     = card.subtaskTotal > 0
+  const allDone     = hasSubs && card.subtaskDone === card.subtaskTotal
 
   function handleDelete(e) {
     e.stopPropagation()
@@ -59,13 +69,18 @@ export default function Card({ card, columnaId, isOverlay = false }) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`${styles.card} ${isDragging ? styles.dragging : ''} ${spotlight ? styles.spotlight : ''} ${isFocusTask ? styles.focusTask : ''}`}
+      className={[
+        styles.card,
+        isDragging   ? styles.dragging   : '',
+        spotlight    ? styles.spotlight  : '',
+        isFocusTask  ? styles.focusTask  : '',
+        priority     ? priority.cls      : '',
+      ].join(' ')}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onPointerDown={handlePointerDown}
       onClick={handleClick}
     >
-      {/* Drag handle + delete */}
       <div className={styles.cardActions} style={{ opacity: hovered && !isDragging ? 1 : 0 }}>
         <button className={styles.deleteBtn} onClick={handleDelete} title="Eliminar tarjeta">✕</button>
       </div>
@@ -101,14 +116,26 @@ export default function Card({ card, columnaId, isOverlay = false }) {
 
           <div className={styles.footer}>
             <div className={styles.meta}>
-              {dateStr && (
-                <span className={styles.metaChip} style={priorityColor ? { color: priorityColor } : undefined}>
-                  <span className={styles.metaIcon}>⊡</span>
-                  {dateStr}
+              {deadline && (
+                <span className={`${styles.deadlineChip} ${styles['deadline_' + deadline.status]}`}>
+                  <i className="ti ti-calendar-event" />
+                  {deadline.label}
+                </span>
+              )}
+
+              {hasSubs && (
+                <span className={`${styles.subsChip} ${allDone ? styles.subsChipDone : ''}`}>
+                  <i className={`ti ${allDone ? 'ti-circle-check' : 'ti-checkbox'}`} />
+                  {card.subtaskDone}/{card.subtaskTotal}
                 </span>
               )}
             </div>
-            <div className={styles.avatar}>U</div>
+
+            {priority && (
+              <span className={`${styles.priorityChip} ${card.prioridad === 'alta' ? styles.priorityChipAlta : styles.priorityChipBaja}`}>
+                {priority.label}
+              </span>
+            )}
           </div>
         </div>
       </div>

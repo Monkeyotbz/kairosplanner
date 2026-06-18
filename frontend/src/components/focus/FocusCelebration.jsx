@@ -26,22 +26,24 @@ const PHRASES = [
 export default function FocusCelebration({ elapsedSeconds, sessionId, totalBreaks = 0, onDone, doneLabel = 'Finalizar' }) {
   const phrase = useMemo(() => PHRASES[Math.floor(Math.random() * PHRASES.length)], [])
   const [progress, setProgress] = useState(null)   // resultado de getFocusProgress
+  const [progressTimedOut, setProgressTimedOut] = useState(false)
   const [barFill, setBarFill] = useState(0)         // 0..1 animado
   const [shownXp, setShownXp] = useState(0)         // contador de XP animado
 
   useEffect(() => {
     let cancelled = false
+    const fallbackTimer = setTimeout(() => { if (!cancelled) setProgressTimedOut(true) }, 9000)
     getFocusProgress({ excludeSessionId: sessionId, earnedSeconds: elapsedSeconds }).then(p => {
       if (cancelled) return
+      clearTimeout(fallbackTimer)
       setProgress(p)
       const start = p.leveledUp ? 0 : p.before.progress
       setBarFill(start)
-      // Dispara la animación en el siguiente frame
       requestAnimationFrame(() => requestAnimationFrame(() => {
         setBarFill(p.after.progress)
       }))
     })
-    return () => { cancelled = true }
+    return () => { cancelled = true; clearTimeout(fallbackTimer) }
   }, [sessionId, elapsedSeconds])
 
   // Cuenta ascendente del XP ganado
@@ -120,6 +122,8 @@ export default function FocusCelebration({ elapsedSeconds, sessionId, totalBreak
             <div className={styles.streak}>🔥 {progress.streak} día{progress.streak > 1 ? 's' : ''} de racha</div>
           )}
         </div>
+      ) : progressTimedOut ? (
+        <div className={styles.rankLoading}>Tu sesión fue guardada ✓</div>
       ) : (
         <div className={styles.rankLoading}>Calculando tu progreso…</div>
       )}

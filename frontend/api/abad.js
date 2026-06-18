@@ -11,18 +11,21 @@ Puedes hacer dos cosas:
    finanzas, presupuestos mensuales, gastos por categoría).
    En español, breve y cálido (1-3 frases).
 2) EJECUTAR acciones con las herramientas disponibles: crear tarjetas, mover tarjetas,
-   registrar gastos e ingresos personales.
+   agregar subtareas a tarjetas existentes, registrar gastos e ingresos personales.
 
 Reglas:
-- Si el usuario pide CREAR/MOVER una tarjeta o REGISTRAR un gasto/ingreso, usa la herramienta.
+- Si el usuario pide CREAR/MOVER una tarjeta o AGREGAR una subtarea o REGISTRAR un gasto/ingreso, usa la herramienta.
+- Para agregar una subtarea a una tarjeta que ACABAS DE CREAR en este mismo chat, usa "agregar_subtarea" con el título exacto que usaste al crearla.
 - Para fechas relativas ("mañana", "el viernes", "en 3 días") calcula la fecha real en YYYY-MM-DD
   usando "fecha_hoy" del contexto.
 - Usa nombres EXACTOS de columnas y miembros del contexto cuando existan.
+- El contexto incluye "tablero_actual" con TODAS las tarjetas del tablero por columna (sin filtro de fecha).
+  Úsalo para buscar tarjetas por nombre antes de usar una herramienta.
 - Para preguntas sobre presupuesto usa los campos "presupuestos" del contexto:
   cada ítem tiene {categoria, limite, gastado, pct, estado} donde estado es 'ok' (<75%),
   'warn' (75-99%) u 'over' (>=100%).
 - Si solo es una pregunta, responde con texto sin herramientas.
-- No inventes datos que no estén en el contexto.`
+- No inventes datos que no estén en el contexto o el historial de esta conversación.`
 
 const TOOLS = [
   {
@@ -40,6 +43,18 @@ const TOOLS = [
         participante: { type: 'string', description: 'Nombre del miembro a asignar. Opcional.' },
       },
       required: ['titulo'],
+    },
+  },
+  {
+    name: 'agregar_subtarea',
+    description: 'Agrega una subtarea a una tarjeta existente en el tablero.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        titulo_tarjeta: { type: 'string', description: 'Título (o parte) de la tarjeta existente' },
+        subtarea:       { type: 'string', description: 'Texto de la nueva subtarea' },
+      },
+      required: ['titulo_tarjeta', 'subtarea'],
     },
   },
   {
@@ -99,25 +114,66 @@ export default async function handler(req, res) {
       return
     }
 
-    // Construir array de mensajes multi-turn.
-    // El historial llega como [{role: 'user'|'abad', text: '...'}].
-    // Necesitamos que empiece con un turno 'user'; descartamos mensajes ABAD al inicio.
+    // Construir array de mensajes multi-turn con soporte para tool_use/tool_result.
+    // Los mensajes normales: {role: 'user'|'abad', text: '...'}.
+    // Los mensajes de herramienta: {role: 'abad', text: '...', toolMeta: {toolUseId, actionName, actionArgs}}.
+    // toolMeta se reconstruye como el par correcto assistant(tool_use) + user(tool_result).
     const claudeMessages = []
     let histStart = 0
     while (histStart < history.length && history[histStart].role !== 'user') histStart++
 
+    let pendingToolResult = null
+
     for (const msg of history.slice(histStart)) {
-      claudeMessages.push({
-        role: msg.role === 'user' ? 'user' : 'assistant',
-        content: msg.text,
-      })
+      if (msg.toolMeta?.toolUseId) {
+        // Reconstruir el par tool_use → tool_result
+        claudeMessages.push({
+          role: 'assistant',
+          content: [{
+            type: 'tool_use',
+            id: msg.toolMeta.toolUseId,
+            name: msg.toolMeta.actionName,
+            input: msg.toolMeta.actionArgs || {},
+          }],
+        })
+        pendingToolResult = { tool_use_id: msg.toolMeta.toolUseId, content: msg.text }
+      } else if (pendingToolResult) {
+        // El siguiente mensaje (usuario) después de un tool_result:
+        // combinarlos en un solo turno user para mantener alternancia correcta.
+        if (msg.role === 'user') {
+          claudeMessages.push({
+            role: 'user',
+            content: [
+              { type: 'tool_result', tool_use_id: pendingToolResult.tool_use_id, content: pendingToolResult.content },
+              { type: 'text', text: msg.text },
+            ],
+          })
+        } else {
+          claudeMessages.push({ role: 'user', content: [{ type: 'tool_result', tool_use_id: pendingToolResult.tool_use_id, content: pendingToolResult.content }] })
+          claudeMessages.push({ role: 'assistant', content: msg.text })
+        }
+        pendingToolResult = null
+      } else {
+        claudeMessages.push({
+          role: msg.role === 'user' ? 'user' : 'assistant',
+          content: msg.text,
+        })
+      }
     }
 
-    // Pregunta actual con contexto fresco siempre en el último turno
-    claudeMessages.push({
-      role: 'user',
-      content: `CONTEXTO del usuario (JSON):\n${JSON.stringify(context ?? {}, null, 2)}\n\nPETICIÓN: ${question.trim()}`,
-    })
+    // Pregunta actual con contexto fresco — si hay un tool_result pendiente, combinarlo
+    const currentContent = `CONTEXTO del usuario (JSON):\n${JSON.stringify(context ?? {}, null, 2)}\n\nPETICIÓN: ${question.trim()}`
+    if (pendingToolResult) {
+      claudeMessages.push({
+        role: 'user',
+        content: [
+          { type: 'tool_result', tool_use_id: pendingToolResult.tool_use_id, content: pendingToolResult.content },
+          { type: 'text', text: currentContent },
+        ],
+      })
+    } else {
+      claudeMessages.push({ role: 'user', content: currentContent })
+    }
 
     const message = await client.messages.create({
       model: MODEL,
@@ -129,7 +185,7 @@ export default async function handler(req, res) {
 
     const toolUse = message.content.find(b => b.type === 'tool_use')
     if (toolUse) {
-      res.status(200).json({ action: toolUse.name, args: toolUse.input || {} })
+      res.status(200).json({ action: toolUse.name, args: toolUse.input || {}, toolUseId: toolUse.id })
       return
     }
 

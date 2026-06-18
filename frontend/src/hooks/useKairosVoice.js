@@ -7,8 +7,9 @@ export function useKairosVoice(options = {}) {
   
   const recognitionRef = useRef(null);
   const onResultRef = useRef(onResult);
-  const finalBufferRef = useRef(''); // Acumula el texto confirmado
-  const manualStopRef = useRef(false); // Para no reiniciar si el usuario lo paró manualmente
+  const finalBufferRef = useRef('');
+  const manualStopRef = useRef(false);
+  const minConfidenceRef = useRef(1);
 
   useEffect(() => {
     onResultRef.current = onResult;
@@ -41,6 +42,8 @@ export function useKairosVoice(options = {}) {
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
           currentFinal += event.results[i][0].transcript + ' ';
+          const conf = event.results[i][0].confidence;
+          if (conf > 0 && conf < minConfidenceRef.current) minConfidenceRef.current = conf;
         } else {
           interim += event.results[i][0].transcript;
         }
@@ -89,6 +92,7 @@ export function useKairosVoice(options = {}) {
   const startListening = useCallback(() => {
     if (recognitionRef.current && !isListening) {
       finalBufferRef.current = '';
+      minConfidenceRef.current = 1;
       setTranscript('');
       manualStopRef.current = false;
       setIsListening(true);
@@ -110,7 +114,7 @@ export function useKairosVoice(options = {}) {
       setTranscript(prevTranscript => {
         const finalToProcess = prevTranscript.trim();
         if (finalToProcess && onResultRef.current) {
-          onResultRef.current(finalToProcess);
+          onResultRef.current(finalToProcess, minConfidenceRef.current);
         }
         return finalToProcess;
       });

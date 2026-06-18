@@ -1,0 +1,77 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  padding: 24px;
+}
+
+.card {
+  width: min(420px, 100%);
+  background: #1a1830;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.08em;
+}
+
+.sub {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.03em;
+}
+
+.desc {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255,255,255,0.55);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.msBtn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 12px;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a2e;
+  justify-content: center;
+  transition: background 0.15s, transform 0.1s;
+}
+.msBtn:hover { background: #f0f0f0; transform: translateY(-1px); }
+.msBtn:active { transform: translateY(0); }
+
+.privacy {
+  margin: 0;
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.3);
+  text-align: center;
+  line-height: 1.6;
+}

@@ -46,12 +46,27 @@ export function computeStreak(sessions, includeToday = false) {
   return streak
 }
 
-// Progreso de enfoque para el letrero de felicitación.
-// Excluye la sesión recién terminada del total histórico y la suma como
-// "ganada" para animar la barra de XP de un nivel al siguiente.
+const RANK_LS_KEY = 'kairos-rank-sessions'
+
 export async function getFocusProgress({ excludeSessionId = null, earnedSeconds = 0 } = {}) {
   let sessions = []
-  try { sessions = await getMySessions() } catch (e) { console.error('[rank] getMySessions falló:', e.message) }
+  try {
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('timeout')), 5000)
+    )
+    sessions = await Promise.race([getMySessions(), timeout])
+    // Persist for offline / timeout fallback (only for the base case)
+    if (!excludeSessionId && !earnedSeconds) {
+      try { localStorage.setItem(RANK_LS_KEY, JSON.stringify(sessions)) } catch (_) {}
+    }
+  } catch (e) {
+    console.error('[rank] getMySessions falló:', e.message)
+    // Use last-known sessions so the UI doesn't freeze with zeros
+    try {
+      const cached = JSON.parse(localStorage.getItem(RANK_LS_KEY) || 'null')
+      if (Array.isArray(cached)) sessions = cached
+    } catch (_) {}
+  }
 
   const baseSeconds = sessions
     .filter(s => s.id !== excludeSessionId)

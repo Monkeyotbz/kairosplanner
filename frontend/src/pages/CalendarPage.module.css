@@ -316,8 +316,20 @@
 
 @media (max-width: 900px) { .viewBtnLabel { display: none; } }
 
-@media (max-width: 768px) {
+/* Tablet: sidebar más estrecho pero visible */
+@media (max-width: 900px) and (min-width: 641px) {
+  .sidebar { width: 180px; padding: 12px 8px; }
+  .abadDock { min-height: 100px; padding: 12px; }
+  .abadGlow { width: 80px; height: 80px; }
+}
+
+@media (max-width: 640px) {
   .sidebar { display: none; }
+  .header { padding: 8px 12px; }
+  .viewBtn { padding: 5px 8px; font-size: 11px; }
+}
+
+@media (max-width: 768px) {
   .header { padding: 8px 12px; }
   .viewBtn { padding: 5px 8px; font-size: 11px; }
 }

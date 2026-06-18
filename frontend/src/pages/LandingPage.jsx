@@ -25,6 +25,8 @@ export default function LandingPage() {
         <VoiceSection />
         <MusicSection />
         <FeaturesSection />
+        <PricingSection />
+        <AboutSection />
         <FinalCTA />
       </main>
       <Footer />
@@ -33,20 +35,35 @@ export default function LandingPage() {
 }
 
 /* ─────────────────────────── Nav ─────────────────────────── */
+const NAV_LINKS = [
+  { href: '#filosofia', label: 'Filosofía' },
+  { href: '#voz',       label: 'Inteligencia' },
+  { href: '#musica',    label: 'Música' },
+  { href: '#modulos',   label: 'Módulos' },
+  { href: '#precios',   label: 'Precios' },
+]
+
 function LandingNav() {
-  const navigate = useNavigate()
+  const navigate  = useNavigate()
+  const [open, setOpen] = useState(false)
+
+  function closeMenu() { setOpen(false) }
+
   return (
     <header className={styles.nav}>
       <div className={styles.navBrand}>
         <InfinityLogo size={42} state="idle" />
         <span className={styles.navName}>KAIROS</span>
       </div>
+
+      {/* Desktop links */}
       <nav className={styles.navLinks}>
-        <a href="#filosofia" className={styles.navLink}>Filosofía</a>
-        <a href="#voz" className={styles.navLink}>Inteligencia</a>
-        <a href="#musica" className={styles.navLink}>Música</a>
-        <a href="#modulos" className={styles.navLink}>Módulos</a>
+        {NAV_LINKS.map(l => (
+          <a key={l.href} href={l.href} className={styles.navLink}>{l.label}</a>
+        ))}
       </nav>
+
+      {/* Desktop actions */}
       <div className={styles.navActions}>
         <LandingThemeSwitcher />
         <button className={styles.navLogin} onClick={() => navigate('/login')}>
@@ -59,6 +76,44 @@ function LandingNav() {
           Empezar gratis
         </button>
       </div>
+
+      {/* Mobile: login + hamburger */}
+      <div className={styles.navMobile}>
+        <button className={styles.navLoginMobile} onClick={() => navigate('/login')}>
+          Ingresar
+        </button>
+        <button
+          className={`${styles.hamburger} ${open ? styles.hamburgerOpen : ''}`}
+          onClick={() => setOpen(v => !v)}
+          aria-label="Menú"
+        >
+          <span /><span /><span />
+        </button>
+      </div>
+
+      {/* Mobile drawer */}
+      {open && (
+        <div className={styles.mobileMenu}>
+          <nav className={styles.mobileLinks}>
+            {NAV_LINKS.map(l => (
+              <a key={l.href} href={l.href} className={styles.mobileLink} onClick={closeMenu}>
+                {l.label}
+              </a>
+            ))}
+          </nav>
+          <div className={styles.mobileDivider} />
+          <div className={styles.mobileActions}>
+            <LandingThemeSwitcher />
+            <button
+              className={styles.navCta}
+              style={{ width: '100%' }}
+              onClick={() => { navigate('/login', { state: { mode: 'register' } }); closeMenu() }}
+            >
+              Empezar gratis →
+            </button>
+          </div>
+        </div>
+      )}
     </header>
   )
 }
@@ -625,6 +680,108 @@ function FeaturesSection() {
             <p className={styles.featDesc}>{f.desc}</p>
           </div>
         ))}
+      </div>
+    </section>
+  )
+}
+
+/* ───────────────────── Precios ───────────────────── */
+function PricingSection() {
+  const navigate = useNavigate()
+  return (
+    <section className={styles.pricing} id="precios">
+      <div className={styles.sectionHead}>
+        <span className={styles.sectionTag}>Planes</span>
+        <h2 className={styles.sectionTitle}>Simple y transparente</h2>
+        <p className={styles.sectionSub}>
+          14 días para descubrir tu Kairos. Sin tarjeta de crédito.
+        </p>
+      </div>
+
+      <div className={styles.pricingGrid}>
+        {/* Trial */}
+        <div className={styles.pricingCard}>
+          <div className={styles.pricingBadge}>Gratis</div>
+          <div className={styles.pricingPrice}>
+            <span className={styles.pricingAmount}>14 días</span>
+            <span className={styles.pricingPer}>prueba completa</span>
+          </div>
+          <ul className={styles.pricingFeats}>
+            <li><i className="ti ti-check" /> Todos los módulos sin límite</li>
+            <li><i className="ti ti-check" /> ABAD — agente de IA incluido</li>
+            <li><i className="ti ti-check" /> Música + Spotify + YouTube</li>
+            <li><i className="ti ti-check" /> Estadísticas y rangos</li>
+            <li><i className="ti ti-check" /> Sin tarjeta de crédito</li>
+          </ul>
+          <button
+            className={styles.pricingBtnSecondary}
+            onClick={() => navigate('/login', { state: { mode: 'register' } })}
+          >
+            Comenzar prueba →
+          </button>
+        </div>
+
+        {/* Pro */}
+        <div className={`${styles.pricingCard} ${styles.pricingCardPro}`}>
+          <div className={styles.pricingGlow} aria-hidden="true" />
+          <div className={styles.pricingBadgePro}>✦ Pro</div>
+          <div className={styles.pricingPrice}>
+            <span className={styles.pricingAmount}>$20.000</span>
+            <span className={styles.pricingPer}>COP / mes</span>
+          </div>
+          <p className={styles.pricingNote}>Pago seguro vía MercadoPago</p>
+          <ul className={styles.pricingFeats}>
+            <li><i className="ti ti-check" /> Todo lo del período de prueba</li>
+            <li><i className="ti ti-check" /> Acceso permanente sin cortes</li>
+            <li><i className="ti ti-check" /> Nuevas funciones al lanzarse</li>
+            <li><i className="ti ti-check" /> Soporte prioritario</li>
+            <li><i className="ti ti-check" /> Cancela cuando quieras</li>
+          </ul>
+          <button
+            className={styles.pricingBtnPro}
+            onClick={() => navigate('/login', { state: { mode: 'register' } })}
+          >
+            Empezar gratis → Pro
+          </button>
+        </div>
+      </div>
+
+      <p className={styles.pricingDisclaimer}>
+        <i className="ti ti-shield-check" /> Al terminar la prueba se te notificará antes de cualquier cobro.
+        No hay cargos automáticos sin confirmación.
+      </p>
+    </section>
+  )
+}
+
+/* ───────────────────── About / Creador ───────────────────── */
+function AboutSection() {
+  return (
+    <section className={styles.about} id="sobre">
+      <div className={styles.aboutInner}>
+        <div className={styles.aboutLogo}>
+          <InfinityLogo size={56} state="idle" />
+        </div>
+        <div className={styles.aboutContent}>
+          <span className={styles.sectionTag}>El origen</span>
+          <h2 className={styles.aboutTitle}>Construido por un humano, para humanos.</h2>
+          <p className={styles.aboutText}>
+            KAIROS nació de la frustración de usar apps que miden el tiempo pero ignoran
+            cómo funciona la mente. No es un producto de corporación — es una herramienta
+            que un desarrollador construyó para sí mismo y decidió compartir.
+          </p>
+          <p className={styles.aboutText}>
+            Cada módulo existe porque resolvió un problema real: el tablero Kanban
+            para no perder el hilo, el modo Enfoque para entrar en flow de verdad,
+            ABAD para capturar sin interrumpir el trabajo.
+          </p>
+          <div className={styles.aboutStack}>
+            <span className={styles.aboutChip}><i className="ti ti-brand-react" /> React</span>
+            <span className={styles.aboutChip}><i className="ti ti-database" /> Supabase</span>
+            <span className={styles.aboutChip}><i className="ti ti-brain" /> Claude AI</span>
+            <span className={styles.aboutChip}><i className="ti ti-brand-spotify" /> Spotify</span>
+          </div>
+        </div>
       </div>
     </section>
   )
