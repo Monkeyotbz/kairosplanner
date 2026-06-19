@@ -93,11 +93,21 @@ export async function addMemberToProject(proyectoId, userId) {
 }
 
 export async function getProjectMembers(proyectoId) {
-  const { data } = await supabase
+  const { data: membersData } = await supabase
     .from('miembros')
-    .select('usuario_id, rol, usuarios(email, nombre)')
+    .select('usuario_id, rol')
     .eq('proyecto_id', proyectoId)
-  return data || []
+  if (!membersData?.length) return []
+
+  const { data: usersData } = await supabase
+    .from('usuarios')
+    .select('id, email, nombre')
+    .in('id', membersData.map(m => m.usuario_id))
+
+  return membersData.map(m => ({
+    ...m,
+    usuarios: usersData?.find(u => u.id === m.usuario_id) || null,
+  }))
 }
 
 // ── Board ────────────────────────────────────────────────────
