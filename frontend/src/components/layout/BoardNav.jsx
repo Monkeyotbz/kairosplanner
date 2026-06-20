@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useBoardStore } from '../../store/boardStore'
 import { useChatStore } from '../../store/chatStore'
 import { createProject, searchUsuarios, addMemberToProject, getProjectMembers } from '../../services/boardService'
+import { socket } from '../../services/socketService'
 import ThemeSwitcher from './ThemeSwitcher'
 import BoardSwitcher from '../kanban/BoardSwitcher'
 import styles from './BoardNav.module.css'
@@ -16,7 +17,21 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel }) {
   const [showTheme, setShowTheme]             = useState(false)
   const [newNombre, setNewNombre]             = useState('')
   const [saving, setSaving]                   = useState(false)
+  const [showLive, setShowLive]               = useState(false)
+  const [liveUsers, setLiveUsers]             = useState([])
   const menuRef = useRef(null)
+
+  useEffect(() => {
+    const COLORS = ['#5a4fcf', '#22c55e', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899']
+    socket.on('presence:update', (nombres) => {
+      setLiveUsers(nombres.map((nombre, i) => ({
+        id: i,
+        nombre,
+        color: COLORS[i % COLORS.length],
+      })))
+    })
+    return () => { socket.off('presence:update') }
+  }, [])
 
   // Invite state
   const [searchQ, setSearchQ]       = useState('')
@@ -92,7 +107,30 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel }) {
       </div>
 
       <div className={styles.right}>
-        <button className={styles.action}>⊟ Filtrar</button>
+
+        {/* ── OPCIÓN A — Píldora "en vivo" ── */}
+        <div
+          className={styles.liveIndicator}
+          onMouseEnter={() => setShowLive(true)}
+          onMouseLeave={() => setShowLive(false)}
+        >
+          <span className={styles.liveDot} />
+          <span className={styles.liveText}>{liveUsers.length} en vivo</span>
+          {showLive && (
+            <div className={styles.liveTooltip}>
+              <div className={styles.liveTooltipTitle}>En este tablero ahora</div>
+              {liveUsers.map(u => (
+                <div key={u.id} className={styles.liveUser}>
+                  <span className={styles.liveAvatar} style={{ background: u.color }}>{u.nombre[0]}</span>
+                  <span className={styles.liveUserName}>{u.nombre}</span>
+                  <span className={styles.livePulse} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+<button className={styles.action}>⊟ Filtrar</button>
         <button className={styles.inviteBtn} onClick={() => setShowInvite(true)}>+ Invitar</button>
         <button className={styles.action}>•••</button>
         <div style={{ position: 'relative' }}>

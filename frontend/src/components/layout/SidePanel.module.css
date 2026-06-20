@@ -182,6 +182,64 @@
   font-family: var(--kairos-font);
 }
 
+/* ── Actividad reciente ── */
+.actList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.actItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 12px;
+  color: var(--kairos-text-secondary);
+  font-family: var(--kairos-font);
+}
+
+.actIconWrap {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(90, 79, 207, 0.15);
+  border: 1px solid rgba(90, 79, 207, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #818cf8;
+  margin-top: 1px;
+}
+
+.actBody {
+  flex: 1;
+  line-height: 1.45;
+}
+
+.actNombre {
+  font-weight: 600;
+  color: var(--kairos-text-primary);
+}
+
+.actTime {
+  display: block;
+  font-size: 10px;
+  color: var(--kairos-text-muted);
+  margin-top: 2px;
+}
+
+.actEmpty {
+  font-size: 12px;
+  color: var(--kairos-text-muted);
+  font-family: var(--kairos-font);
+  font-style: italic;
+}
+
 /* ── Móvil: nunca visible ── */
 @media (max-width: 768px) {
   .panel { display: none; }

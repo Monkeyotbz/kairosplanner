@@ -9,8 +9,10 @@ export default function ToastContainer() {
     <div className={styles.container}>
       {toasts.map(toast => (
         toast._type === 'focus-recovery'
-          ? <FocusRecoveryToast key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
-          : <DeadlineToast      key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
+          ? <FocusRecoveryToast  key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
+          : toast._type === 'board-activity'
+          ? <BoardActivityToast  key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
+          : <DeadlineToast       key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
       ))}
     </div>
   )
@@ -25,6 +27,20 @@ function FocusRecoveryToast({ toast, onClose }) {
       <div className={styles.body}>
         <p className={styles.title}>Sesión de enfoque recuperada</p>
         <p className={styles.sub}>{toast.minutos} min guardados en tus estadísticas</p>
+      </div>
+      <button className={styles.closeBtn} onClick={onClose} aria-label="Cerrar">✕</button>
+    </div>
+  )
+}
+
+function BoardActivityToast({ toast, onClose }) {
+  return (
+    <div className={`${styles.toast} ${styles.activity}`}>
+      <div className={styles.iconWrap}>
+        <i className={`ti ${toast.icon || 'ti-activity'}`} />
+      </div>
+      <div className={styles.body}>
+        <p className={styles.title}>{toast.text}</p>
       </div>
       <button className={styles.closeBtn} onClick={onClose} aria-label="Cerrar">✕</button>
     </div>

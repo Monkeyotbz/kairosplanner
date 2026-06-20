@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useBoardStore } from '../../store/boardStore'
 import { useAuthStore } from '../../store/authStore'
-import { getMessages, sendMessage, subscribeToMessages } from '../../services/chatService'
+import { getMessages, sendMessage } from '../../services/chatService'
 import { getProjectMembers } from '../../services/boardService'
-import { supabase } from '../../services/supabase'
+import { socket } from '../../services/socketService'
 import styles from './ChatPanel.module.css'
 
 function timeLabel(dateStr) {
@@ -27,16 +27,13 @@ function Avatar({ name, url, size = 28 }) {
 export default function ChatPanel({ onClose }) {
   const { proyecto } = useBoardStore()
   const { user, profile } = useAuthStore()
-  const [messages,    setMessages]    = useState([])
-  const [members,     setMembers]     = useState([])
-  const [onlineUsers, setOnlineUsers] = useState(new Set())
-  const [input,       setInput]       = useState('')
-  const [loading,     setLoading]     = useState(true)
-  const [sending,     setSending]     = useState(false)
-  const bottomRef    = useRef(null)
-  const inputRef     = useRef(null)
-  const channelRef   = useRef(null)
-  const presenceRef  = useRef(null)
+  const [messages, setMessages] = useState([])
+  const [members,  setMembers]  = useState([])
+  const [input,    setInput]    = useState('')
+  const [loading,  setLoading]  = useState(true)
+  const [sending,  setSending]  = useState(false)
+  const bottomRef = useRef(null)
+  const inputRef  = useRef(null)
 
   useEffect(() => {
     if (!proyecto?.id || !user?.id) return
@@ -50,34 +47,12 @@ export default function ChatPanel({ onClose }) {
       setMembers(mbs)
     }).catch(console.error).finally(() => setLoading(false))
 
-    // Suscripción a mensajes nuevos
-    channelRef.current = subscribeToMessages(proyecto.id, (msg) => {
-      setMessages(prev => {
-        if (prev.some(m => m.id === msg.id)) return prev
-        return [...prev, msg]
-      })
+    // Recibir mensajes de otros usuarios vía Socket.io
+    socket.on('chat:message', (msg) => {
+      setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg])
     })
 
-    // Presencia online — rastrea quién tiene el chat abierto
-    presenceRef.current = supabase.channel(`presence-${proyecto.id}`)
-    presenceRef.current
-      .on('presence', { event: 'sync' }, () => {
-        const state = presenceRef.current.presenceState()
-        const online = new Set(
-          Object.values(state).flat().map(p => p.user_id)
-        )
-        setOnlineUsers(online)
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await presenceRef.current.track({ user_id: user.id })
-        }
-      })
-
-    return () => {
-      if (channelRef.current)  supabase.removeChannel(channelRef.current)
-      if (presenceRef.current) supabase.removeChannel(presenceRef.current)
-    }
+    return () => { socket.off('chat:message') }
   }, [proyecto?.id, user?.id])
 
   useEffect(() => {
@@ -91,11 +66,13 @@ export default function ChatPanel({ onClose }) {
     setSending(true)
     try {
       const msg = await sendMessage(proyecto.id, user.id, text)
-      // El canal realtime lo añadirá — si falla, lo añadimos localmente
+      // Añadir localmente (el socket solo lo reciben los demás)
       setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg])
+      // Enviar a los demás vía Socket.io
+      socket.emit('chat:message', msg)
     } catch (err) {
       console.error(err)
-      setInput(text) // restaurar si falló
+      setInput(text)
     } finally {
       setSending(false)
       inputRef.current?.focus()
@@ -127,15 +104,13 @@ export default function ChatPanel({ onClose }) {
       {members.length > 0 && (
         <div className={styles.members}>
           {members.map(m => {
-            const name     = m.usuarios?.nombre || m.usuarios?.email || '?'
-            const url      = m.usuarios?.avatar_url
-            const isMe     = m.usuario_id === user?.id
-            const isOnline = onlineUsers.has(m.usuario_id)
+            const name = m.usuarios?.nombre || m.usuarios?.email || '?'
+            const url  = m.usuarios?.avatar_url
+            const isMe = m.usuario_id === user?.id
             return (
-              <div key={m.usuario_id} className={styles.memberPill} title={isOnline ? `${name} — en línea` : name}>
+              <div key={m.usuario_id} className={styles.memberPill} title={name}>
                 <div className={styles.memberAvatarWrap}>
                   <Avatar name={name} url={url} size={24} />
-                  <span className={`${styles.presenceDot} ${isOnline ? styles.online : styles.offline}`} />
                 </div>
                 <span className={`${styles.memberName} ${isMe ? styles.memberMe : ''}`}>
                   {isMe ? 'Tú' : name.split(' ')[0]}
@@ -162,11 +137,11 @@ export default function ChatPanel({ onClose }) {
           </div>
         ) : (
           messages.map((msg, i) => {
-            const isOwn     = msg.usuario_id === user?.id
-            const name      = msg.usuarios?.nombre || msg.usuarios?.email || '?'
-            const url       = msg.usuarios?.avatar_url
-            const prevMsg   = messages[i - 1]
-            const grouped   = prevMsg && prevMsg.usuario_id === msg.usuario_id
+            const isOwn   = msg.usuario_id === user?.id
+            const name    = msg.usuarios?.nombre || msg.usuarios?.email || '?'
+            const url     = msg.usuarios?.avatar_url
+            const prevMsg = messages[i - 1]
+            const grouped = prevMsg && prevMsg.usuario_id === msg.usuario_id
             return (
               <div
                 key={msg.id}

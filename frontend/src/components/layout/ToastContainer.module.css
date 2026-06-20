@@ -51,6 +51,13 @@
 }
 .recovery .iconWrap { color: #34d399; }
 
+.activity {
+  background: rgba(18, 15, 38, 0.92);
+  border: 1px solid rgba(90, 79, 207, 0.25);
+  border-left: 3px solid #5a4fcf;
+}
+.activity .iconWrap { color: #818cf8; }
+
 .iconWrap {
   font-size: 20px;
   line-height: 1;
