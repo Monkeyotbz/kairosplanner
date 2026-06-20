@@ -1,0 +1,198 @@
+.section {
+  background: var(--kairos-card-bg, rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--kairos-radius-lg, 14px);
+  padding: 20px 24px;
+}
+
+.heading {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--kairos-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 18px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 0;
+  color: var(--kairos-text-muted);
+  font-size: 13px;
+}
+.emptyHint { font-size: 11px; color: var(--kairos-text-muted); text-align: center; }
+
+/* ── Extra mensual ─────────────────────────────────────────── */
+.extraRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.extraLabel { font-size: 12px; color: var(--kairos-text-secondary); }
+.extraBtn {
+  background: rgba(167,139,250,0.1);
+  border: 1px solid rgba(167,139,250,0.3);
+  border-radius: 8px;
+  color: #a78bfa;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+  display: flex;
+  align-items: center;
+}
+.extraInput {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(167,139,250,0.5);
+  border-radius: 8px;
+  color: var(--kairos-text-primary);
+  font-size: 13px;
+  padding: 6px 12px;
+  font-family: var(--kairos-font);
+  width: 160px;
+  outline: none;
+}
+
+/* ── Métodos ─────────────────────────────────────────────────── */
+.metodos { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+
+.metodoBtn {
+  flex: 1;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--kairos-font);
+  text-align: left;
+}
+.metodoBtn:hover { background: rgba(255,255,255,0.07); }
+.metodoActive { border-color: var(--kairos-purple-400, #a78bfa) !important; background: rgba(167,139,250,0.08) !important; }
+
+.metodoIcon { font-size: 20px; }
+.metodoName { font-size: 13px; font-weight: 700; color: var(--kairos-text-primary); }
+.metodoDesc { font-size: 11px; color: var(--kairos-text-muted); }
+.metodoMeses {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--kairos-purple-400, #a78bfa);
+  margin-top: 4px;
+}
+.metodoMeses::after { content: ' meses'; font-size: 11px; font-weight: 500; color: var(--kairos-text-muted); }
+
+.tip { font-size: 11px; color: var(--kairos-text-muted); margin: 0 0 14px; font-style: italic; }
+
+/* ── Lista de deudas ─────────────────────────────────────────── */
+.deudas { display: flex; flex-direction: column; gap: 8px; }
+
+.noExtra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--kairos-text-muted);
+  padding: 16px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+}
+
+.deudaItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  transition: opacity 0.2s;
+}
+.libre { opacity: 0.6; }
+
+.deudaOrder {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(167,139,250,0.15);
+  color: #a78bfa;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.deudaInfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+
+.deudaTop { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.deudaConcepto { font-size: 13px; font-weight: 600; color: var(--kairos-text-primary); }
+
+.tagLibre {
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+.tagFecha {
+  font-size: 10px;
+  color: var(--kairos-text-muted);
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+.deudaCapRow { display: flex; align-items: center; gap: 6px; }
+.deudaCapLabel { font-size: 11px; color: var(--kairos-text-muted); }
+.deudaCapVal {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--kairos-text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+  display: flex;
+  align-items: center;
+  padding: 0;
+  text-decoration: underline dotted;
+}
+
+.barWrap {
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.bar { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+
+/* ── Resumen final ──────────────────────────────────────────── */
+.resumen {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: rgba(167,139,250,0.08);
+  border: 1px solid rgba(167,139,250,0.25);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--kairos-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.resumen i { color: #a78bfa; font-size: 16px; }
+.resumen strong { color: var(--kairos-text-primary); }
