@@ -64,6 +64,15 @@
   gap: 12px;
 }
 
+.reconnecting {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--kairos-text-secondary);
+  margin: 0;
+}
+
 .errorIcon {
   font-size: 34px;
   color: var(--kairos-text-muted);

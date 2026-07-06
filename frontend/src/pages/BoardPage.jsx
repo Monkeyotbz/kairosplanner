@@ -60,8 +60,11 @@ export default function BoardPage() {
       <div className={`${styles.state} ${styles.errorState}`}>
         <i className={`ti ti-cloud-off ${styles.errorIcon}`} aria-hidden="true" />
         <p className={styles.error}>{error}</p>
+        <p className={styles.reconnecting}>
+          <span className={styles.spinner} /> Reconectando automáticamente…
+        </p>
         <button className={styles.retryBtn} onClick={() => loadBoard()}>
-          <i className="ti ti-refresh" aria-hidden="true" /> Reintentar
+          <i className="ti ti-refresh" aria-hidden="true" /> Reintentar ahora
         </button>
       </div>
     )
