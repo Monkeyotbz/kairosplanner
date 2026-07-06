@@ -57,8 +57,12 @@ export default function BoardPage() {
 
   if (error) {
     return (
-      <div className={styles.state}>
+      <div className={`${styles.state} ${styles.errorState}`}>
+        <i className={`ti ti-cloud-off ${styles.errorIcon}`} aria-hidden="true" />
         <p className={styles.error}>{error}</p>
+        <button className={styles.retryBtn} onClick={() => loadBoard()}>
+          <i className="ti ti-refresh" aria-hidden="true" /> Reintentar
+        </button>
       </div>
     )
   }

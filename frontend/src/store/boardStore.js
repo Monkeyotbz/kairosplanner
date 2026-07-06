@@ -1,5 +1,13 @@
 import { create } from 'zustand'
 import { getMisProyectos, getBoardByProject, getMyBoard, updateCardColumn, updateCard, createCard, deleteCard, createColumn, updateColumn, deleteColumn, deleteProject } from '../services/boardService'
+import { withTimeout, isTimeoutError } from '../services/supabase'
+import { useToastStore } from './toastStore'
+
+// Aviso visible cuando un cambio optimista no llegó a Supabase — sin esto el
+// usuario cree que guardó y lo pierde al recargar.
+function notifySaveError(sub = 'Revisa tu conexión e inténtalo de nuevo.') {
+  useToastStore.getState().addToast({ _type: 'error', title: 'Cambio sin guardar', sub })
+}
 
 export const useBoardStore = create((set, get) => ({
   proyectos: [],
@@ -21,11 +29,12 @@ export const useBoardStore = create((set, get) => ({
       let proyecto, boardData
 
       if (targetId) {
-        const proyectos = await getMisProyectos()
+        const proyectos = await withTimeout(getMisProyectos(), 12000, 'getMisProyectos')
+        if (!proyectos.length) { set({ loading: false, error: 'empty' }); return }
         proyecto = proyectos.find(p => p.id === targetId) || proyectos[0]
-        boardData = await getBoardByProject(proyecto.id)
+        boardData = await withTimeout(getBoardByProject(proyecto.id), 12000, 'getBoardByProject')
       } else {
-        const data = await getMyBoard()
+        const data = await withTimeout(getMyBoard(), 12000, 'getMyBoard')
         if (!data) { set({ loading: false, error: 'empty' }); return }
         ({ proyecto, ...boardData } = data)
       }
@@ -43,7 +52,11 @@ export const useBoardStore = create((set, get) => ({
 
       set({ proyecto, board: boardData.board, columns: boardData.columns, cardsByColumn, loading: false, error: null })
     } catch (err) {
-      set({ error: err.message, loading: false })
+      console.error('Error al cargar tablero:', err)
+      const message = isTimeoutError(err)
+        ? 'La conexión con la base de datos tardó demasiado.'
+        : err.message
+      set({ error: message, loading: false })
     }
   },
 
@@ -97,7 +110,7 @@ export const useBoardStore = create((set, get) => ({
       }
     })
     try { await updateCardColumn(cardId, toCol) }
-    catch (err) { console.error('Error al mover tarjeta:', err) }
+    catch (err) { console.error('Error al mover tarjeta:', err); notifySaveError('El movimiento de la tarjeta no se guardó.') }
   },
 
   removeCard: async (cardId, columnaId) => {
@@ -107,7 +120,8 @@ export const useBoardStore = create((set, get) => ({
         [columnaId]: (s.cardsByColumn[columnaId] || []).filter(c => c.id !== cardId),
       },
     }))
-    await deleteCard(cardId)
+    try { await deleteCard(cardId) }
+    catch (err) { console.error('Error al eliminar tarjeta:', err); notifySaveError('La tarjeta no se eliminó de la base de datos.') }
   },
 
   selectCard: (card) => set({ selectedCard: card }),
@@ -151,6 +165,7 @@ export const useBoardStore = create((set, get) => ({
       }))
     } catch (err) {
       console.error('Error al editar tarjeta:', err)
+      notifySaveError('Los cambios de la tarjeta no se guardaron.')
     }
   },
 
@@ -171,7 +186,7 @@ export const useBoardStore = create((set, get) => ({
     // Optimista
     set(s => ({ columns: s.columns.map(c => c.id === id ? { ...c, ...fields } : c) }))
     try { await updateColumn(id, fields) }
-    catch (err) { console.error('Error al editar columna:', err) }
+    catch (err) { console.error('Error al editar columna:', err); notifySaveError('Los cambios de la lista no se guardaron.') }
   },
 
   removeColumn: async (id) => {
@@ -181,7 +196,7 @@ export const useBoardStore = create((set, get) => ({
       return { columns: s.columns.filter(c => c.id !== id), cardsByColumn: next }
     })
     try { await deleteColumn(id) }
-    catch (err) { console.error('Error al eliminar columna:', err) }
+    catch (err) { console.error('Error al eliminar columna:', err); notifySaveError('La lista no se eliminó de la base de datos.') }
   },
 
   // Reordenar columnas por lista de ids (drag o menú)
@@ -191,7 +206,7 @@ export const useBoardStore = create((set, get) => ({
       return { columns: orderedIds.map(id => byId[id]).filter(Boolean) }
     })
     try { await Promise.all(orderedIds.map((id, i) => updateColumn(id, { orden: i }))) }
-    catch (err) { console.error('Error al reordenar columnas:', err) }
+    catch (err) { console.error('Error al reordenar columnas:', err); notifySaveError('El nuevo orden de las listas no se guardó.') }
   },
 
   // Mover una columna una posición (-1 izquierda, +1 derecha)
@@ -227,7 +242,7 @@ export const useBoardStore = create((set, get) => ({
         columns: [...s.columns, col],
         cardsByColumn: { ...s.cardsByColumn, [col.id]: newCards },
       }))
-    } catch (err) { console.error('Error al copiar lista:', err) }
+    } catch (err) { console.error('Error al copiar lista:', err); notifySaveError('No se pudo copiar la lista.') }
   },
 
   // Ordenar las tarjetas de una columna (fecha | prioridad | nombre)
@@ -246,13 +261,13 @@ export const useBoardStore = create((set, get) => ({
     try {
       const cards = get().cardsByColumn[colId] || []
       await Promise.all(cards.map((c, i) => updateCard(c.id, { orden: i })))
-    } catch (err) { console.error('Error al ordenar tarjetas:', err) }
+    } catch (err) { console.error('Error al ordenar tarjetas:', err); notifySaveError('El orden de las tarjetas no se guardó.') }
   },
 
   setCardsByColumn: (cardsByColumn) => set({ cardsByColumn }),
 
   persistMove: async (cardId, newColId) => {
     try { await updateCardColumn(cardId, newColId) }
-    catch (err) { console.error('Error al mover tarjeta:', err) }
+    catch (err) { console.error('Error al mover tarjeta:', err); notifySaveError('El movimiento de la tarjeta no se guardó.') }
   },
 }))
