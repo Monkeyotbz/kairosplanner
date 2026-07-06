@@ -22,12 +22,14 @@ function pushRecent(id) {
 }
 
 export default function BoardSwitcher({ onClose }) {
-  const { proyectos, proyecto, loadBoard, loadProyectos } = useBoardStore()
-  const [query, setQuery]       = useState('')
-  const [creating, setCreating] = useState(false)
-  const [nombre, setNombre]     = useState('')
-  const [saving, setSaving]     = useState(false)
-  const [recent, setRecent]     = useState(loadRecent())
+  const { proyectos, proyecto, loadBoard, loadProyectos, removeProyecto } = useBoardStore()
+  const [query, setQuery]         = useState('')
+  const [creating, setCreating]   = useState(false)
+  const [nombre, setNombre]       = useState('')
+  const [saving, setSaving]       = useState(false)
+  const [recent, setRecent]       = useState(loadRecent())
+  const [confirmId, setConfirmId] = useState(null)
+  const [deletingId, setDeletingId] = useState(null)
 
   useEffect(() => { loadProyectos() }, [loadProyectos])
 
@@ -53,6 +55,18 @@ export default function BoardSwitcher({ onClose }) {
     onClose()
   }
 
+  async function handleDelete(id) {
+    setDeletingId(id)
+    try {
+      await removeProyecto(id)
+    } catch (err) {
+      console.error('Error al eliminar tablero:', err)
+    } finally {
+      setDeletingId(null)
+      setConfirmId(null)
+    }
+  }
+
   async function handleCreate(e) {
     e.preventDefault()
     if (!nombre.trim()) return
@@ -68,13 +82,50 @@ export default function BoardSwitcher({ onClose }) {
 
   function BoardCard({ p }) {
     const active = p.id === proyecto?.id
+    const canDelete = p.rol === 'admin'
+    const confirming = confirmId === p.id
+    const deleting = deletingId === p.id
+
     return (
-      <button className={`${styles.card} ${active ? styles.cardActive : ''}`} onClick={() => selectBoard(p.id)}>
+      <div
+        className={`${styles.card} ${active ? styles.cardActive : ''}`}
+        role="button"
+        tabIndex={0}
+        onClick={() => { if (!confirming) selectBoard(p.id) }}
+        onKeyDown={e => { if (!confirming && (e.key === 'Enter' || e.key === ' ')) selectBoard(p.id) }}
+      >
         <div className={styles.cover} style={{ background: coverGradient(p.id || p.nombre) }}>
           {active && <span className={styles.activeBadge}>● Activo</span>}
+          {canDelete && !confirming && (
+            <button
+              className={styles.deleteBtn}
+              title="Eliminar tablero"
+              onClick={e => { e.stopPropagation(); setConfirmId(p.id) }}
+            >
+              <i className="ti ti-trash" aria-hidden="true" />
+            </button>
+          )}
         </div>
-        <div className={styles.cardName}>{p.nombre}</div>
-      </button>
+
+        {confirming ? (
+          <div className={styles.confirmBox} onClick={e => e.stopPropagation()}>
+            <p className={styles.confirmText}>¿Eliminar "{p.nombre}"?</p>
+            <div className={styles.createActions}>
+              <button
+                type="button"
+                className={styles.confirmDelete}
+                disabled={deleting}
+                onClick={() => handleDelete(p.id)}
+              >
+                {deleting ? '...' : 'Eliminar'}
+              </button>
+              <button type="button" className={styles.createCancel} onClick={() => setConfirmId(null)}>✕</button>
+            </div>
+          </div>
+        ) : (
+          <div className={styles.cardName}>{p.nombre}</div>
+        )}
+      </div>
     )
   }
 

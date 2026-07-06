@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { getMisProyectos, getBoardByProject, getMyBoard, updateCardColumn, updateCard, createCard, deleteCard, createColumn, updateColumn, deleteColumn } from '../services/boardService'
+import { getMisProyectos, getBoardByProject, getMyBoard, updateCardColumn, updateCard, createCard, deleteCard, createColumn, updateColumn, deleteColumn, deleteProject } from '../services/boardService'
 
 export const useBoardStore = create((set, get) => ({
   proyectos: [],
@@ -51,6 +51,23 @@ export const useBoardStore = create((set, get) => ({
   loadProyectos: async () => {
     const proyectos = await getMisProyectos()
     set({ proyectos })
+  },
+
+  // Elimina un proyecto/tablero por completo (cascade en Supabase)
+  removeProyecto: async (proyectoId) => {
+    await deleteProject(proyectoId)
+    const { proyecto, proyectos } = get()
+    const restantes = proyectos.filter(p => p.id !== proyectoId)
+    set({ proyectos: restantes })
+
+    if (proyecto?.id === proyectoId) {
+      localStorage.removeItem('kairos-last-project')
+      if (restantes.length) {
+        await get().loadBoard(restantes[0].id)
+      } else {
+        set({ proyecto: null, board: null, columns: [], cardsByColumn: {}, error: 'empty' })
+      }
+    }
   },
 
   // ── Tarjetas ────────────────────────────────────────────────
