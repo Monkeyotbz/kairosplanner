@@ -35,6 +35,10 @@
   position: relative;
   font-family: var(--kairos-font);
   color: var(--c-text);
+  /* Contiene glows y tarjetas flotantes que sobresalen del viewport en mobile.
+     clip no crea scroll-container (a diferencia de hidden); hidden es el fallback. */
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Overrides de acento por tema (pre-Chrome-111, sin color-mix) */
@@ -853,7 +857,7 @@
   border: 1px solid var(--c-border);
   border-radius: 10px;
   white-space: nowrap;
-  max-width: 340px;
+  max-width: min(340px, calc(100% - 16px));
   overflow: hidden;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -889,6 +893,7 @@
   font-weight: 600;
   color: var(--c-accent-soft);
   white-space: nowrap;
+  max-width: calc(100% - 16px);
   animation: fadeUp 0.3s ease both;
 }
 .voiceResult i { font-size: 14px; }
@@ -1157,6 +1162,9 @@
   gap: 12px;
   z-index: 49;
   animation: fadeUp 0.2s ease both;
+  /* En landscape el menú puede superar la altura del viewport */
+  max-height: calc(100vh - 68px);
+  overflow-y: auto;
 }
 
 .mobileLinks {
@@ -1458,6 +1466,22 @@
   .musicGrid { grid-template-columns: 1fr; }
   .pricingGrid { grid-template-columns: 1fr; max-width: 420px; }
   .aboutInner { gap: 24px; }
+
+  /* Floats: sin offsets negativos grandes — a este ancho el mockup ya llena el viewport */
+  .floatVoice { left: -8px; }
+  .floatStats { right: -8px; }
+
+  /* Popover del Kanban: ya no hay espacio a la derecha del mockup;
+     se muestra como sheet centrado sobre el propio mockup */
+  .cardPopover {
+    top: auto;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: 320px;
+    margin: 0 auto;
+  }
 }
 
 @media (max-width: 600px) {
@@ -1502,6 +1526,20 @@
   .voiceChips { gap: 8px; }
   .voiceChip { font-size: 11px; padding: 9px 12px; }
   .voiceChip i { font-size: 13px; }
+
+  /* Resultado de voz: permitir salto de línea en pantallas angostas */
+  .voiceResult {
+    white-space: normal;
+    width: max-content;
+    text-align: center;
+  }
+
+  /* Glows de ancho fijo: limitarlos al viewport */
+  .heroGlow, .finalGlow { max-width: 100vw; }
+
+  /* Disclaimer de precios: dos líneas en mobile, ícono alineado arriba */
+  .pricingDisclaimer { align-items: flex-start; }
+  .pricingDisclaimer i { margin-top: 2px; }
 
   /* Features */
   .featGrid { grid-template-columns: 1fr; }
