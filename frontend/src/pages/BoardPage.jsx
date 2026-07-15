@@ -45,7 +45,21 @@ export default function BoardPage() {
 
   if (loading) return <div className={styles.state}><span className={styles.spinner} /> Cargando tablero...</div>
   if (error === 'empty') return <EmptyBoard />
-  if (error) return <div className={styles.state}><p className={styles.error}>{error}</p></div>
+
+  if (error) {
+    return (
+      <div className={`${styles.state} ${styles.errorState}`}>
+        <i className={`ti ti-cloud-off ${styles.errorIcon}`} aria-hidden="true" />
+        <p className={styles.error}>{error}</p>
+        <p className={styles.reconnecting}>
+          <span className={styles.spinner} /> Reconectando automáticamente…
+        </p>
+        <button className={styles.retryBtn} onClick={() => loadBoard()}>
+          <i className="ti ti-refresh" aria-hidden="true" /> Reintentar ahora
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.page}>

@@ -1,0 +1,167 @@
+.section {
+  background: var(--kairos-card-bg, rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--kairos-radius-lg, 14px);
+  padding: 20px 24px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.heading {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--kairos-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.addBtn {
+  padding: 7px 16px;
+  background: var(--kairos-purple-600, #534AB7);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+  transition: background 0.15s;
+}
+.addBtn:hover { background: var(--kairos-purple-400, #a78bfa); }
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 28px 0;
+  color: var(--kairos-text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ── Formulario ─────────────────────────────────────────────── */
+.form {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.fieldFull { grid-column: 1 / -1; }
+
+.field, .fieldFull {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.field span, .fieldFull span { font-size: 11px; color: var(--kairos-text-muted); }
+
+.input {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: var(--kairos-text-primary);
+  font-size: 13px;
+  padding: 8px 12px;
+  font-family: var(--kairos-font);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input:focus { border-color: rgba(167,139,250,0.5); }
+.input::placeholder { color: var(--kairos-text-muted); }
+
+.formActions { display: flex; gap: 8px; justify-content: flex-end; }
+
+.cancelBtn {
+  padding: 7px 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: var(--kairos-text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+}
+.saveBtn {
+  padding: 7px 20px;
+  background: var(--kairos-purple-600, #534AB7);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--kairos-font);
+}
+
+/* ── Cards ───────────────────────────────────────────────────── */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+
+.card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cardDone { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.05); }
+
+.cardTop { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.cardNombre { font-size: 14px; font-weight: 700; color: var(--kairos-text-primary); }
+
+.cardActions { display: flex; gap: 4px; flex-shrink: 0; }
+.iconBtn {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.06);
+  border: none;
+  color: var(--kairos-text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.12s;
+  font-family: var(--kairos-font);
+}
+.iconBtn:hover { background: rgba(255,255,255,0.12); color: var(--kairos-text-primary); }
+
+.cardAmounts { display: flex; align-items: baseline; gap: 4px; }
+.cardCurrent { font-size: 18px; font-weight: 800; color: var(--kairos-purple-400, #a78bfa); }
+.cardSep { font-size: 13px; color: var(--kairos-text-muted); }
+.cardGoal { font-size: 13px; color: var(--kairos-text-muted); }
+
+.progressWrap {
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+.cardMeta { font-size: 11px; color: var(--kairos-text-muted); display: flex; flex-wrap: wrap; gap: 4px; }
+.fecha { color: var(--kairos-purple-400, #a78bfa); font-weight: 600; }
+.doneTag { font-size: 12px; font-weight: 700; color: #22c55e; }
+
+@media (max-width: 600px) {
+  .formGrid { grid-template-columns: 1fr; }
+  .cards { grid-template-columns: 1fr; }
+}

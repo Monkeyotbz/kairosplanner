@@ -59,6 +59,42 @@
   font-size: 13px;
 }
 
+.errorState {
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reconnecting {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--kairos-text-secondary);
+  margin: 0;
+}
+
+.errorIcon {
+  font-size: 34px;
+  color: var(--kairos-text-muted);
+}
+
+.retryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 10px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--kairos-font);
+  color: #fff;
+  background: var(--kairos-purple-600);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.retryBtn:hover { opacity: 0.85; }
+
 /* ── Móvil: columnas apiladas, scroll vertical ── */
 @media (max-width: 768px) {
   .content { flex-direction: column; }

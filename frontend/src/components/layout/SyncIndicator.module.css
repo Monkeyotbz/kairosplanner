@@ -1,0 +1,55 @@
+.pill {
+  position: fixed;
+  top: 72px;
+  right: 18px;
+  z-index: 950;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--kairos-font);
+  color: var(--kairos-text-secondary);
+  background: var(--kairos-modal-bg);
+  border: 1px solid var(--kairos-border-2);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.3);
+  animation: syncIn 0.18s ease;
+  pointer-events: none;
+}
+
+@keyframes syncIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pill i { font-size: 14px; }
+
+.saved {
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.35);
+}
+
+.waiting {
+  color: #fb923c;
+  border-color: rgba(251, 146, 60, 0.35);
+}
+
+.spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--kairos-border-2);
+  border-top-color: var(--kairos-purple-400);
+  border-radius: 50%;
+  animation: syncSpin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes syncSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .pill { top: 62px; right: 10px; }
+}

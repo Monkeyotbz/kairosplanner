@@ -76,6 +76,11 @@ export async function createProjectForOnboarding({ nombre, descripcion = '', col
   return { proyecto, board, columnas: cols || [] }
 }
 
+export async function deleteProject(proyectoId) {
+  const { error } = await supabase.from('proyectos').delete().eq('id', proyectoId)
+  if (error) throw error
+}
+
 export async function searchUsuarios(query) {
   const { data } = await supabase
     .from('usuarios')

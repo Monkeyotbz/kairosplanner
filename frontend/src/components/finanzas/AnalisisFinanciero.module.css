@@ -1,0 +1,133 @@
+.wrap { display: flex; flex-direction: column; gap: 16px; }
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--kairos-text-muted);
+  font-size: 14px;
+  padding: 40px 0;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--kairos-purple-400, #a78bfa);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Dashboard ejecutivo ────────────────────────────────────── */
+.dashboard {
+  background: var(--kairos-card-bg, rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--kairos-radius-lg, 14px);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.dashTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--kairos-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.dashGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.dashCard {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dashCardLabel { font-size: 11px; color: var(--kairos-text-muted); }
+.dashVal { font-size: 22px; font-weight: 800; color: var(--kairos-text-primary); line-height: 1.2; }
+.dashSub { font-size: 10px; color: var(--kairos-text-muted); }
+
+.dashScore { font-size: 32px; font-weight: 900; line-height: 1; }
+.dashScore small { font-size: 14px; font-weight: 500; color: var(--kairos-text-muted); }
+.dashScoreLabel { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* ── Distribución ───────────────────────────────────────────── */
+.dist {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.distTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--kairos-text-secondary);
+  margin: 0 0 4px;
+}
+
+.distRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.distLabel {
+  font-size: 11px;
+  color: var(--kairos-text-muted);
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.distBarWrap {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 4px;
+  overflow: visible;
+  position: relative;
+}
+
+.distBarReal {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+  position: absolute;
+  top: 0; left: 0;
+}
+
+.distBarIdeal {
+  position: absolute;
+  top: -3px;
+  height: 14px;
+  width: 2px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 1px;
+  transform: translateX(-1px);
+}
+
+.distPct { font-size: 12px; font-weight: 700; color: var(--kairos-text-primary); width: 30px; text-align: right; flex-shrink: 0; }
+.distOver { color: #ef4444; }
+.distIdeal { font-size: 10px; color: var(--kairos-text-muted); width: 30px; flex-shrink: 0; }
+
+.distHint { font-size: 10px; color: var(--kairos-text-muted); margin: 4px 0 0; font-style: italic; }
+
+@media (max-width: 600px) {
+  .dashGrid { grid-template-columns: 1fr 1fr; }
+}

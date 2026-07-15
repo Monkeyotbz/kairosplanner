@@ -1,0 +1,96 @@
+.section {
+  background: var(--kairos-card-bg, rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--kairos-radius-lg, 14px);
+  padding: 20px 24px;
+}
+
+.heading {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--kairos-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 18px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 0;
+  color: var(--kairos-text-muted);
+  font-size: 13px;
+}
+
+/* ── Resumen ──────────────────────────────────────────────────── */
+.resumen {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+}
+
+.resumenRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.resumenRow:last-child { border-bottom: none; }
+
+.resumenLabel { flex: 1; font-size: 12px; color: var(--kairos-text-secondary); }
+.resumenMonto { font-size: 13px; font-weight: 700; }
+.resumenPct   { font-size: 11px; color: var(--kairos-text-muted); width: 32px; text-align: right; }
+
+/* ── Ítems ───────────────────────────────────────────────────── */
+.items { display: flex; flex-direction: column; gap: 8px; }
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 10px 14px;
+  flex-wrap: wrap;
+}
+
+.itemLeft { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.itemConcepto { font-size: 13px; font-weight: 600; color: var(--kairos-text-primary); }
+.itemHint { font-size: 11px; color: var(--kairos-text-muted); }
+
+.itemMonto { font-size: 14px; font-weight: 700; flex-shrink: 0; display: flex; align-items: center; gap: 4px; }
+.badge { font-size: 10px; font-weight: 500; color: var(--kairos-text-muted); }
+
+.clasificar { display: flex; gap: 4px; flex-shrink: 0; }
+
+.chip {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s;
+  font-family: var(--kairos-font);
+}
+.chip:hover { border-color: rgba(255,255,255,0.35); transform: scale(1.1); }
+.chipActive { border-width: 2px; transform: scale(1.05); }
+
+.hint {
+  font-size: 11px;
+  color: var(--kairos-text-muted);
+  margin: 12px 0 0;
+  text-align: center;
+}

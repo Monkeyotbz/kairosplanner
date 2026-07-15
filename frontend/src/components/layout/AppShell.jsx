@@ -7,6 +7,7 @@ import MusicPlayer from '../music/MusicPlayer'
 import StarField from './StarField'
 import ChatPanel from '../chat/ChatPanel'
 import ToastContainer from './ToastContainer'
+import SyncIndicator from './SyncIndicator'
 import ImmersiveFocus from '../focus/ImmersiveFocus'
 import FocusCapsule from '../focus/FocusCapsule'
 import AbadChat from '../kairos/AbadChat'
@@ -55,6 +56,7 @@ export default function AppShell() {
       <MusicPlayer />
       {chatOpen && <ChatPanel onClose={closeChat} />}
       <ToastContainer />
+      <SyncIndicator />
       <ImmersiveFocus />
       <FocusCapsule />
       <AbadChat />

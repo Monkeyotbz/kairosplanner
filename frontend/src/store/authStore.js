@@ -1,13 +1,21 @@
 import { create } from 'zustand'
-import { supabase } from '../services/supabase'
+import { supabase, withTimeout } from '../services/supabase'
 
 async function fetchProfile(userId) {
-  const { data } = await supabase
-    .from('usuarios')
-    .select('id, email, nombre, avatar_url')
-    .eq('id', userId)
-    .single()
-  return data || null
+  try {
+    const { data } = await withTimeout(
+      supabase
+        .from('usuarios')
+        .select('id, email, nombre, avatar_url')
+        .eq('id', userId)
+        .single(),
+      8000, 'fetchProfile'
+    )
+    return data || null
+  } catch (err) {
+    console.error('[auth] fetchProfile falló:', err)
+    return null
+  }
 }
 
 export const useAuthStore = create((set) => ({
@@ -16,9 +24,14 @@ export const useAuthStore = create((set) => ({
   loading: true,
 
   init: async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    const profile = session?.user ? await fetchProfile(session.user.id) : null
-    set({ user: session?.user ?? null, profile, loading: false })
+    try {
+      const { data: { session } } = await withTimeout(supabase.auth.getSession(), 8000, 'getSession')
+      const profile = session?.user ? await fetchProfile(session.user.id) : null
+      set({ user: session?.user ?? null, profile, loading: false })
+    } catch (err) {
+      console.error('[auth] init falló:', err)
+      set({ user: null, profile: null, loading: false })
+    }
 
     supabase.auth.onAuthStateChange(async (_event, session) => {
       const profile = session?.user ? await fetchProfile(session.user.id) : null

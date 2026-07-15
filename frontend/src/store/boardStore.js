@@ -1,14 +1,18 @@
 import { create } from 'zustand'
-import { getMisProyectos, getBoardByProject, getMyBoard, updateCardColumn, updateCard, createCard, deleteCard, createColumn, updateColumn, deleteColumn } from '../services/boardService'
+import { getMisProyectos, getBoardByProject, getMyBoard, deleteProject } from '../services/boardService'
+import { withRetry, isTimeoutError } from '../services/supabase'
+import { enqueue, flush, hasPending } from '../services/syncQueue'
+import { onReconnect, isOnline } from '../services/connection'
 import { useAuthStore } from './authStore'
 import { useToastStore } from './toastStore'
 import { socket, joinBoard } from '../services/socketService'
-import { saveActividad, getActividad } from '../services/actividadService'
+import { getActividad } from '../services/actividadService'
 
-function actor() {
-  const { nombre, email } = useAuthStore.getState().profile ?? {}
-  return nombre || email || 'Alguien'
-}
+// Reintento automático de carga: si loadBoard falla, se reprograma solo con
+// backoff (5s, 10s... máx 30s) — el usuario nunca tiene que recargar a mano.
+let _retryTimer = null
+let _retryAttempt = 0
+let _loadedAt = 0
 
 function notify(icon, text) {
   useToastStore.getState().addToast({ _type: 'board-activity', icon, text, duration: 4000 })
@@ -35,14 +39,19 @@ export const useBoardStore = create((set, get) => ({
     set({ loading: true, error: null })
     const targetId = proyectoId || localStorage.getItem('kairos-last-project')
     try {
+      // Cambios locales pendientes primero: si leyéramos antes de vaciar la
+      // cola, el servidor devolvería datos viejos y pisaría la UI optimista.
+      if (hasPending() && isOnline()) await flush()
+
       let proyecto, boardData
 
       if (targetId) {
-        const proyectos = await getMisProyectos()
+        const proyectos = await withRetry(() => getMisProyectos(), { ms: 12000, label: 'getMisProyectos' })
+        if (!proyectos.length) { set({ loading: false, error: 'empty' }); return }
         proyecto = proyectos.find(p => p.id === targetId) || proyectos[0]
-        boardData = await getBoardByProject(proyecto.id)
+        boardData = await withRetry(() => getBoardByProject(proyecto.id), { ms: 12000, label: 'getBoardByProject' })
       } else {
-        const data = await getMyBoard()
+        const data = await withRetry(() => getMyBoard(), { ms: 12000, label: 'getMyBoard' })
         if (!data) { set({ loading: false, error: 'empty' }); return }
         ;({ proyecto, ...boardData } = data)
       }
@@ -57,6 +66,9 @@ export const useBoardStore = create((set, get) => ({
         if (cardsByColumn[card.columna_id]) cardsByColumn[card.columna_id].push(card)
       })
 
+      clearTimeout(_retryTimer)
+      _retryAttempt = 0
+      _loadedAt = Date.now()
       set({ proyecto, board: boardData.board, columns: boardData.columns, cardsByColumn, loading: false, error: null })
 
       // Cargar historial de actividad
@@ -142,7 +154,26 @@ export const useBoardStore = create((set, get) => ({
       })
 
     } catch (err) {
-      set({ error: err.message, loading: false })
+      console.error('Error al cargar tablero:', err)
+
+      // Reprogramar reintento automático con backoff
+      _retryAttempt++
+      clearTimeout(_retryTimer)
+      _retryTimer = setTimeout(() => {
+        const s = get()
+        if (!s.loading && s.error && s.error !== 'empty') s.loadBoard(proyectoId)
+      }, Math.min(5000 * _retryAttempt, 30000))
+
+      // Si ya hay un tablero en pantalla, no lo tapamos con un error:
+      // se sigue trabajando con la copia local y la cola sincroniza después.
+      if (get().board) {
+        set({ loading: false })
+        return
+      }
+      const message = isTimeoutError(err)
+        ? 'Sin conexión con la base de datos.'
+        : err.message
+      set({ error: message, loading: false })
     }
   },
 
@@ -152,31 +183,41 @@ export const useBoardStore = create((set, get) => ({
     set({ proyectos })
   },
 
-  // Registrar actividad propia en estado + Supabase
-  _log: (descripcion) => {
-    const nombre = actor()
-    const userId = useAuthStore.getState().user?.id
-    const proyectoId = get().proyecto?.id
-    const item = makeActItem(nombre, descripcion)
-    set(s => ({ actividad: [...s.actividad, item] }))
-    if (proyectoId) saveActividad(proyectoId, userId, nombre, descripcion).catch(console.error)
+  // Elimina un proyecto/tablero por completo (cascade en Supabase)
+  removeProyecto: async (proyectoId) => {
+    await deleteProject(proyectoId)
+    const { proyecto, proyectos } = get()
+    const restantes = proyectos.filter(p => p.id !== proyectoId)
+    set({ proyectos: restantes })
+
+    if (proyecto?.id === proyectoId) {
+      localStorage.removeItem('kairos-last-project')
+      if (restantes.length) {
+        await get().loadBoard(restantes[0].id)
+      } else {
+        set({ proyecto: null, board: null, columns: [], cardsByColumn: {}, error: 'empty' })
+      }
+    }
   },
 
   // ── Tarjetas ────────────────────────────────────────────────
+  // Todas las mutaciones son locales al instante y se persisten vía la cola
+  // de sincronización (syncQueue) — funcionan aun sin conexión.
   addCard: async (columnaId, titulo) => {
-    const card = await createCard({ columna_id: columnaId, titulo })
-    set(s => ({ cardsByColumn: { ...s.cardsByColumn, [columnaId]: [...(s.cardsByColumn[columnaId] || []), card] } }))
-    const colName = get().columns.find(c => c.id === columnaId)?.nombre || ''
-    socket.emit('card:created', { columnaId, card, colName, nombre: actor() })
-    get()._log(`creó "${card.titulo}"${colName ? ` en ${colName}` : ''}`)
+    const row = { id: crypto.randomUUID(), columna_id: columnaId, titulo, orden: 9999 }
+    enqueue('card.create', { row })
+    const card = { ...row, labels: [], subtaskTotal: 0, subtaskDone: 0 }
+    set(s => ({
+      cardsByColumn: {
+        ...s.cardsByColumn,
+        [columnaId]: [...(s.cardsByColumn[columnaId] || []), card],
+      },
+    }))
     return card
   },
 
   moveCardToColumn: async (cardId, fromCol, toCol) => {
     if (fromCol === toCol) return
-    const state = get()
-    const cardInfo = (state.cardsByColumn[fromCol] || []).find(c => c.id === cardId)
-    const toColName = state.columns.find(c => c.id === toCol)?.nombre || ''
     set(s => {
       const card = (s.cardsByColumn[fromCol] || []).find(c => c.id === cardId)
       if (!card) return {}
@@ -188,19 +229,17 @@ export const useBoardStore = create((set, get) => ({
         },
       }
     })
-    try {
-      await updateCardColumn(cardId, toCol)
-      socket.emit('card:moved', { cardId, fromCol, toCol, cardTitle: cardInfo?.titulo || '', toColName, nombre: actor() })
-      get()._log(`movió "${cardInfo?.titulo || ''}"${toColName ? ` a ${toColName}` : ''}`)
-    } catch (err) { console.error('Error al mover tarjeta:', err) }
+    enqueue('card.move', { id: cardId, columna_id: toCol })
   },
 
   removeCard: async (cardId, columnaId) => {
-    const cardInfo = (get().cardsByColumn[columnaId] || []).find(c => c.id === cardId)
-    set(s => ({ cardsByColumn: { ...s.cardsByColumn, [columnaId]: (s.cardsByColumn[columnaId] || []).filter(c => c.id !== cardId) } }))
-    await deleteCard(cardId)
-    socket.emit('card:deleted', { cardId, columnaId, cardTitle: cardInfo?.titulo || '', nombre: actor() })
-    get()._log(`eliminó "${cardInfo?.titulo || ''}"`)
+    set(s => ({
+      cardsByColumn: {
+        ...s.cardsByColumn,
+        [columnaId]: (s.cardsByColumn[columnaId] || []).filter(c => c.id !== cardId),
+      },
+    }))
+    enqueue('card.delete', { id: cardId })
   },
 
   selectCard: (card) => set({ selectedCard: card }),
@@ -220,52 +259,38 @@ export const useBoardStore = create((set, get) => ({
   },
 
   editCard: async (cardId, columnaId, fields) => {
+    // Optimistic update — la cola persiste en segundo plano
     set(s => ({
       selectedCard: s.selectedCard?.id === cardId ? { ...s.selectedCard, ...fields } : s.selectedCard,
       cardsByColumn: { ...s.cardsByColumn, [columnaId]: (s.cardsByColumn[columnaId] || []).map(c => c.id === cardId ? { ...c, ...fields } : c) },
     }))
-    try {
-      const updated = await updateCard(cardId, fields)
-      set(s => ({
-        cardsByColumn: { ...s.cardsByColumn, [columnaId]: (s.cardsByColumn[columnaId] || []).map(c => c.id === cardId ? updated : c) },
-        selectedCard: s.selectedCard?.id === cardId ? updated : s.selectedCard,
-      }))
-      socket.emit('card:updated', { cardId, columnaId, fields })
-    } catch (err) { console.error('Error al editar tarjeta:', err) }
+    enqueue('card.update', { id: cardId, fields })
   },
 
   // ── Columnas (listas) ───────────────────────────────────────
   addColumn: async (nombre) => {
     const { board, columns } = get()
     if (!board || !nombre?.trim()) return
-    try {
-      const col = await createColumn({ tablero_id: board.id, nombre: nombre.trim(), orden: columns.length })
-      set(s => ({ columns: [...s.columns, col], cardsByColumn: { ...s.cardsByColumn, [col.id]: [] } }))
-      socket.emit('column:created', { column: col, nombre: actor() })
-      get()._log(`creó la lista "${col.nombre}"`)
-    } catch (err) { console.error('Error al crear columna:', err) }
+    const row = { id: crypto.randomUUID(), tablero_id: board.id, nombre: nombre.trim(), color: '#534AB7', orden: columns.length }
+    enqueue('column.create', { row })
+    set(s => ({
+      columns: [...s.columns, row],
+      cardsByColumn: { ...s.cardsByColumn, [row.id]: [] },
+    }))
   },
 
   editColumn: async (id, fields) => {
     set(s => ({ columns: s.columns.map(c => c.id === id ? { ...c, ...fields } : c) }))
-    try {
-      await updateColumn(id, fields)
-      socket.emit('column:updated', { colId: id, fields })
-    } catch (err) { console.error('Error al editar columna:', err) }
+    enqueue('column.update', { id, fields })
   },
 
   removeColumn: async (id) => {
-    const colName = get().columns.find(c => c.id === id)?.nombre || ''
     set(s => {
       const next = { ...s.cardsByColumn }
       delete next[id]
       return { columns: s.columns.filter(c => c.id !== id), cardsByColumn: next }
     })
-    try {
-      await deleteColumn(id)
-      socket.emit('column:deleted', { colId: id, colName, nombre: actor() })
-      get()._log(`eliminó la lista "${colName}"`)
-    } catch (err) { console.error('Error al eliminar columna:', err) }
+    enqueue('column.delete', { id })
   },
 
   reorderColumns: async (orderedIds) => {
@@ -273,10 +298,7 @@ export const useBoardStore = create((set, get) => ({
       const byId = Object.fromEntries(s.columns.map(c => [c.id, c]))
       return { columns: orderedIds.map(id => byId[id]).filter(Boolean) }
     })
-    try {
-      await Promise.all(orderedIds.map((id, i) => updateColumn(id, { orden: i })))
-      socket.emit('column:reordered', { orderedIds })
-    } catch (err) { console.error('Error al reordenar columnas:', err) }
+    orderedIds.forEach((id, i) => enqueue('column.update', { id, fields: { orden: i } }))
   },
 
   moveColumn: (colId, dir) => {
@@ -293,22 +315,20 @@ export const useBoardStore = create((set, get) => ({
     const { board, columns, cardsByColumn } = get()
     const src = columns.find(c => c.id === colId)
     if (!board || !src) return
-    try {
-      const col = await createColumn({ tablero_id: board.id, nombre: `${src.nombre} (copia)`, color: src.color, orden: columns.length })
-      const newCards = []
-      for (const c of (cardsByColumn[colId] || [])) {
-        const card = await createCard({ columna_id: col.id, titulo: c.titulo })
-        const fields = {}
-        if (c.descripcion)  fields.descripcion = c.descripcion
-        if (c.prioridad)    fields.prioridad = c.prioridad
-        if (c.fecha_limite) fields.fecha_limite = c.fecha_limite
-        let final = card
-        if (Object.keys(fields).length) { try { final = await updateCard(card.id, fields) } catch (_) {} }
-        newCards.push(final)
-      }
-      set(s => ({ columns: [...s.columns, col], cardsByColumn: { ...s.cardsByColumn, [col.id]: newCards } }))
-      socket.emit('column:created', { column: col, nombre: actor() })
-    } catch (err) { console.error('Error al copiar lista:', err) }
+    const col = { id: crypto.randomUUID(), tablero_id: board.id, nombre: `${src.nombre} (copia)`, color: src.color, orden: columns.length }
+    enqueue('column.create', { row: col })
+    const newCards = (cardsByColumn[colId] || []).map((c, i) => {
+      const row = { id: crypto.randomUUID(), columna_id: col.id, titulo: c.titulo, orden: i }
+      if (c.descripcion)  row.descripcion = c.descripcion
+      if (c.prioridad)    row.prioridad = c.prioridad
+      if (c.fecha_limite) row.fecha_limite = c.fecha_limite
+      enqueue('card.create', { row })
+      return { ...row, labels: [], subtaskTotal: 0, subtaskDone: 0 }
+    })
+    set(s => ({
+      columns: [...s.columns, col],
+      cardsByColumn: { ...s.cardsByColumn, [col.id]: newCards },
+    }))
   },
 
   sortColumnCards: async (colId, by) => {
@@ -323,24 +343,22 @@ export const useBoardStore = create((set, get) => ({
       })
       return { cardsByColumn: { ...s.cardsByColumn, [colId]: cards } }
     })
-    try {
-      const cards = get().cardsByColumn[colId] || []
-      await Promise.all(cards.map((c, i) => updateCard(c.id, { orden: i })))
-    } catch (err) { console.error('Error al ordenar tarjetas:', err) }
+    const cards = get().cardsByColumn[colId] || []
+    cards.forEach((c, i) => enqueue('card.update', { id: c.id, fields: { orden: i } }))
   },
 
   setCardsByColumn: (cardsByColumn) => set({ cardsByColumn }),
 
-  persistMove: async (cardId, newColId, fromCol) => {
-    try {
-      const state = get()
-      const cardInfo = (state.cardsByColumn[newColId] || []).find(c => c.id === cardId)
-      const toColName = state.columns.find(c => c.id === newColId)?.nombre || ''
-      await updateCardColumn(cardId, newColId)
-      if (fromCol) {
-        socket.emit('card:moved', { cardId, fromCol, toCol: newColId, cardTitle: cardInfo?.titulo || '', toColName, nombre: actor() })
-        get()._log(`movió "${cardInfo?.titulo || ''}"${toColName ? ` a ${toColName}` : ''}`)
-      }
-    } catch (err) { console.error('Error al mover tarjeta:', err) }
+  persistMove: async (cardId, newColId) => {
+    enqueue('card.move', { id: cardId, columna_id: newColId })
   },
 }))
+
+// Al recuperar conexión o foco: recargar solo si hay error visible o si los
+// datos llevan >5 min sin refrescarse (la cola ya se vació sola en syncQueue).
+onReconnect(() => {
+  const s = useBoardStore.getState()
+  if (s.loading) return
+  const stale = _loadedAt > 0 && Date.now() - _loadedAt > 5 * 60_000
+  if ((s.error && s.error !== 'empty') || stale) s.loadBoard()
+})

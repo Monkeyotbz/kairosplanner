@@ -7,13 +7,12 @@ export default function ToastContainer() {
 
   return (
     <div className={styles.container}>
-      {toasts.map(toast => (
-        toast._type === 'focus-recovery'
-          ? <FocusRecoveryToast  key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
-          : toast._type === 'board-activity'
-          ? <BoardActivityToast  key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
-          : <DeadlineToast       key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
-      ))}
+      {toasts.map(toast => {
+        if (toast._type === 'focus-recovery') return <FocusRecoveryToast key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
+        if (toast._type === 'board-activity') return <BoardActivityToast key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
+        if (toast._type === 'error')          return <ErrorToast         key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
+        return <DeadlineToast key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
+      })}
     </div>
   )
 }
@@ -41,6 +40,21 @@ function BoardActivityToast({ toast, onClose }) {
       </div>
       <div className={styles.body}>
         <p className={styles.title}>{toast.text}</p>
+      </div>
+      <button className={styles.closeBtn} onClick={onClose} aria-label="Cerrar">✕</button>
+    </div>
+  )
+}
+
+function ErrorToast({ toast, onClose }) {
+  return (
+    <div className={`${styles.toast} ${styles.urgent}`}>
+      <div className={styles.iconWrap}>
+        <i className="ti ti-cloud-off" />
+      </div>
+      <div className={styles.body}>
+        <p className={styles.title}>{toast.title || 'Algo salió mal'}</p>
+        <p className={styles.sub}>{toast.sub}</p>
       </div>
       <button className={styles.closeBtn} onClick={onClose} aria-label="Cerrar">✕</button>
     </div>
