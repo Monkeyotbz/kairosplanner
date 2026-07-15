@@ -17,14 +17,14 @@ alter table actividad enable row level security;
 create policy "actividad_select" on actividad
   for select using (
     exists (
-      select 1 from proyecto_miembros
-      where proyecto_miembros.proyecto_id = actividad.proyecto_id
-        and proyecto_miembros.usuario_id  = auth.uid()
+      select 1 from miembros
+      where miembros.proyecto_id = actividad.proyecto_id
+        and miembros.usuario_id  = auth.uid()
     )
     or exists (
       select 1 from proyectos
       where proyectos.id         = actividad.proyecto_id
-        and proyectos.usuario_id = auth.uid()
+        and proyectos.creado_por = auth.uid()
     )
   );
 
@@ -34,14 +34,14 @@ create policy "actividad_insert" on actividad
     usuario_id = auth.uid()
     and (
       exists (
-        select 1 from proyecto_miembros
-        where proyecto_miembros.proyecto_id = actividad.proyecto_id
-          and proyecto_miembros.usuario_id  = auth.uid()
+        select 1 from miembros
+        where miembros.proyecto_id = actividad.proyecto_id
+          and miembros.usuario_id  = auth.uid()
       )
       or exists (
         select 1 from proyectos
         where proyectos.id         = actividad.proyecto_id
-          and proyectos.usuario_id = auth.uid()
+          and proyectos.creado_por = auth.uid()
       )
     )
   );
