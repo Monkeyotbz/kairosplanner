@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react"
-import { getProyectoEtiquetas, getProjectMembers } from "../../services/boardService"
+import { useState, useEffect, useRef } from "react"
+import { getProjectMembers } from "../../services/boardService"
+import { useBoardStore } from "../../store/boardStore"
 import styles from "./FilterPanel.module.css"
 
 const PRIORITIES = [
@@ -14,30 +15,38 @@ const TABS = [
   { id: "member",   label: "Miembro"   },
 ]
 
-export default function FilterPanel({ open, proyectoId, onFilterChange }) {
+export default function FilterPanel({ open, proyectoId, onFilterChange, onClose }) {
   const [activeTab, setActiveTab] = useState("priority")
   const [selectedPriorities, setSelectedPriorities] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
   const [selectedMembers, setSelectedMembers] = useState([])
-  const [etiquetas, setEtiquetas] = useState([])
+  const etiquetas = useBoardStore(s => s.etiquetas)
   const [miembros, setMiembros] = useState([])
   const [loadingData, setLoadingData] = useState(false)
+  const ref = useRef(null)
+
+  // Cerrar al hacer click afuera del popover
+  useEffect(() => {
+    if (!open) return
+    function handleClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) onClose?.()
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [open, onClose])
 
   useEffect(() => {
     if (!proyectoId) return
     setLoadingData(true)
-    Promise.all([
-      getProyectoEtiquetas(proyectoId).catch(() => []),
-      getProjectMembers(proyectoId).catch(() => []),
-    ]).then(([tags, members]) => {
-      setEtiquetas(tags)
-      setMiembros(members.map(m => ({
+    getProjectMembers(proyectoId)
+      .catch(() => [])
+      .then(members => setMiembros(members.map(m => ({
         id:     m.usuario_id,
         label:  (m.usuarios && (m.usuarios.nombre || m.usuarios.email)) || "Sin nombre",
         avatar: ((m.usuarios && (m.usuarios.nombre || m.usuarios.email)) || "?")[0].toUpperCase(),
         color:  "#5a4fcf",
-      })))
-    }).finally(() => setLoadingData(false))
+      }))))
+      .finally(() => setLoadingData(false))
   }, [proyectoId])
 
   useEffect(() => {
@@ -66,14 +75,8 @@ export default function FilterPanel({ open, proyectoId, onFilterChange }) {
 
   return (
     <div
-      className={styles.filterPanel}
-      style={{
-        width: open ? 220 : 0,
-        opacity: open ? 1 : 0,
-        padding: open ? "16px 14px" : "0",
-        overflow: "hidden",
-        transition: "width 0.25s ease, opacity 0.2s ease, padding 0.25s ease",
-      }}
+      className={`${styles.filterPanel} ${open ? styles.filterPanelOpen : ""}`}
+      ref={ref}
     >
       <div className={styles.tabs}>
         {TABS.map(tab => (
