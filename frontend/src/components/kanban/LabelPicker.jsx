@@ -9,12 +9,13 @@ const PRESET_COLORS = [
 ]
 
 export default function LabelPicker({ onClose, style }) {
-  const { selectedCard, proyecto, updateSelectedCardLabels } = useBoardStore()
+  const { selectedCard, proyecto, updateSelectedCardLabels, addEtiqueta } = useBoardStore()
   const [labels, setLabels]       = useState([])
   const [creating, setCreating]   = useState(false)
   const [newName, setNewName]     = useState('')
   const [newColor, setNewColor]   = useState(PRESET_COLORS[0])
   const [saving, setSaving]       = useState(false)
+  const [error, setError]         = useState('')
   const ref = useRef(null)
   const inputRef = useRef(null)
 
@@ -57,11 +58,16 @@ export default function LabelPicker({ onClose, style }) {
     const name = newName.trim()
     if (!name || !proyecto?.id) return
     setSaving(true)
+    setError('')
     try {
       const label = await createEtiqueta(proyecto.id, name, newColor)
       setLabels(prev => [...prev, label])
+      addEtiqueta(label)
       setNewName('')
       setCreating(false)
+    } catch (err) {
+      console.error('Error al crear etiqueta:', err)
+      setError(err.message || 'No se pudo crear la etiqueta')
     } finally { setSaving(false) }
   }
 
@@ -102,6 +108,7 @@ export default function LabelPicker({ onClose, style }) {
             placeholder="Nombre de la etiqueta"
             onKeyDown={e => e.key === 'Escape' && setCreating(false)}
           />
+          {error && <p style={{ color: '#ef4444', fontSize: 12, margin: '4px 0' }}>{error}</p>}
           <div className={styles.colorRow}>
             {PRESET_COLORS.map(c => (
               <button

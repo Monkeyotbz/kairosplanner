@@ -6,7 +6,7 @@ import Column from './Column'
 import Card from './Card'
 import styles from './Board.module.css'
 
-export default function Board() {
+export default function Board({ activeFilters }) {
   const { columns, cardsByColumn, setCardsByColumn, persistMove, searchQuery, addColumn, reorderColumns } = useBoardStore()
   const [activeCard, setActiveCard] = useState(null)
   const [workingCards, setWorkingCards] = useState(null)
@@ -86,16 +86,24 @@ export default function Board() {
     }
   }
 
+  const { selectedPriorities = [], selectedTags = [], selectedMembers = [] } = activeFilters || {}
+  const hasActiveFilters = selectedPriorities.length > 0 || selectedTags.length > 0 || selectedMembers.length > 0
+
+  function matchesFilters(c) {
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase()
+      if (!c.titulo.toLowerCase().includes(q) && !(c.descripcion || '').toLowerCase().includes(q)) return false
+    }
+    if (selectedPriorities.length && !selectedPriorities.includes(c.prioridad)) return false
+    if (selectedTags.length && !(c.labels || []).some(l => selectedTags.includes(l.id))) return false
+    if (selectedMembers.length && !selectedMembers.includes(c.asignado_a)) return false
+    return true
+  }
+
   const baseCards = workingCards || cardsByColumn
-  const displayCards = searchQuery
+  const displayCards = (searchQuery || hasActiveFilters)
     ? Object.fromEntries(
-        Object.entries(baseCards).map(([colId, cards]) => [
-          colId,
-          cards.filter(c =>
-            c.titulo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (c.descripcion || '').toLowerCase().includes(searchQuery.toLowerCase())
-          ),
-        ])
+        Object.entries(baseCards).map(([colId, cards]) => [colId, cards.filter(matchesFilters)])
       )
     : baseCards
 

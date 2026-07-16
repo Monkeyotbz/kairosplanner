@@ -1,18 +1,23 @@
 import { create } from 'zustand'
-import { getMisProyectos, getBoardByProject, getMyBoard, deleteProject } from '../services/boardService'
+import { getMisProyectos, getBoardByProject, getMyBoard, deleteProject, getProyectoEtiquetas } from '../services/boardService'
 import { withRetry, isTimeoutError } from '../services/supabase'
 import { enqueue, flush, hasPending } from '../services/syncQueue'
 import { onReconnect, isOnline } from '../services/connection'
 import { useAuthStore } from './authStore'
 import { useToastStore } from './toastStore'
 import { socket, joinBoard } from '../services/socketService'
-import { getActividad } from '../services/actividadService'
+import { getActividad, saveActividad } from '../services/actividadService'
 
 // Reintento automático de carga: si loadBoard falla, se reprograma solo con
 // backoff (5s, 10s... máx 30s) — el usuario nunca tiene que recargar a mano.
 let _retryTimer = null
 let _retryAttempt = 0
 let _loadedAt = 0
+
+function actor() {
+  const { nombre, email } = useAuthStore.getState().profile ?? {}
+  return nombre || email || 'Alguien'
+}
 
 function notify(icon, text) {
   useToastStore.getState().addToast({ _type: 'board-activity', icon, text, duration: 4000 })
@@ -29,6 +34,7 @@ export const useBoardStore = create((set, get) => ({
   columns: [],
   cardsByColumn: {},
   actividad: [],
+  etiquetas: [],
   selectedCard: null,
   searchQuery: '',
   loading: true,
@@ -73,6 +79,9 @@ export const useBoardStore = create((set, get) => ({
 
       // Cargar historial de actividad
       getActividad(proyecto.id).then(items => set({ actividad: items })).catch(() => {})
+
+      // Cargar etiquetas del proyecto (para FilterPanel y LabelPicker)
+      getProyectoEtiquetas(proyecto.id).then(items => set({ etiquetas: items })).catch(() => {})
 
       // ── Unirse a la sala de Socket.io ──
       const { nombre, email } = useAuthStore.getState().profile ?? {}
@@ -183,6 +192,20 @@ export const useBoardStore = create((set, get) => ({
     set({ proyectos })
   },
 
+  // Registra una etiqueta recién creada (LabelPicker) para que el
+  // FilterPanel la vea sin tener que recargar el tablero.
+  addEtiqueta: (etiqueta) => set(s => ({ etiquetas: [...s.etiquetas, etiqueta] })),
+
+  // Registrar actividad propia en estado + Supabase
+  _log: (descripcion) => {
+    const nombre = actor()
+    const userId = useAuthStore.getState().user?.id
+    const proyectoId = get().proyecto?.id
+    const item = makeActItem(nombre, descripcion)
+    set(s => ({ actividad: [...s.actividad, item] }))
+    if (proyectoId) saveActividad(proyectoId, userId, nombre, descripcion).catch(console.error)
+  },
+
   // Elimina un proyecto/tablero por completo (cascade en Supabase)
   removeProyecto: async (proyectoId) => {
     await deleteProject(proyectoId)
@@ -213,11 +236,17 @@ export const useBoardStore = create((set, get) => ({
         [columnaId]: [...(s.cardsByColumn[columnaId] || []), card],
       },
     }))
+    const colName = get().columns.find(c => c.id === columnaId)?.nombre || ''
+    socket.emit('card:created', { columnaId, card, colName, nombre: actor() })
+    get()._log(`creó "${card.titulo}"${colName ? ` en ${colName}` : ''}`)
     return card
   },
 
   moveCardToColumn: async (cardId, fromCol, toCol) => {
     if (fromCol === toCol) return
+    const state = get()
+    const cardInfo = (state.cardsByColumn[fromCol] || []).find(c => c.id === cardId)
+    const toColName = state.columns.find(c => c.id === toCol)?.nombre || ''
     set(s => {
       const card = (s.cardsByColumn[fromCol] || []).find(c => c.id === cardId)
       if (!card) return {}
@@ -230,9 +259,12 @@ export const useBoardStore = create((set, get) => ({
       }
     })
     enqueue('card.move', { id: cardId, columna_id: toCol })
+    socket.emit('card:moved', { cardId, fromCol, toCol, cardTitle: cardInfo?.titulo || '', toColName, nombre: actor() })
+    get()._log(`movió "${cardInfo?.titulo || ''}"${toColName ? ` a ${toColName}` : ''}`)
   },
 
   removeCard: async (cardId, columnaId) => {
+    const cardInfo = (get().cardsByColumn[columnaId] || []).find(c => c.id === cardId)
     set(s => ({
       cardsByColumn: {
         ...s.cardsByColumn,
@@ -240,6 +272,8 @@ export const useBoardStore = create((set, get) => ({
       },
     }))
     enqueue('card.delete', { id: cardId })
+    socket.emit('card:deleted', { cardId, columnaId, cardTitle: cardInfo?.titulo || '', nombre: actor() })
+    get()._log(`eliminó "${cardInfo?.titulo || ''}"`)
   },
 
   selectCard: (card) => set({ selectedCard: card }),
@@ -265,6 +299,7 @@ export const useBoardStore = create((set, get) => ({
       cardsByColumn: { ...s.cardsByColumn, [columnaId]: (s.cardsByColumn[columnaId] || []).map(c => c.id === cardId ? { ...c, ...fields } : c) },
     }))
     enqueue('card.update', { id: cardId, fields })
+    socket.emit('card:updated', { cardId, columnaId, fields })
   },
 
   // ── Columnas (listas) ───────────────────────────────────────
@@ -277,20 +312,26 @@ export const useBoardStore = create((set, get) => ({
       columns: [...s.columns, row],
       cardsByColumn: { ...s.cardsByColumn, [row.id]: [] },
     }))
+    socket.emit('column:created', { column: row, nombre: actor() })
+    get()._log(`creó la lista "${row.nombre}"`)
   },
 
   editColumn: async (id, fields) => {
     set(s => ({ columns: s.columns.map(c => c.id === id ? { ...c, ...fields } : c) }))
     enqueue('column.update', { id, fields })
+    socket.emit('column:updated', { colId: id, fields })
   },
 
   removeColumn: async (id) => {
+    const colName = get().columns.find(c => c.id === id)?.nombre || ''
     set(s => {
       const next = { ...s.cardsByColumn }
       delete next[id]
       return { columns: s.columns.filter(c => c.id !== id), cardsByColumn: next }
     })
     enqueue('column.delete', { id })
+    socket.emit('column:deleted', { colId: id, colName, nombre: actor() })
+    get()._log(`eliminó la lista "${colName}"`)
   },
 
   reorderColumns: async (orderedIds) => {
@@ -299,6 +340,7 @@ export const useBoardStore = create((set, get) => ({
       return { columns: orderedIds.map(id => byId[id]).filter(Boolean) }
     })
     orderedIds.forEach((id, i) => enqueue('column.update', { id, fields: { orden: i } }))
+    socket.emit('column:reordered', { orderedIds })
   },
 
   moveColumn: (colId, dir) => {
@@ -329,6 +371,7 @@ export const useBoardStore = create((set, get) => ({
       columns: [...s.columns, col],
       cardsByColumn: { ...s.cardsByColumn, [col.id]: newCards },
     }))
+    socket.emit('column:created', { column: col, nombre: actor() })
   },
 
   sortColumnCards: async (colId, by) => {
@@ -349,8 +392,15 @@ export const useBoardStore = create((set, get) => ({
 
   setCardsByColumn: (cardsByColumn) => set({ cardsByColumn }),
 
-  persistMove: async (cardId, newColId) => {
+  persistMove: async (cardId, newColId, fromCol) => {
+    const state = get()
+    const cardInfo = (state.cardsByColumn[newColId] || []).find(c => c.id === cardId)
+    const toColName = state.columns.find(c => c.id === newColId)?.nombre || ''
     enqueue('card.move', { id: cardId, columna_id: newColId })
+    if (fromCol) {
+      socket.emit('card:moved', { cardId, fromCol, toCol: newColId, cardTitle: cardInfo?.titulo || '', toColName, nombre: actor() })
+      get()._log(`movió "${cardInfo?.titulo || ''}"${toColName ? ` a ${toColName}` : ''}`)
+    }
   },
 }))
 
