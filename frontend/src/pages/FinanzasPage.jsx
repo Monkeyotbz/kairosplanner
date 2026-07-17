@@ -8,6 +8,7 @@ import BudgetPanel         from '../components/finanzas/BudgetPanel'
 import RecurrenciasPanel   from '../components/finanzas/RecurrenciasPanel'
 import CashFlowChart       from '../components/finanzas/CashFlowChart'
 import SugerenciaAhorro    from '../components/finanzas/SugerenciaAhorro'
+import CalculadoraAhorro   from '../components/finanzas/CalculadoraAhorro'
 import ProyectoFinanzas    from '../components/finanzas/ProyectoFinanzas'
 import HealthScore         from '../components/finanzas/HealthScore'
 import AlertasFinancieras  from '../components/finanzas/AlertasFinancieras'
@@ -139,6 +140,7 @@ export default function FinanzasPage() {
                 />
                 <RecurrenciasPanel onChange={handleRecurrenciasChange} />
                 <SugerenciaAhorro recurrencias={recurrencias} onGoToMetas={() => setTab('analisis')} />
+                <CalculadoraAhorro recurrencias={recurrencias} />
                 <CashFlowChart recurrencias={recurrencias} currentMonthBalance={summary.balance} />
               </>
             )

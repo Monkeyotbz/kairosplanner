@@ -1,9 +1,6 @@
 import { formatMoney } from '../../services/financeService'
-import { calcMeta, fmtK } from '../../services/financeAnalytics'
+import { fmtK } from '../../services/financeAnalytics'
 import styles from './SugerenciaAhorro.module.css'
-
-const GOALS_KEY = 'kairos-savings-goals'
-const MESES_NOMBRE = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
 
 // Cuántas veces al mes ocurre cada frecuencia (para normalizar montos)
 const FACTOR_MENSUAL = {
@@ -14,10 +11,6 @@ const FACTOR_MENSUAL = {
   bimestral:  1 / 2,
   trimestral: 1 / 3,
   anual:      1 / 12,
-}
-
-function loadGoals() {
-  try { return JSON.parse(localStorage.getItem(GOALS_KEY) || '[]') } catch { return [] }
 }
 
 function mensualizar(items) {
@@ -31,7 +24,6 @@ export default function SugerenciaAhorro({ recurrencias, onGoToMetas }) {
   const capacidad      = ingresoMensual - gastoMensual
   const ideal          = ingresoMensual * 0.20
   const sugerido       = Math.max(0, Math.min(capacidad, ideal))
-  const goals          = loadGoals()
 
   if (activos.length === 0) return null
 
@@ -87,40 +79,6 @@ export default function SugerenciaAhorro({ recurrencias, onGoToMetas }) {
         </div>
       )}
 
-      {goals.length === 0 ? (
-        <button className={styles.ctaBtn} onClick={onGoToMetas}>
-          <i className="ti ti-target" /> Crear mi primera meta de ahorro
-        </button>
-      ) : (
-        <div className={styles.goals}>
-          {goals.map((g, i) => {
-            const res  = calcMeta(g)
-            const pct  = Math.min(100, res.progresoPct || 0)
-            const done = pct >= 100
-            return (
-              <div key={i} className={styles.goal}>
-                <div className={styles.goalTop}>
-                  <span className={styles.goalName}>{g.nombre}</span>
-                  <span className={styles.goalAmounts}>
-                    ${fmtK(g.balanceActual || 0)} / ${fmtK(g.objetivo)}
-                  </span>
-                </div>
-                <div className={styles.goalBarWrap}>
-                  <div
-                    className={styles.goalBar}
-                    style={{ width: `${pct}%`, background: done ? '#22c55e' : 'var(--kairos-purple-400, #a78bfa)' }}
-                  />
-                </div>
-                <span className={styles.goalEta}>
-                  {done
-                    ? '🎉 ¡Meta alcanzada!'
-                    : `→ ${MESES_NOMBRE[res.fechaEstimada.getMonth()]} ${res.fechaEstimada.getFullYear()} ahorrando $${fmtK(g.ahorroMensual)}/mes`}
-                </span>
-              </div>
-            )
-          })}
-        </div>
-      )}
     </section>
   )
 }
