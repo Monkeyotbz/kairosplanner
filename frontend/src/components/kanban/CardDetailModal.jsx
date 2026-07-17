@@ -60,7 +60,6 @@ export default function CardDetailModal() {
   const [assignSide, setAssignSide] = useState({ open: false, top: 0, right: 0 })
   const dateRef       = useRef(null)
   const assignRef     = useRef(null)
-  const dateSideRef   = useRef(null)
   const labelsWrapRef = useRef(null)
   const assignWrapRef = useRef(null)
 
@@ -305,28 +304,14 @@ export default function CardDetailModal() {
               {/* Fecha límite */}
               <div className={styles.metaItem}>
                 <span className={styles.metaLabel}>Fecha límite</span>
-                <div className={styles.metaVal} style={{ position: 'relative' }}>
-                  {dateInfo ? (
-                    <button
-                      className={`${styles.dueChip} ${dateInfo.isPast ? styles.dueChipPast : ''}`}
-                      onClick={() => dateRef.current?.showPicker?.()}
-                    >
-                      <i className="ti ti-calendar-x" aria-hidden="true" /> {dateInfo.label}
-                    </button>
-                  ) : (
-                    <button className={styles.metaEmpty} onClick={() => dateRef.current?.showPicker?.()}>
-                      <i className="ti ti-calendar" aria-hidden="true" /> Añadir fecha
-                    </button>
-                  )}
-                  <input
-                    ref={dateRef}
-                    type="date"
-                    className={styles.hiddenDate}
-                    value={localDate}
-                    onChange={e => setLocalDate(e.target.value)}
-                    onBlur={saveDate}
-                  />
-                </div>
+                <input
+                  ref={dateRef}
+                  type="date"
+                  className={`${styles.dateInput} ${dateInfo?.isPast ? styles.dateInputPast : ''}`}
+                  value={localDate}
+                  onChange={e => setLocalDate(e.target.value)}
+                  onBlur={saveDate}
+                />
               </div>
 
               {/* Columna */}
@@ -456,20 +441,16 @@ export default function CardDetailModal() {
 
             <span className={styles.sideLabel}>Acciones</span>
 
-            {/* Fecha límite */}
-            <div style={{ position: 'relative' }}>
-              <button className={styles.sideBtn} onClick={() => dateSideRef.current?.showPicker?.()}>
-                <i className="ti ti-calendar" aria-hidden="true" /> Fecha límite
-              </button>
-              <input
-                ref={dateSideRef}
-                type="date"
-                className={styles.hiddenDate}
-                value={localDate}
-                onChange={e => setLocalDate(e.target.value)}
-                onBlur={saveDate}
-              />
-            </div>
+            {/* Fecha límite — enfoca el input real de la columna principal */}
+            <button
+              className={styles.sideBtn}
+              onClick={() => {
+                dateRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+                dateRef.current?.focus()
+              }}
+            >
+              <i className="ti ti-calendar" aria-hidden="true" /> Fecha límite
+            </button>
 
             {/* Editar etiquetas */}
             <div ref={labelsWrapRef}>
