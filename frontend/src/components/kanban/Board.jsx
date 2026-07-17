@@ -6,6 +6,22 @@ import Column from './Column'
 import Card from './Card'
 import styles from './Board.module.css'
 
+function fechaBucket(fechaLimite) {
+  if (!fechaLimite) return 'sinfecha'
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  const due = new Date(fechaLimite + 'T00:00:00')
+  const diffDays = Math.round((due - today) / 86400000)
+  if (diffDays < 0) return 'vencida'
+  if (diffDays === 0) return 'hoy'
+  if (diffDays <= 7) return 'semana'
+  return null // fuera de rango: no calza con ningún bucket del filtro
+}
+
+function subtareaBucket(c) {
+  if (!c.subtaskTotal) return 'sin'
+  return c.subtaskDone >= c.subtaskTotal ? 'completas' : 'pendientes'
+}
+
 export default function Board({ activeFilters }) {
   const { columns, cardsByColumn, setCardsByColumn, persistMove, searchQuery, addColumn, reorderColumns } = useBoardStore()
   const [activeCard, setActiveCard] = useState(null)
@@ -86,8 +102,12 @@ export default function Board({ activeFilters }) {
     }
   }
 
-  const { selectedPriorities = [], selectedTags = [], selectedMembers = [], selectedLists = [] } = activeFilters || {}
+  const {
+    selectedPriorities = [], selectedTags = [], selectedMembers = [], selectedLists = [],
+    selectedFecha = [], selectedSubtareas = [], soloSinAsignar = false, soloSinEtiquetas = false,
+  } = activeFilters || {}
   const hasActiveFilters = selectedPriorities.length > 0 || selectedTags.length > 0 || selectedMembers.length > 0
+    || selectedLists.length > 0 || selectedFecha.length > 0 || selectedSubtareas.length > 0 || soloSinAsignar || soloSinEtiquetas
 
   function matchesFilters(c) {
     if (searchQuery) {
@@ -97,6 +117,10 @@ export default function Board({ activeFilters }) {
     if (selectedPriorities.length && !selectedPriorities.includes(c.prioridad)) return false
     if (selectedTags.length && !(c.labels || []).some(l => selectedTags.includes(l.id))) return false
     if (selectedMembers.length && !selectedMembers.includes(c.asignado_a)) return false
+    if (selectedFecha.length && !selectedFecha.includes(fechaBucket(c.fecha_limite))) return false
+    if (selectedSubtareas.length && !selectedSubtareas.includes(subtareaBucket(c))) return false
+    if (soloSinAsignar && c.asignado_a) return false
+    if (soloSinEtiquetas && (c.labels || []).length > 0) return false
     return true
   }
 
@@ -108,9 +132,10 @@ export default function Board({ activeFilters }) {
     : baseCards
 
   // Filtro "por lista": las columnas no seleccionadas se ocultan del todo.
-  const visibleColumns = selectedLists.length
-    ? columns.filter(col => selectedLists.includes(col.id))
-    : columns
+  // Con cualquier otro filtro activo, además se ocultan las columnas que
+  // se quedaron sin ninguna tarjeta que calce (menos ruido visual).
+  const visibleColumns = (selectedLists.length ? columns.filter(col => selectedLists.includes(col.id)) : columns)
+    .filter(col => !hasActiveFilters || (displayCards[col.id] || []).length > 0)
 
   return (
     <DndContext
