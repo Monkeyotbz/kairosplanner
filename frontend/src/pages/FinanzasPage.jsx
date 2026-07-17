@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getTransacciones, calcSummary, calcByCategoria } from '../services/financeService'
+import { getTransacciones, calcSummary, calcByCategoria, materializeRecurrencias } from '../services/financeService'
 import FinanceSummary      from '../components/finanzas/FinanceSummary'
 import FinanceChart        from '../components/finanzas/FinanceChart'
 import TransactionList     from '../components/finanzas/TransactionList'
@@ -7,6 +7,7 @@ import TransactionForm     from '../components/finanzas/TransactionForm'
 import BudgetPanel         from '../components/finanzas/BudgetPanel'
 import RecurrenciasPanel   from '../components/finanzas/RecurrenciasPanel'
 import CashFlowChart       from '../components/finanzas/CashFlowChart'
+import SugerenciaAhorro    from '../components/finanzas/SugerenciaAhorro'
 import ProyectoFinanzas    from '../components/finanzas/ProyectoFinanzas'
 import HealthScore         from '../components/finanzas/HealthScore'
 import AlertasFinancieras  from '../components/finanzas/AlertasFinancieras'
@@ -24,6 +25,8 @@ export default function FinanzasPage() {
   const [recurrencias, setRecurrencias]   = useState([])
   const [showForm, setShowForm]           = useState(false)
   const [loading, setLoading]             = useState(true)
+  const [needsSql, setNeedsSql]           = useState(false)
+  const [ready, setReady]                 = useState(false)
 
   function load() {
     setLoading(true)
@@ -33,7 +36,25 @@ export default function FinanzasPage() {
     })
   }
 
-  useEffect(() => { if (tab === 'personal') load() }, [year, month, tab])
+  // Al entrar, convierte en transacciones las ocurrencias vencidas de los
+  // recurrentes activos (salario, renta…) antes de cargar el mes.
+  useEffect(() => {
+    materializeRecurrencias()
+      .then(res => setNeedsSql(res.needsSql))
+      .finally(() => setReady(true))
+  }, [])
+
+  useEffect(() => { if (tab === 'personal' && ready) load() }, [year, month, tab, ready])
+
+  // Cuando cambian los recurrentes (nuevo, editado, reactivado), materializa
+  // de una vez lo que ya esté vencido y refresca los movimientos.
+  function handleRecurrenciasChange(list) {
+    setRecurrencias(list)
+    materializeRecurrencias().then(res => {
+      if (res.needsSql) setNeedsSql(true)
+      if (res.inserted > 0) load()
+    })
+  }
 
   function prevMonth() {
     if (month === 1) { setYear(y => y - 1); setMonth(12) }
@@ -77,6 +98,12 @@ export default function FinanzasPage() {
       {/* ── Tab Personal ──────────────────────────────────────────── */}
       {tab === 'personal' && (
         <>
+          {needsSql && (
+            <div className={styles.sqlWarn}>
+              ⚠️ Falta ejecutar <code>backend/database/materializacion_recurrencias.sql</code> en
+              Supabase → SQL Editor para que los recurrentes se registren solos como movimientos.
+            </div>
+          )}
           {loading
             ? <div className={styles.state}><span className={styles.spinner} /> Cargando...</div>
             : (
@@ -109,7 +136,8 @@ export default function FinanzasPage() {
                   year={year} month={month}
                   monthLabel={`${MONTHS[month - 1]} ${year}`}
                 />
-                <RecurrenciasPanel onChange={setRecurrencias} />
+                <RecurrenciasPanel onChange={handleRecurrenciasChange} />
+                <SugerenciaAhorro recurrencias={recurrencias} onGoToMetas={() => setTab('analisis')} />
                 <CashFlowChart recurrencias={recurrencias} currentMonthBalance={summary.balance} />
               </>
             )

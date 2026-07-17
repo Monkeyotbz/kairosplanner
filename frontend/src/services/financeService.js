@@ -341,6 +341,77 @@ export function projectCashFlow(recurrencias, startBalance = 0, days = 90) {
   return points
 }
 
+// ── Materialización: recurrentes → transacciones reales ──────
+// Al abrir Finanzas se insertan como transacciones las ocurrencias ya
+// vencidas de cada recurrente activo. Solo se materializa el mes en curso:
+// un mes que nunca se abrió no aparece de repente con historial, y borrar
+// un movimiento auto no lo revive (ultima_materializacion avanza a hoy).
+// Requiere correr backend/database/materializacion_recurrencias.sql.
+
+function isoLocal(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function isMissingColumn(error) {
+  return !!error && (error.code === '42703' || error.code === 'PGRST204' ||
+    /recurrencia_id|ultima_materializacion/i.test(error.message || ''))
+}
+
+export async function materializeRecurrencias() {
+  try {
+    const userId = await getUserId()
+    const { data: recs, error: recErr } = await supabase
+      .from('recurrencias')
+      .select('*')
+      .eq('usuario_id', userId)
+      .eq('activa', true)
+    if (recErr || !recs?.length) return { inserted: 0, needsSql: false }
+
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0)
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1)
+
+    const rows = []
+    for (const r of recs) {
+      let desde = inicioMes
+      if (r.ultima_materializacion) {
+        const sig = new Date(r.ultima_materializacion + 'T00:00:00')
+        sig.setDate(sig.getDate() + 1)
+        if (sig > desde) desde = sig
+      }
+      for (let d = new Date(desde); d <= hoy; d.setDate(d.getDate() + 1)) {
+        if (!firesOn(r, d)) continue
+        rows.push({
+          usuario_id:     userId,
+          concepto:       r.concepto,
+          monto:          r.monto,
+          tipo:           r.tipo,
+          categoria_id:   r.categoria_id,
+          fecha:          isoLocal(d),
+          recurrencia_id: r.id,
+        })
+      }
+    }
+
+    if (rows.length > 0) {
+      const { error } = await supabase
+        .from('transacciones')
+        .upsert(rows, { onConflict: 'recurrencia_id,fecha', ignoreDuplicates: true })
+      if (error) return { inserted: 0, needsSql: isMissingColumn(error) }
+    }
+
+    const { error: updErr } = await supabase
+      .from('recurrencias')
+      .update({ ultima_materializacion: isoLocal(hoy) })
+      .eq('usuario_id', userId)
+      .eq('activa', true)
+    if (updErr) return { inserted: rows.length, needsSql: isMissingColumn(updErr) }
+
+    return { inserted: rows.length, needsSql: false }
+  } catch {
+    return { inserted: 0, needsSql: false }
+  }
+}
+
 // ── Cálculos ─────────────────────────────────────────────────
 export function calcSummary(items, tipoIngreso = 'ingreso', tipoGasto = 'gasto') {
   const ingresos = items.filter(t => t.tipo === tipoIngreso).reduce((s, t) => s + Number(t.monto), 0)

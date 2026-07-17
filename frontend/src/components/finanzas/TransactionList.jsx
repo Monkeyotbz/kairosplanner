@@ -30,7 +30,12 @@ export default function TransactionList({ transacciones, onDeleted }) {
                 </span>
 
                 <div className={styles.info}>
-                  <span className={styles.concepto}>{t.concepto}</span>
+                  <span className={styles.concepto}>
+                    {t.concepto}
+                    {t.recurrencia_id && (
+                      <span className={styles.autoBadge} title="Generado automáticamente desde un recurrente">↻ auto</span>
+                    )}
+                  </span>
                   <span className={styles.meta}>
                     {t.categorias_finanzas?.nombre || 'Sin categoría'} · {formatDate(t.fecha)}
                   </span>
