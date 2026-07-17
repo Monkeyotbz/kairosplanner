@@ -324,7 +324,11 @@ function firesOn(r, date) {
   }
 }
 
-export function projectCashFlow(recurrencias, startBalance = 0, days = 90) {
+// `omitUntil`: los eventos hasta esa fecha (inclusive) NO se aplican.
+// El mes en curso ya está materializado como transacciones (plan del mes),
+// así que su efecto ya vive en el balance del mes / saldo inicial — volver
+// a aplicarlo aquí sería descontar (o sumar) dos veces.
+export function projectCashFlow(recurrencias, startBalance = 0, days = 90, omitUntil = null) {
   const points = []
   let balance = startBalance
   const today = new Date()
@@ -337,19 +341,29 @@ export function projectCashFlow(recurrencias, startBalance = 0, days = 90) {
     date.setHours(0, 0, 0, 0)
 
     const events = []
-    active.forEach(r => {
-      if (!firesOn(r, date)) return
-      balance += r.tipo === 'ingreso' ? Number(r.monto) : -Number(r.monto)
-      events.push({ concepto: r.concepto, monto: Number(r.monto), tipo: r.tipo })
-    })
+    if (!omitUntil || date > omitUntil) {
+      active.forEach(r => {
+        if (!firesOn(r, date)) return
+        balance += r.tipo === 'ingreso' ? Number(r.monto) : -Number(r.monto)
+        events.push({ concepto: r.concepto, monto: Number(r.monto), tipo: r.tipo })
+      })
+    }
 
     points.push({
-      fecha: date.toISOString().slice(0, 10),
+      fecha: isoLocal(date),
       balance: Math.round(balance * 100) / 100,
       events,
     })
   }
   return points
+}
+
+// Fin del mes en curso — límite estándar para omitUntil
+export function finDeMesActual() {
+  const hoy = new Date()
+  const fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0)
+  fin.setHours(0, 0, 0, 0)
+  return fin
 }
 
 // ── Materialización: recurrentes → transacciones reales ──────

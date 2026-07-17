@@ -3,7 +3,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ReferenceLine, ResponsiveContainer, Dot,
 } from 'recharts'
-import { projectCashFlow, formatMoney } from '../../services/financeService'
+import { projectCashFlow, finDeMesActual, formatMoney } from '../../services/financeService'
 import styles from './CashFlowChart.module.css'
 
 const HORIZONS = [30, 60, 90]
@@ -64,8 +64,11 @@ export default function CashFlowChart({ recurrencias, currentMonthBalance = 0 })
     setEditingSaldo(false)
   }, [])
 
+  // Los recurrentes del mes en curso ya están materializados como
+  // movimientos (y descontados en tu balance del mes), así que la
+  // proyección solo aplica eventos desde el mes siguiente.
   const points = useMemo(
-    () => projectCashFlow(recurrencias, startBalance, horizon),
+    () => projectCashFlow(recurrencias, startBalance, horizon, finDeMesActual()),
     [recurrencias, startBalance, horizon]
   )
 
@@ -86,7 +89,9 @@ export default function CashFlowChart({ recurrencias, currentMonthBalance = 0 })
           <h2 className={styles.heading}>
             <i className="ti ti-trending-up" /> Flujo de caja
           </h2>
-          <span className={styles.subtitle}>Proyección basada en tus recurrentes</span>
+          <span className={styles.subtitle}>
+            Proyección desde el mes próximo — el mes actual ya está descontado en tu balance
+          </span>
         </div>
         <div className={styles.controls}>
           {HORIZONS.map(h => (
