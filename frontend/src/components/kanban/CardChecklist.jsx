@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { getSubtareas, createSubtarea, toggleSubtarea, deleteSubtarea } from '../../services/boardService'
+import { useBoardStore } from '../../store/boardStore'
 import styles from './CardChecklist.module.css'
 
 export default function CardChecklist({ cardId, triggerAdd = 0 }) {
+  const updateSelectedCardSubtasks = useBoardStore(s => s.updateSelectedCardSubtasks)
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [adding, setAdding] = useState(false)
@@ -63,6 +65,13 @@ export default function CardChecklist({ cardId, triggerAdd = 0 }) {
   const done = items.filter(i => i.completada).length
   const total = items.length
   const pct = total > 0 ? Math.round((done / total) * 100) : 0
+
+  // Mantiene la tarjeta en cardsByColumn en sync (chip de progreso + filtro
+  // de Subtareas), sin esperar a recargar el tablero.
+  useEffect(() => {
+    if (loading) return
+    updateSelectedCardSubtasks(done, total)
+  }, [done, total, loading])
 
   return (
     <div className={styles.wrap}>

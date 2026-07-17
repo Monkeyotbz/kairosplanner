@@ -292,6 +292,23 @@ export const useBoardStore = create((set, get) => ({
     }))
   },
 
+  // Mantiene subtaskDone/subtaskTotal en sync con el checklist real, para
+  // que el filtro de "Subtareas" y el chip de la tarjeta no queden
+  // desactualizados hasta recargar el tablero.
+  updateSelectedCardSubtasks: (subtaskDone, subtaskTotal) => {
+    const card = get().selectedCard
+    if (!card) return
+    set(s => ({
+      selectedCard: { ...card, subtaskDone, subtaskTotal },
+      cardsByColumn: {
+        ...s.cardsByColumn,
+        [card.columna_id]: (s.cardsByColumn[card.columna_id] || []).map(c =>
+          c.id === card.id ? { ...c, subtaskDone, subtaskTotal } : c
+        ),
+      },
+    }))
+  },
+
   editCard: async (cardId, columnaId, fields) => {
     // Optimistic update — la cola persiste en segundo plano
     set(s => ({
