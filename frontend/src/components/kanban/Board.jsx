@@ -86,7 +86,7 @@ export default function Board({ activeFilters }) {
     }
   }
 
-  const { selectedPriorities = [], selectedTags = [], selectedMembers = [] } = activeFilters || {}
+  const { selectedPriorities = [], selectedTags = [], selectedMembers = [], selectedLists = [] } = activeFilters || {}
   const hasActiveFilters = selectedPriorities.length > 0 || selectedTags.length > 0 || selectedMembers.length > 0
 
   function matchesFilters(c) {
@@ -107,6 +107,11 @@ export default function Board({ activeFilters }) {
       )
     : baseCards
 
+  // Filtro "por lista": las columnas no seleccionadas se ocultan del todo.
+  const visibleColumns = selectedLists.length
+    ? columns.filter(col => selectedLists.includes(col.id))
+    : columns
+
   return (
     <DndContext
       sensors={sensors}
@@ -116,8 +121,8 @@ export default function Board({ activeFilters }) {
       onDragEnd={handleDragEnd}
     >
       <div className={styles.board}>
-        <SortableContext items={columns.map(c => c.id)} strategy={horizontalListSortingStrategy}>
-          {columns.map(col => (
+        <SortableContext items={visibleColumns.map(c => c.id)} strategy={horizontalListSortingStrategy}>
+          {visibleColumns.map(col => (
             <Column
               key={col.id}
               column={col}

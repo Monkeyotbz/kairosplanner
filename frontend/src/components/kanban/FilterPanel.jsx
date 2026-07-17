@@ -13,6 +13,7 @@ const TABS = [
   { id: "priority", label: "Prioridad" },
   { id: "tag",      label: "Etiqueta"  },
   { id: "member",   label: "Miembro"   },
+  { id: "list",     label: "Lista"     },
 ]
 
 export default function FilterPanel({ open, proyectoId, onFilterChange, onClose }) {
@@ -20,7 +21,9 @@ export default function FilterPanel({ open, proyectoId, onFilterChange, onClose 
   const [selectedPriorities, setSelectedPriorities] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
   const [selectedMembers, setSelectedMembers] = useState([])
+  const [selectedLists, setSelectedLists] = useState([])
   const etiquetas = useBoardStore(s => s.etiquetas)
+  const columns = useBoardStore(s => s.columns)
   const [miembros, setMiembros] = useState([])
   const [loadingData, setLoadingData] = useState(false)
   const ref = useRef(null)
@@ -51,25 +54,27 @@ export default function FilterPanel({ open, proyectoId, onFilterChange, onClose 
 
   useEffect(() => {
     if (onFilterChange) {
-      onFilterChange({ selectedPriorities, selectedTags, selectedMembers })
+      onFilterChange({ selectedPriorities, selectedTags, selectedMembers, selectedLists })
     }
-  }, [selectedPriorities, selectedTags, selectedMembers])
+  }, [selectedPriorities, selectedTags, selectedMembers, selectedLists])
 
   const toggle = (setList, id) =>
     setList(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
 
-  const activeCount = selectedPriorities.length + selectedTags.length + selectedMembers.length
+  const activeCount = selectedPriorities.length + selectedTags.length + selectedMembers.length + selectedLists.length
 
   const clearAll = () => {
     setSelectedPriorities([])
     setSelectedTags([])
     setSelectedMembers([])
+    setSelectedLists([])
   }
 
   const tabCount = (id) => {
     if (id === "priority") return selectedPriorities.length
     if (id === "tag")      return selectedTags.length
     if (id === "member")   return selectedMembers.length
+    if (id === "list")     return selectedLists.length
     return 0
   }
 
@@ -167,6 +172,27 @@ export default function FilterPanel({ open, proyectoId, onFilterChange, onClose 
             })}
           </div>
         )}
+        {activeTab === "list" && (
+          <div className={styles.optionList}>
+            <div className={styles.sectionHint}>Muestra solo las listas seleccionadas</div>
+            {columns.length === 0 ? (
+              <div style={{ color: "#666", fontSize: "12px", padding: "8px 0" }}>Sin listas en este tablero</div>
+            ) : columns.map(col => {
+              const active = selectedLists.includes(col.id)
+              return (
+                <button
+                  key={col.id}
+                  className={[styles.optionItem, active ? styles.optionItemActive : ""].join(" ")}
+                  onClick={() => toggle(setSelectedLists, col.id)}
+                >
+                  <span className={styles.priorityDot} style={{ background: col.color || "#5a4fcf" }} />
+                  <span className={styles.optionLabel}>{col.nombre}</span>
+                  {active && <span className={styles.checkMark}>v</span>}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       {activeCount > 0 && (
@@ -200,6 +226,16 @@ export default function FilterPanel({ open, proyectoId, onFilterChange, onClose 
                   <span className={styles.chipAvatar} style={{ background: m.color }}>{m.avatar}</span>
                   {m.label}
                   <button className={styles.chipX} onClick={() => toggle(setSelectedMembers, id)}>x</button>
+                </span>
+              ) : null
+            })}
+            {selectedLists.map(id => {
+              const col = columns.find(x => x.id === id)
+              return col ? (
+                <span key={id} className={styles.chip}>
+                  <span className={styles.chipDot} style={{ background: col.color || "#5a4fcf" }} />
+                  {col.nombre}
+                  <button className={styles.chipX} onClick={() => toggle(setSelectedLists, id)}>x</button>
                 </span>
               ) : null
             })}
