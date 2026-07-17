@@ -24,6 +24,7 @@ export default function FinanzasPage() {
   const [transacciones, setTransacciones] = useState([])
   const [recurrencias, setRecurrencias]   = useState([])
   const [showForm, setShowForm]           = useState(false)
+  const [editTx, setEditTx]               = useState(null)
   const [loading, setLoading]             = useState(true)
   const [needsSql, setNeedsSql]           = useState(false)
   const [ready, setReady]                 = useState(false)
@@ -129,7 +130,7 @@ export default function FinanzasPage() {
                 <FinanceSummary ingresos={summary.ingresos} gastos={summary.gastos} balance={summary.balance} />
                 <div className={styles.mainRow}>
                   <FinanceChart data={byCategoria} />
-                  <TransactionList transacciones={transacciones} onDeleted={load} />
+                  <TransactionList transacciones={transacciones} onDeleted={load} onEdit={setEditTx} />
                 </div>
                 <BudgetPanel
                   transacciones={transacciones}
@@ -143,7 +144,13 @@ export default function FinanzasPage() {
             )
           }
           <button className={styles.newBtn} onClick={() => setShowForm(true)}>+ Nuevo movimiento</button>
-          {showForm && <TransactionForm onSaved={() => { setShowForm(false); load() }} onClose={() => setShowForm(false)} />}
+          {(showForm || editTx) && (
+            <TransactionForm
+              initial={editTx}
+              onSaved={() => { setShowForm(false); setEditTx(null); load() }}
+              onClose={() => { setShowForm(false); setEditTx(null) }}
+            />
+          )}
         </>
       )}
 

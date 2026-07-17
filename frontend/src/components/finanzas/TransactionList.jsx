@@ -5,7 +5,9 @@ function formatDate(d) {
   return new Date(d + 'T00:00:00').toLocaleDateString('es', { day: 'numeric', month: 'short' })
 }
 
-export default function TransactionList({ transacciones, onDeleted }) {
+export default function TransactionList({ transacciones, onDeleted, onEdit }) {
+  const todayIso = new Date().toISOString().slice(0, 10)
+
   async function handleDelete(id) {
     if (!confirm('¿Eliminar este movimiento?')) return
     await deleteTransaccion(id)
@@ -21,7 +23,7 @@ export default function TransactionList({ transacciones, onDeleted }) {
         : (
           <ul className={styles.list}>
             {transacciones.map(t => (
-              <li key={t.id} className={styles.item}>
+              <li key={t.id} className={`${styles.item} ${t.fecha > todayIso ? styles.itemFuturo : ''}`}>
                 <span
                   className={styles.catIcon}
                   style={{ background: `${t.categorias_finanzas?.color || '#6b7280'}22` }}
@@ -35,6 +37,9 @@ export default function TransactionList({ transacciones, onDeleted }) {
                     {t.recurrencia_id && (
                       <span className={styles.autoBadge} title="Generado automáticamente desde un recurrente">↻ auto</span>
                     )}
+                    {t.fecha > todayIso && (
+                      <span className={styles.futuroBadge} title="Aún no llega la fecha — cuenta en el plan del mes">⏱ programado</span>
+                    )}
                   </span>
                   <span className={styles.meta}>
                     {t.categorias_finanzas?.nombre || 'Sin categoría'} · {formatDate(t.fecha)}
@@ -45,6 +50,9 @@ export default function TransactionList({ transacciones, onDeleted }) {
                   {t.tipo === 'ingreso' ? '+' : '-'}${formatMoney(t.monto)}
                 </span>
 
+                <button className={styles.editBtn} onClick={() => onEdit?.(t)} title="Editar monto o fecha">
+                  <i className="ti ti-pencil" />
+                </button>
                 <button className={styles.deleteBtn} onClick={() => handleDelete(t.id)} title="Eliminar">✕</button>
               </li>
             ))}

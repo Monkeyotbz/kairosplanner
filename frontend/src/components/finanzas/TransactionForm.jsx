@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react'
-import { getCategorias, addTransaccion } from '../../services/financeService'
+import { getCategorias, addTransaccion, updateTransaccion } from '../../services/financeService'
 import styles from './TransactionForm.module.css'
 
-export default function TransactionForm({ onSaved, onClose }) {
+// `initial`: transacción existente → modo edición (ej. el salario auto
+// cuando el monto del mes cambió). Sin `initial` → nuevo movimiento.
+export default function TransactionForm({ onSaved, onClose, initial = null }) {
   const today = new Date().toISOString().slice(0, 10)
-  const [tipo, setTipo]           = useState('gasto')
-  const [concepto, setConcepto]   = useState('')
-  const [monto, setMonto]         = useState('')
-  const [categoriaId, setCatId]   = useState('')
-  const [fecha, setFecha]         = useState(today)
+  const editing = !!initial?.id
+  const [tipo, setTipo]           = useState(initial?.tipo || 'gasto')
+  const [concepto, setConcepto]   = useState(initial?.concepto || '')
+  const [monto, setMonto]         = useState(initial ? String(initial.monto) : '')
+  const [categoriaId, setCatId]   = useState(initial?.categoria_id || '')
+  const [fecha, setFecha]         = useState(initial?.fecha || today)
   const [categorias, setCategorias] = useState([])
   const [loading, setLoading]     = useState(false)
   const [error, setError]         = useState('')
@@ -23,7 +26,9 @@ export default function TransactionForm({ onSaved, onClose }) {
     setLoading(true)
     setError('')
     try {
-      await addTransaccion({ concepto, monto: parseFloat(monto), tipo, categoria_id: categoriaId || null, fecha })
+      const payload = { concepto, monto: parseFloat(monto), tipo, categoria_id: categoriaId || null, fecha }
+      if (editing) await updateTransaccion(initial.id, payload)
+      else await addTransaccion(payload)
       onSaved()
     } catch (err) {
       setError(err.message)
@@ -36,7 +41,7 @@ export default function TransactionForm({ onSaved, onClose }) {
     <div className={styles.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
       <div className={styles.modal}>
         <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>Nuevo movimiento</h2>
+          <h2 className={styles.modalTitle}>{editing ? 'Editar movimiento' : 'Nuevo movimiento'}</h2>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
@@ -90,7 +95,7 @@ export default function TransactionForm({ onSaved, onClose }) {
           <div className={styles.actions}>
             <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancelar</button>
             <button type="submit" className={styles.saveBtn} disabled={loading}>
-              {loading ? 'Guardando...' : 'Guardar'}
+              {loading ? 'Guardando...' : editing ? 'Guardar cambios' : 'Guardar'}
             </button>
           </div>
         </form>
