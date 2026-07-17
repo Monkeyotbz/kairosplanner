@@ -1,28 +1,55 @@
 .filterPanel {
-  display: none;
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  z-index: 500;
-  background: #13132b;
-  border: 0.5px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 14px;
-  width: 240px;
-  max-width: calc(100vw - 24px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
-}
-
-.filterPanelOpen {
+  position: relative;
+  z-index: 15;
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--kairos-glass-chrome-bg);
+  -webkit-backdrop-filter: var(--kairos-glass-filter);
+  backdrop-filter: var(--kairos-glass-filter);
+  border-left: 1px solid var(--kairos-glass-border);
   display: flex;
   flex-direction: column;
-  animation: popIn 0.14s ease-out;
+  overflow-y: auto;
+  overflow-x: hidden;
+  animation: slideIn 0.18s ease-out;
+  padding: 14px;
 }
 
-@keyframes popIn {
-  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
 }
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -14px -14px 12px;
+  padding: 14px 16px 10px;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--kairos-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-family: var(--kairos-font);
+}
+
+.closeBtn {
+  font-size: 13px;
+  color: var(--kairos-text-muted);
+  padding: 2px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: var(--kairos-font);
+}
+.closeBtn:hover { color: var(--kairos-text-primary); background: rgba(255,255,255,0.06); }
 
 .tabs {
   display: flex;
@@ -145,6 +172,33 @@
   font-size: 10px;
   font-weight: 700;
   flex-shrink: 0;
+}
+
+.quickRow {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.quickChip {
+  flex: 1;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-align: center;
+  padding: 6px 4px;
+  border-radius: 7px;
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.quickChipActive {
+  border-style: solid;
+  border-color: #7c6fd4;
+  background: rgba(92, 79, 207, 0.15);
+  color: #c4bbff;
 }
 
 .activeSummary {

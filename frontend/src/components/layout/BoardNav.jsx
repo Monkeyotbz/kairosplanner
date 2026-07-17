@@ -5,10 +5,9 @@ import { createProject, searchUsuarios, addMemberToProject, getProjectMembers } 
 import { socket } from '../../services/socketService'
 import ThemeSwitcher from './ThemeSwitcher'
 import BoardSwitcher from '../kanban/BoardSwitcher'
-import FilterPanel from '../kanban/FilterPanel'
 import styles from './BoardNav.module.css'
 
-export default function BoardNav({ proyecto, panelOpen, onTogglePanel, onFilterChange }) {
+export default function BoardNav({ proyecto, panelOpen, onTogglePanel, filtersOpen, onToggleFilters }) {
   const { isOpen: chatOpen, toggle: toggleChat } = useChatStore()
   const { proyectos, loadBoard, loadProyectos } = useBoardStore()
   const [showSwitcher, setShowSwitcher]       = useState(false)
@@ -16,7 +15,6 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel, onFilterC
   const [showNewProject, setShowNewProject]   = useState(false)
   const [showInvite, setShowInvite]           = useState(false)
   const [showTheme, setShowTheme]             = useState(false)
-  const [showFilters, setShowFilters]         = useState(false)
   const [newNombre, setNewNombre]             = useState('')
   const [saving, setSaving]                   = useState(false)
   const [showLive, setShowLive]               = useState(false)
@@ -132,20 +130,12 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel, onFilterC
           )}
         </div>
 
-        <div style={{ position: 'relative' }}>
-          <button
-            className={`${styles.action} ${showFilters ? styles.actionActive : ''}`}
-            onClick={() => setShowFilters(v => !v)}
-          >
-            ⊟ Filtrar
-          </button>
-          <FilterPanel
-            open={showFilters}
-            proyectoId={proyecto?.id}
-            onFilterChange={onFilterChange}
-            onClose={() => setShowFilters(false)}
-          />
-        </div>
+        <button
+          className={`${styles.action} ${filtersOpen ? styles.actionActive : ''}`}
+          onClick={onToggleFilters}
+        >
+          ⊟ Filtrar
+        </button>
         <button className={styles.inviteBtn} onClick={() => setShowInvite(true)}>+ Invitar</button>
         <button className={styles.action}>•••</button>
         <div style={{ position: 'relative' }}>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { getProjectMembers } from "../../services/boardService"
 import { useBoardStore } from "../../store/boardStore"
 import styles from "./FilterPanel.module.css"
@@ -10,33 +10,41 @@ const PRIORITIES = [
 ]
 
 const TABS = [
-  { id: "priority", label: "Prioridad" },
-  { id: "tag",      label: "Etiqueta"  },
-  { id: "member",   label: "Miembro"   },
-  { id: "list",     label: "Lista"     },
+  { id: "priority", label: "Prioridad"    },
+  { id: "tag",      label: "Etiqueta"     },
+  { id: "member",   label: "Miembro"      },
+  { id: "list",     label: "Lista"        },
+  { id: "fecha",    label: "Fecha límite" },
+  { id: "subtareas", label: "Subtareas"   },
 ]
 
-export default function FilterPanel({ open, proyectoId, onFilterChange, onClose }) {
+const FECHA_BUCKETS = [
+  { id: "vencida",  label: "Vencidas",         color: "#ef4444" },
+  { id: "hoy",      label: "Vence hoy",        color: "#fb923c" },
+  { id: "semana",   label: "Vence esta semana", color: "#facc15" },
+  { id: "sinfecha", label: "Sin fecha",        color: "#6b7280" },
+]
+
+const SUBTAREA_BUCKETS = [
+  { id: "pendientes", label: "Con pendientes",  color: "#f59e0b" },
+  { id: "completas",  label: "Todas completas", color: "#22c55e" },
+  { id: "sin",        label: "Sin subtareas",   color: "#6b7280" },
+]
+
+export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
   const [activeTab, setActiveTab] = useState("priority")
   const [selectedPriorities, setSelectedPriorities] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
   const [selectedMembers, setSelectedMembers] = useState([])
   const [selectedLists, setSelectedLists] = useState([])
+  const [selectedFecha, setSelectedFecha] = useState([])
+  const [selectedSubtareas, setSelectedSubtareas] = useState([])
+  const [soloSinAsignar, setSoloSinAsignar] = useState(false)
+  const [soloSinEtiquetas, setSoloSinEtiquetas] = useState(false)
   const etiquetas = useBoardStore(s => s.etiquetas)
   const columns = useBoardStore(s => s.columns)
   const [miembros, setMiembros] = useState([])
   const [loadingData, setLoadingData] = useState(false)
-  const ref = useRef(null)
-
-  // Cerrar al hacer click afuera del popover
-  useEffect(() => {
-    if (!open) return
-    function handleClick(e) {
-      if (ref.current && !ref.current.contains(e.target)) onClose?.()
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [open, onClose])
 
   useEffect(() => {
     if (!proyectoId) return
@@ -54,35 +62,47 @@ export default function FilterPanel({ open, proyectoId, onFilterChange, onClose 
 
   useEffect(() => {
     if (onFilterChange) {
-      onFilterChange({ selectedPriorities, selectedTags, selectedMembers, selectedLists })
+      onFilterChange({
+        selectedPriorities, selectedTags, selectedMembers, selectedLists,
+        selectedFecha, selectedSubtareas, soloSinAsignar, soloSinEtiquetas,
+      })
     }
-  }, [selectedPriorities, selectedTags, selectedMembers, selectedLists])
+  }, [selectedPriorities, selectedTags, selectedMembers, selectedLists, selectedFecha, selectedSubtareas, soloSinAsignar, soloSinEtiquetas])
 
   const toggle = (setList, id) =>
     setList(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
 
   const activeCount = selectedPriorities.length + selectedTags.length + selectedMembers.length + selectedLists.length
+    + selectedFecha.length + selectedSubtareas.length + (soloSinAsignar ? 1 : 0) + (soloSinEtiquetas ? 1 : 0)
 
   const clearAll = () => {
     setSelectedPriorities([])
     setSelectedTags([])
     setSelectedMembers([])
     setSelectedLists([])
+    setSelectedFecha([])
+    setSelectedSubtareas([])
+    setSoloSinAsignar(false)
+    setSoloSinEtiquetas(false)
   }
 
   const tabCount = (id) => {
-    if (id === "priority") return selectedPriorities.length
-    if (id === "tag")      return selectedTags.length
-    if (id === "member")   return selectedMembers.length
-    if (id === "list")     return selectedLists.length
+    if (id === "priority")   return selectedPriorities.length
+    if (id === "tag")        return selectedTags.length
+    if (id === "member")     return selectedMembers.length
+    if (id === "list")       return selectedLists.length
+    if (id === "fecha")      return selectedFecha.length
+    if (id === "subtareas")  return selectedSubtareas.length
     return 0
   }
 
   return (
-    <div
-      className={`${styles.filterPanel} ${open ? styles.filterPanelOpen : ""}`}
-      ref={ref}
-    >
+    <aside className={styles.filterPanel}>
+      <div className={styles.header}>
+        <span className={styles.title}>Filtros</span>
+        <button className={styles.closeBtn} onClick={onClose} aria-label="Cerrar filtros">✕</button>
+      </div>
+
       <div className={styles.tabs}>
         {TABS.map(tab => (
           <button
@@ -193,6 +213,61 @@ export default function FilterPanel({ open, proyectoId, onFilterChange, onClose 
             })}
           </div>
         )}
+
+        {activeTab === "fecha" && (
+          <div className={styles.optionList}>
+            <div className={styles.sectionHint}>Filtra por vencimiento</div>
+            {FECHA_BUCKETS.map(f => {
+              const active = selectedFecha.includes(f.id)
+              return (
+                <button
+                  key={f.id}
+                  className={[styles.optionItem, active ? styles.optionItemActive : ""].join(" ")}
+                  onClick={() => toggle(setSelectedFecha, f.id)}
+                >
+                  <span className={styles.priorityDot} style={{ background: f.color }} />
+                  <span className={styles.optionLabel}>{f.label}</span>
+                  {active && <span className={styles.checkMark}>v</span>}
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        {activeTab === "subtareas" && (
+          <div className={styles.optionList}>
+            <div className={styles.sectionHint}>Filtra por estado del checklist</div>
+            {SUBTAREA_BUCKETS.map(s => {
+              const active = selectedSubtareas.includes(s.id)
+              return (
+                <button
+                  key={s.id}
+                  className={[styles.optionItem, active ? styles.optionItemActive : ""].join(" ")}
+                  onClick={() => toggle(setSelectedSubtareas, s.id)}
+                >
+                  <span className={styles.priorityDot} style={{ background: s.color }} />
+                  <span className={styles.optionLabel}>{s.label}</span>
+                  {active && <span className={styles.checkMark}>v</span>}
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      <div className={styles.quickRow}>
+        <button
+          className={[styles.quickChip, soloSinAsignar ? styles.quickChipActive : ""].join(" ")}
+          onClick={() => setSoloSinAsignar(v => !v)}
+        >
+          Sin asignar
+        </button>
+        <button
+          className={[styles.quickChip, soloSinEtiquetas ? styles.quickChipActive : ""].join(" ")}
+          onClick={() => setSoloSinEtiquetas(v => !v)}
+        >
+          Sin etiquetas
+        </button>
       </div>
 
       {activeCount > 0 && (
@@ -239,10 +314,42 @@ export default function FilterPanel({ open, proyectoId, onFilterChange, onClose 
                 </span>
               ) : null
             })}
+            {selectedFecha.map(id => {
+              const f = FECHA_BUCKETS.find(x => x.id === id)
+              return f ? (
+                <span key={id} className={styles.chip}>
+                  <span className={styles.chipDot} style={{ background: f.color }} />
+                  {f.label}
+                  <button className={styles.chipX} onClick={() => toggle(setSelectedFecha, id)}>x</button>
+                </span>
+              ) : null
+            })}
+            {selectedSubtareas.map(id => {
+              const s = SUBTAREA_BUCKETS.find(x => x.id === id)
+              return s ? (
+                <span key={id} className={styles.chip}>
+                  <span className={styles.chipDot} style={{ background: s.color }} />
+                  {s.label}
+                  <button className={styles.chipX} onClick={() => toggle(setSelectedSubtareas, id)}>x</button>
+                </span>
+              ) : null
+            })}
+            {soloSinAsignar && (
+              <span className={styles.chip}>
+                Sin asignar
+                <button className={styles.chipX} onClick={() => setSoloSinAsignar(false)}>x</button>
+              </span>
+            )}
+            {soloSinEtiquetas && (
+              <span className={styles.chip}>
+                Sin etiquetas
+                <button className={styles.chipX} onClick={() => setSoloSinEtiquetas(false)}>x</button>
+              </span>
+            )}
           </div>
           <button className={styles.clearBtn} onClick={clearAll}>Limpiar todo</button>
         </div>
       )}
-    </div>
+    </aside>
   )
 }
