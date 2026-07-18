@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import {
   getMisProyectos, getBoardByProject, getMyBoard, deleteProject, getProyectoEtiquetas, marcarComentariosLeidos,
-  iniciarRegistroTiempo, detenerRegistroTiempo, getRegistroTiempoActivo,
+  iniciarRegistroTiempo, detenerRegistroTiempo, getRegistroTiempoActivo, stopRegistroTiempoBeacon,
 } from '../services/boardService'
 import { withRetry, isTimeoutError } from '../services/supabase'
 import { enqueue, flush, hasPending } from '../services/syncQueue'
@@ -503,3 +503,18 @@ onReconnect(() => {
   const stale = _loadedAt > 0 && Date.now() - _loadedAt > 5 * 60_000
   if ((s.error && s.error !== 'empty') || stale) s.loadBoard()
 })
+
+// Si cierras la pestaña/navegador (o el sistema operativo alcanza a avisarle
+// al navegador antes de apagar el equipo) con un cronómetro corriendo, lo
+// detenemos para que no siga contando tiempo con KAIROS cerrado. No hay
+// forma de detectar un corte de energía o un cierre forzado — para eso
+// sirve el "retomar" al cargar el tablero (arriba), que no deja que un
+// cronómetro huérfano quede corriendo para siempre.
+if (typeof window !== 'undefined') {
+  const stopIfRunning = () => {
+    const timer = useBoardStore.getState().activeTimer
+    if (timer) stopRegistroTiempoBeacon(timer.registroId)
+  }
+  window.addEventListener('pagehide', stopIfRunning)
+  window.addEventListener('beforeunload', stopIfRunning)
+}

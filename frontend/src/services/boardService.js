@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase, getAccessTokenSync } from './supabase'
 
 const CARD_SELECT = 'id, columna_id, titulo, descripcion, prioridad, fecha_limite, cover_url, orden, asignado_a, ' +
   'tarjeta_etiqueta(etiquetas(id, nombre, color)), subtareas(id, completada), ' +
@@ -387,6 +387,27 @@ export async function getRegistroTiempoActivo() {
     .maybeSingle()
   if (error) throw error
   return data
+}
+
+// Cierra el registro activo al cerrar la pestaña/navegador. Un `fetch`
+// normal (el que usa supabase-js) no tiene garantía de completarse una vez
+// que la página empieza a descargarse — `keepalive` sí, así que se arma la
+// petición REST a mano en vez de pasar por el cliente.
+export function stopRegistroTiempoBeacon(registroId) {
+  const token = getAccessTokenSync()
+  if (!token) return
+  const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/registros_tiempo?id=eq.${registroId}`
+  fetch(url, {
+    method: 'PATCH',
+    keepalive: true,
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${token}`,
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify({ fin: new Date().toISOString() }),
+  }).catch(() => {})
 }
 
 // ── Subtareas ────────────────────────────────────────────────
