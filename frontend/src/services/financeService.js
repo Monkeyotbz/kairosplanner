@@ -68,6 +68,17 @@ export async function addTransaccion({ concepto, monto, tipo, categoria_id, fech
   return data
 }
 
+export async function updateTransaccion(id, fields) {
+  const { data, error } = await supabase
+    .from('transacciones')
+    .update(fields)
+    .eq('id', id)
+    .select('*, categorias_finanzas(nombre, color, icono)')
+    .single()
+  if (error) throw error
+  return data
+}
+
 export async function deleteTransaccion(id) {
   const { error } = await supabase.from('transacciones').delete().eq('id', id)
   if (error) throw error
@@ -313,7 +324,11 @@ function firesOn(r, date) {
   }
 }
 
-export function projectCashFlow(recurrencias, startBalance = 0, days = 90) {
+// `omitUntil`: los eventos hasta esa fecha (inclusive) NO se aplican.
+// El mes en curso ya está materializado como transacciones (plan del mes),
+// así que su efecto ya vive en el balance del mes / saldo inicial — volver
+// a aplicarlo aquí sería descontar (o sumar) dos veces.
+export function projectCashFlow(recurrencias, startBalance = 0, days = 90, omitUntil = null) {
   const points = []
   let balance = startBalance
   const today = new Date()
@@ -326,19 +341,103 @@ export function projectCashFlow(recurrencias, startBalance = 0, days = 90) {
     date.setHours(0, 0, 0, 0)
 
     const events = []
-    active.forEach(r => {
-      if (!firesOn(r, date)) return
-      balance += r.tipo === 'ingreso' ? Number(r.monto) : -Number(r.monto)
-      events.push({ concepto: r.concepto, monto: Number(r.monto), tipo: r.tipo })
-    })
+    if (!omitUntil || date > omitUntil) {
+      active.forEach(r => {
+        if (!firesOn(r, date)) return
+        balance += r.tipo === 'ingreso' ? Number(r.monto) : -Number(r.monto)
+        events.push({ concepto: r.concepto, monto: Number(r.monto), tipo: r.tipo })
+      })
+    }
 
     points.push({
-      fecha: date.toISOString().slice(0, 10),
+      fecha: isoLocal(date),
       balance: Math.round(balance * 100) / 100,
       events,
     })
   }
   return points
+}
+
+// Fin del mes en curso — límite estándar para omitUntil
+export function finDeMesActual() {
+  const hoy = new Date()
+  const fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0)
+  fin.setHours(0, 0, 0, 0)
+  return fin
+}
+
+// ── Materialización: recurrentes → transacciones reales ──────
+// Al abrir Finanzas se inserta como transacciones el MES EN CURSO COMPLETO
+// de cada recurrente activo (incluidas fechas futuras del mes: el salario
+// del día 20 se ve desde el día 1, como plan del mes). Si el monto cambió,
+// el movimiento se edita directamente. Borrar un movimiento auto no lo
+// revive (ultima_materializacion avanza al fin de mes). Meses que nunca se
+// abrieron no se backfillean.
+// Requiere correr backend/database/materializacion_recurrencias.sql.
+
+function isoLocal(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function isMissingColumn(error) {
+  return !!error && (error.code === '42703' || error.code === 'PGRST204' ||
+    /recurrencia_id|ultima_materializacion/i.test(error.message || ''))
+}
+
+export async function materializeRecurrencias() {
+  try {
+    const userId = await getUserId()
+    const { data: recs, error: recErr } = await supabase
+      .from('recurrencias')
+      .select('*')
+      .eq('usuario_id', userId)
+      .eq('activa', true)
+    if (recErr || !recs?.length) return { inserted: 0, needsSql: false }
+
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0)
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1)
+    const finMes    = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0)
+
+    const rows = []
+    for (const r of recs) {
+      let desde = inicioMes
+      if (r.ultima_materializacion) {
+        const sig = new Date(r.ultima_materializacion + 'T00:00:00')
+        sig.setDate(sig.getDate() + 1)
+        if (sig > desde) desde = sig
+      }
+      for (let d = new Date(desde); d <= finMes; d.setDate(d.getDate() + 1)) {
+        if (!firesOn(r, d)) continue
+        rows.push({
+          usuario_id:     userId,
+          concepto:       r.concepto,
+          monto:          r.monto,
+          tipo:           r.tipo,
+          categoria_id:   r.categoria_id,
+          fecha:          isoLocal(d),
+          recurrencia_id: r.id,
+        })
+      }
+    }
+
+    if (rows.length > 0) {
+      const { error } = await supabase
+        .from('transacciones')
+        .upsert(rows, { onConflict: 'recurrencia_id,fecha', ignoreDuplicates: true })
+      if (error) return { inserted: 0, needsSql: isMissingColumn(error) }
+    }
+
+    const { error: updErr } = await supabase
+      .from('recurrencias')
+      .update({ ultima_materializacion: isoLocal(finMes) })
+      .eq('usuario_id', userId)
+      .eq('activa', true)
+    if (updErr) return { inserted: rows.length, needsSql: isMissingColumn(updErr) }
+
+    return { inserted: rows.length, needsSql: false }
+  } catch {
+    return { inserted: 0, needsSql: false }
+  }
 }
 
 // ── Cálculos ─────────────────────────────────────────────────

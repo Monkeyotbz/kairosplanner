@@ -1,4 +1,4 @@
-import { projectCashFlow } from './financeService'
+import { projectCashFlow, finDeMesActual } from './financeService'
 
 const BALANCE_KEY = 'kairos-cashflow-saldo'
 
@@ -130,7 +130,9 @@ export function calcAlertas(summary, recurrencias, presupuestos, transacciones) 
   const { ingresos } = summary
   const balance = parseFloat(localStorage.getItem(BALANCE_KEY) || '0')
 
-  const cashFlow = projectCashFlow(recurrencias, balance, 30)
+  // El mes en curso ya está materializado y descontado del balance:
+  // proyectar solo eventos del mes siguiente (evita doble descuento)
+  const cashFlow = projectCashFlow(recurrencias, balance, 30, finDeMesActual())
 
   // 1. Zona de peligro próxima (7 días)
   for (let i = 1; i <= 7; i++) {

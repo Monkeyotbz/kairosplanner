@@ -1,8 +1,8 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import * as XLSX from 'xlsx'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import { getTransacciones, calcSummary, calcByCategoria } from '../services/financeService'
+import { getTransacciones, calcSummary, calcByCategoria, materializeRecurrencias } from '../services/financeService'
 import FinanceSummary      from '../components/finanzas/FinanceSummary'
 import FinanceChart        from '../components/finanzas/FinanceChart'
 import TransactionList     from '../components/finanzas/TransactionList'
@@ -10,6 +10,8 @@ import TransactionForm     from '../components/finanzas/TransactionForm'
 import BudgetPanel         from '../components/finanzas/BudgetPanel'
 import RecurrenciasPanel   from '../components/finanzas/RecurrenciasPanel'
 import CashFlowChart       from '../components/finanzas/CashFlowChart'
+import SugerenciaAhorro    from '../components/finanzas/SugerenciaAhorro'
+import CalculadoraAhorro   from '../components/finanzas/CalculadoraAhorro'
 import ProyectoFinanzas    from '../components/finanzas/ProyectoFinanzas'
 import HealthScore         from '../components/finanzas/HealthScore'
 import AlertasFinancieras  from '../components/finanzas/AlertasFinancieras'
@@ -24,9 +26,12 @@ export default function FinanzasPage() {
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth() + 1)
   const [transacciones, setTransacciones] = useState([])
-  const [recurrencias, setRecurrencias] = useState([])
-  const [showForm, setShowForm] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [recurrencias, setRecurrencias]   = useState([])
+  const [showForm, setShowForm]           = useState(false)
+  const [editTx, setEditTx]               = useState(null)
+  const [loading, setLoading]             = useState(true)
+  const [needsSql, setNeedsSql]           = useState(false)
+  const [ready, setReady]                 = useState(false)
 
   function load() {
     setLoading(true)
@@ -36,7 +41,25 @@ export default function FinanzasPage() {
     })
   }
 
-  useEffect(() => { if (tab === 'personal') load() }, [year, month, tab])
+  // Al entrar, convierte en transacciones las ocurrencias vencidas de los
+  // recurrentes activos (salario, renta…) antes de cargar el mes.
+  useEffect(() => {
+    materializeRecurrencias()
+      .then(res => setNeedsSql(res.needsSql))
+      .finally(() => setReady(true))
+  }, [])
+
+  useEffect(() => { if (tab === 'personal' && ready) load() }, [year, month, tab, ready])
+
+  // Cuando cambian los recurrentes (nuevo, editado, reactivado), materializa
+  // de una vez lo que ya esté vencido y refresca los movimientos.
+  function handleRecurrenciasChange(list) {
+    setRecurrencias(list)
+    materializeRecurrencias().then(res => {
+      if (res.needsSql) setNeedsSql(true)
+      if (res.inserted > 0) load()
+    })
+  }
 
   function prevMonth() {
     if (month === 1) { setYear(y => y - 1); setMonth(12) }
@@ -127,6 +150,12 @@ export default function FinanzasPage() {
       {/* ── Tab Personal ──────────────────────────────────────────── */}
       {tab === 'personal' && (
         <>
+          {needsSql && (
+            <div className={styles.sqlWarn}>
+              ⚠️ Falta ejecutar <code>backend/database/materializacion_recurrencias.sql</code> en
+              Supabase → SQL Editor para que los recurrentes se registren solos como movimientos.
+            </div>
+          )}
           {loading
             ? <div className={styles.state}><span className={styles.spinner} /> Cargando...</div>
             : (
@@ -152,10 +181,16 @@ export default function FinanzasPage() {
                 <FinanceSummary ingresos={summary.ingresos} gastos={summary.gastos} balance={summary.balance} />
                 <div className={styles.mainRow}>
                   <FinanceChart data={byCategoria} />
-                  <TransactionList transacciones={transacciones} onDeleted={load} />
+                  <TransactionList transacciones={transacciones} onDeleted={load} onEdit={setEditTx} />
                 </div>
-                <BudgetPanel transacciones={transacciones} year={year} month={month} monthLabel={MONTHS[month - 1] + ' ' + year} />
-                <RecurrenciasPanel onChange={setRecurrencias} />
+                <BudgetPanel
+                  transacciones={transacciones}
+                  year={year} month={month}
+                  monthLabel={`${MONTHS[month - 1]} ${year}`}
+                />
+                <RecurrenciasPanel onChange={handleRecurrenciasChange} />
+                <SugerenciaAhorro recurrencias={recurrencias} onGoToMetas={() => setTab('analisis')} />
+                <CalculadoraAhorro recurrencias={recurrencias} />
                 <CashFlowChart recurrencias={recurrencias} currentMonthBalance={summary.balance} />
               </>
             )
@@ -165,7 +200,13 @@ export default function FinanzasPage() {
             <button style={{ background:'rgba(34,197,94,0.1)', border:'1px solid rgba(34,197,94,0.3)', borderRadius:'8px', padding:'6px 12px', color:'#86efac', cursor:'pointer', fontSize:'12px' }} onClick={exportCSV}>Exportar CSV</button>
             <button style={{ background:'rgba(34,197,94,0.1)', border:'1px solid rgba(34,197,94,0.3)', borderRadius:'8px', padding:'6px 12px', color:'#86efac', cursor:'pointer', fontSize:'12px' }} onClick={exportPDF}>Exportar PDF</button>
           </div>
-          {showForm && <TransactionForm onSaved={() => { setShowForm(false); load() }} onClose={() => setShowForm(false)} />}
+          {(showForm || editTx) && (
+            <TransactionForm
+              initial={editTx}
+              onSaved={() => { setShowForm(false); setEditTx(null); load() }}
+              onClose={() => { setShowForm(false); setEditTx(null) }}
+            />
+          )}
         </>
       )}
 

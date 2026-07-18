@@ -38,6 +38,23 @@
   color: var(--kairos-purple-100) !important;
 }
 
+/* Aviso: falta correr SQL de materialización */
+.sqlWarn {
+  background: rgba(234,179,8,0.1);
+  border: 1px solid rgba(234,179,8,0.35);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 12px;
+  color: var(--kairos-text-secondary);
+  line-height: 1.5;
+}
+.sqlWarn code {
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 11px;
+}
+
 /* Month picker */
 .monthRow {
   display: flex;

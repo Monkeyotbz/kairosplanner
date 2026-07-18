@@ -40,6 +40,11 @@
 
 .item:hover { background: rgba(255,255,255,0.04); }
 .item:hover .deleteBtn { opacity: 1; }
+.item:hover .editBtn   { opacity: 1; }
+
+/* Movimiento programado: la fecha aún no llega, cuenta en el plan del mes */
+.itemFuturo .catIcon,
+.itemFuturo .monto { opacity: 0.6; }
 
 .catIcon {
   width: 34px;
@@ -71,6 +76,18 @@
 
 .meta { font-size: 11px; color: var(--kairos-text-muted); }
 
+.autoBadge {
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--kairos-purple-400, #a78bfa);
+  background: rgba(167,139,250,0.12);
+  border: 1px solid rgba(167,139,250,0.25);
+  border-radius: 4px;
+  padding: 1px 5px;
+  vertical-align: middle;
+}
+
 .monto {
   font-size: 14px;
   font-weight: 700;
@@ -80,6 +97,29 @@
 
 .ingreso { color: #4ade80; }
 .gasto   { color: #f87171; }
+
+.futuroBadge {
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--kairos-text-muted);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 4px;
+  padding: 1px 5px;
+  vertical-align: middle;
+}
+
+.editBtn {
+  opacity: 0;
+  font-size: 12px;
+  color: var(--kairos-text-muted);
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: all 0.12s;
+  flex-shrink: 0;
+}
+.editBtn:hover { color: var(--kairos-purple-400, #a78bfa); background: rgba(167,139,250,0.12); }
 
 .deleteBtn {
   opacity: 0;

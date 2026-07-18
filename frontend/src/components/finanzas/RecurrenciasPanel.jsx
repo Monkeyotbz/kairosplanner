@@ -120,10 +120,11 @@ export default function RecurrenciasPanel({ onChange }) {
     onChange?.(items.map(x => x.id === item.id ? { ...x, ...updated } : x))
   }
 
-  async function handleDelete(id) {
-    setItems(prev => prev.filter(x => x.id !== id))
-    await deleteRecurrencia(id)
-    onChange?.(items.filter(x => x.id !== id))
+  async function handleDelete(item) {
+    if (!confirm(`¿Eliminar el recurrente "${item.concepto}"? Dejará de proyectarse en el flujo de caja y de registrarse cada mes.`)) return
+    setItems(prev => prev.filter(x => x.id !== item.id))
+    await deleteRecurrencia(item.id)
+    onChange?.(items.filter(x => x.id !== item.id))
   }
 
   async function handleSave() {
@@ -349,7 +350,7 @@ function RecurList({ label, items, accent, onToggle, onEdit, onDelete }) {
                 <button className={styles.iconBtn} onClick={() => onEdit(item)} title="Editar">
                   <i className="ti ti-pencil" />
                 </button>
-                <button className={`${styles.iconBtn} ${styles.iconBtnDel}`} onClick={() => onDelete(item.id)} title="Eliminar">
+                <button className={`${styles.iconBtn} ${styles.iconBtnDel}`} onClick={() => onDelete(item)} title="Eliminar">
                   <i className="ti ti-trash" />
                 </button>
               </div>
