@@ -1,0 +1,92 @@
+﻿.capsule {
+  position: fixed;
+  left: 16px;
+  bottom: calc(var(--kairos-entorno-h, 44px) + 16px);
+  z-index: 1150;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px 7px 7px;
+  max-width: min(320px, 88vw);
+  border-radius: 14px;
+  background: rgba(18, 14, 45, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+  animation: capIn 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+@keyframes capIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.timeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(55, 138, 221, 0.14);
+  flex-shrink: 0;
+  font-family: var(--kairos-font);
+  transition: background 0.15s ease;
+}
+.timeChip:hover { background: rgba(55, 138, 221, 0.22); }
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #378ADD;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
+.time {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #cfe6fb;
+  font-variant-numeric: tabular-nums;
+}
+
+.task {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  font-family: var(--kairos-font);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.task:hover { color: #fff; }
+
+.stopBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(216, 90, 48, 0.16);
+  color: #fca07a;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+.stopBtn:hover { background: rgba(216, 90, 48, 0.28); }
+.stopBtn i { font-size: 13px; }

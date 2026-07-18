@@ -10,6 +10,7 @@ import ToastContainer from './ToastContainer'
 import SyncIndicator from './SyncIndicator'
 import ImmersiveFocus from '../focus/ImmersiveFocus'
 import FocusCapsule from '../focus/FocusCapsule'
+import CardTimerCapsule from '../kanban/CardTimerCapsule'
 import AbadChat from '../kairos/AbadChat'
 import AbadOnboarding from '../kairos/AbadOnboarding'
 import CookieConsent from './CookieConsent'
@@ -59,6 +60,7 @@ export default function AppShell() {
       <SyncIndicator />
       <ImmersiveFocus />
       <FocusCapsule />
+      <CardTimerCapsule />
       <AbadChat />
       <AbadOnboarding />
       <CookieConsent />

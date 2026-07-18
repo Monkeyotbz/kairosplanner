@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuthStore } from '../../store/authStore'
+import { useBoardStore } from '../../store/boardStore'
 import { getComentarios, addComentario, deleteComentario } from '../../services/boardService'
 import styles from './CardComments.module.css'
 
@@ -13,6 +14,7 @@ function timeAgo(dateStr) {
 
 export default function CardComments({ cardId }) {
   const { user } = useAuthStore()
+  const markCardCommentsRead = useBoardStore(s => s.markCardCommentsRead)
   const [comments, setComments] = useState([])
   const [loading, setLoading]   = useState(true)
   const [text, setText]         = useState('')
@@ -25,6 +27,8 @@ export default function CardComments({ cardId }) {
     getComentarios(cardId)
       .then(setComments)
       .finally(() => setLoading(false))
+    // Abrir los comentarios cuenta como leerlos
+    markCardCommentsRead(cardId)
   }, [cardId])
 
   async function handleSend(e) {

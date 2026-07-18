@@ -1,17 +1,29 @@
-import { supabase } from './supabase'
+import { supabase, getAccessTokenSync } from './supabase'
 
-const CARD_SELECT = 'id, columna_id, titulo, descripcion, prioridad, fecha_limite, cover_url, orden, asignado_a, tarjeta_etiqueta(etiquetas(id, nombre, color)), subtareas(id, completada)'
+const CARD_SELECT = 'id, columna_id, titulo, descripcion, prioridad, fecha_limite, cover_url, orden, asignado_a, ' +
+  'tarjeta_etiqueta(etiquetas(id, nombre, color)), subtareas(id, completada), ' +
+  'comentarios(creado_en), comentario_lecturas(ultima_lectura), registros_tiempo(segundos_totales)'
+
+// RLS ya limita comentario_lecturas y registros_tiempo a las filas del
+// usuario actual, así que estos campos embebidos nunca exponen datos de
+// otros miembros del proyecto.
+function mapCard(card) {
+  const subs = card.subtareas || []
+  const comentarios = card.comentarios || []
+  const ultimaLectura = card.comentario_lecturas?.[0]?.ultima_lectura || null
+  const tiempos = card.registros_tiempo || []
+  return {
+    ...card,
+    labels: (card.tarjeta_etiqueta || []).map(te => te.etiquetas).filter(Boolean),
+    subtaskTotal: subs.length,
+    subtaskDone:  subs.filter(s => s.completada).length,
+    unreadComments: comentarios.some(c => !ultimaLectura || new Date(c.creado_en) > new Date(ultimaLectura)),
+    tiempoTotalSeg: tiempos.reduce((sum, r) => sum + (r.segundos_totales || 0), 0),
+  }
+}
 
 function mapCards(rawCards) {
-  return (rawCards || []).map(card => {
-    const subs = card.subtareas || []
-    return {
-      ...card,
-      labels: (card.tarjeta_etiqueta || []).map(te => te.etiquetas).filter(Boolean),
-      subtaskTotal: subs.length,
-      subtaskDone:  subs.filter(s => s.completada).length,
-    }
-  })
+  return (rawCards || []).map(mapCard)
 }
 
 // ── Proyectos ────────────────────────────────────────────────
@@ -192,7 +204,7 @@ export async function createCard({ columna_id, titulo }) {
     .select(CARD_SELECT)
     .single()
   if (error) throw error
-  return { ...data, labels: (data.tarjeta_etiqueta || []).map(te => te.etiquetas).filter(Boolean) }
+  return mapCard(data)
 }
 
 export async function deleteCard(id) {
@@ -208,7 +220,7 @@ export async function updateCard(cardId, fields) {
     .select(CARD_SELECT)
     .single()
   if (error) throw error
-  return { ...data, labels: (data.tarjeta_etiqueta || []).map(te => te.etiquetas).filter(Boolean) }
+  return mapCard(data)
 }
 
 export async function updateCardColumn(cardId, columnId) {
@@ -308,6 +320,74 @@ export async function addComentario(tarjetaId, contenido) {
 export async function deleteComentario(id) {
   const { error } = await supabase.from('comentarios').delete().eq('id', id)
   if (error) throw error
+}
+
+// Marca como "leídos" los comentarios de una tarjeta para el usuario actual.
+export async function marcarComentariosLeidos(tarjetaId) {
+  const { data: { user } } = await supabase.auth.getUser()
+  const { error } = await supabase
+    .from('comentario_lecturas')
+    .upsert({ usuario_id: user.id, tarjeta_id: tarjetaId, ultima_lectura: new Date().toISOString() })
+  if (error) throw error
+}
+
+// ── Tiempo registrado ────────────────────────────────────────
+export async function iniciarRegistroTiempo(tarjetaId) {
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data, error } = await supabase
+    .from('registros_tiempo')
+    .insert({ tarjeta_id: tarjetaId, usuario_id: user.id, inicio: new Date().toISOString() })
+    .select('id, inicio, fin')
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function detenerRegistroTiempo(id) {
+  const { data, error } = await supabase
+    .from('registros_tiempo')
+    .update({ fin: new Date().toISOString() })
+    .eq('id', id)
+    .select('id, inicio, fin, segundos_totales')
+    .single()
+  if (error) throw error
+  return data
+}
+
+// El cronómetro que quedó corriendo (fin=null) de una visita anterior —
+// para restaurarlo en la cápsula flotante aunque hayas cerrado la tarjeta
+// o recargado la página. RLS limita el resultado al usuario actual.
+export async function getRegistroTiempoActivo() {
+  const { data, error } = await supabase
+    .from('registros_tiempo')
+    .select('id, tarjeta_id, inicio, tarjetas(titulo)')
+    .is('fin', null)
+    .order('inicio', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
+
+// Cierra el registro activo al cerrar la pestaña/navegador. Un `fetch`
+// normal (el que usa supabase-js) no tiene garantía de completarse una vez
+// que la página empieza a descargarse — `keepalive` sí, así que se arma la
+// petición REST a mano en vez de pasar por el cliente.
+export function stopRegistroTiempoBeacon(registroId) {
+  const token = getAccessTokenSync()
+  if (!token) return
+  const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/registros_tiempo?id=eq.${registroId}`
+  fetch(url, {
+    method: 'PATCH',
+    keepalive: true,
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${token}`,
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify({ fin: new Date().toISOString() }),
+  }).catch(() => {})
 }
 
 // ── Subtareas ────────────────────────────────────────────────

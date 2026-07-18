@@ -215,25 +215,25 @@
   font-weight: 600;
 }
 
-.dueChip {
+/* Input de fecha nativo visible — showPicker() fallaba en algunos
+   navegadores y el selector "no abría" */
+.dateInput {
   background: var(--kairos-surface-2);
   color: var(--kairos-text-secondary);
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 5px;
   border: 0.5px solid var(--kairos-border-1);
   cursor: pointer;
   font-family: var(--kairos-font);
   transition: background 0.12s;
+  color-scheme: dark;
 }
-.dueChip:hover { background: var(--kairos-surface-3); }
-.dueChip i { font-size: 13px; }
+.dateInput:hover { background: var(--kairos-surface-3); }
+:global([data-theme="snow"]) .dateInput { color-scheme: light; }
 
-.dueChipPast {
+.dateInputPast {
   background: rgba(216, 90, 48, 0.18);
   color: #fca07a;
   border-color: rgba(216, 90, 48, 0.35);
@@ -255,15 +255,6 @@
 }
 .metaEmpty:hover { border-color: var(--kairos-border-2); color: var(--kairos-text-secondary); }
 .metaEmpty i { font-size: 13px; }
-
-.hiddenDate {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-  border: none;
-  pointer-events: none;
-}
 
 /* ── Timer block ── */
 .timerBlock {

@@ -5,6 +5,18 @@ export const supabase = createClient(
   import.meta.env.VITE_SUPABASE_ANON_KEY
 )
 
+// Token de sesión en memoria, actualizado en cada cambio de auth. Existe
+// para poder armar peticiones "keepalive" en beforeunload/pagehide sin
+// esperar a supabase.auth.getSession() (es async — para cuando resuelve,
+// la pestaña ya terminó de cerrarse y la petición nunca sale).
+let _accessToken = null
+supabase.auth.getSession().then(({ data }) => { _accessToken = data.session?.access_token ?? null })
+supabase.auth.onAuthStateChange((_event, session) => { _accessToken = session?.access_token ?? null })
+
+export function getAccessTokenSync() {
+  return _accessToken
+}
+
 // Evita promesas colgadas: si la query no resuelve en `ms`, rechaza con
 // Error('timeout:<label>') para que el caller pueda salir del loading.
 export function withTimeout(promise, ms = 10000, label = 'supabase') {

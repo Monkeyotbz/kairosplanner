@@ -106,10 +106,11 @@ export default function Board({ activeFilters }) {
   const {
     selectedPriorities = [], selectedTags = [], selectedMembers = [], selectedLists = [],
     selectedFecha = [], selectedSubtareas = [], soloSinAsignar = false, soloSinEtiquetas = false,
+    soloSinLeer = false, soloConTiempo = false,
   } = activeFilters || {}
   const hasActiveFilters = selectedPriorities.length > 0 || selectedTags.length > 0 || selectedMembers.length > 0
     || selectedLists.length > 0 || selectedFecha.length > 0 || selectedSubtareas.length > 0
-    || soloSinAsignar || soloSinEtiquetas
+    || soloSinAsignar || soloSinEtiquetas || soloSinLeer || soloConTiempo
 
   function matchesFilters(c) {
     if (searchQuery) {
@@ -123,6 +124,8 @@ export default function Board({ activeFilters }) {
     if (selectedSubtareas.length && !selectedSubtareas.includes(subtareaBucket(c))) return false
     if (soloSinAsignar && c.asignado_a) return false
     if (soloSinEtiquetas && (c.labels || []).length > 0) return false
+    if (soloSinLeer && !c.unreadComments) return false
+    if (soloConTiempo && !(c.tiempoTotalSeg > 0)) return false
     return true
   }
 

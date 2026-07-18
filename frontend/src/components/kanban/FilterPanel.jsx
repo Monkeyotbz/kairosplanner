@@ -41,6 +41,8 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
   const [selectedSubtareas, setSelectedSubtareas] = useState([])
   const [soloSinAsignar, setSoloSinAsignar] = useState(false)
   const [soloSinEtiquetas, setSoloSinEtiquetas] = useState(false)
+  const [soloSinLeer, setSoloSinLeer] = useState(false)
+  const [soloConTiempo, setSoloConTiempo] = useState(false)
   const etiquetas = useBoardStore(s => s.etiquetas)
   const columns = useBoardStore(s => s.columns)
   const [miembros, setMiembros] = useState([])
@@ -65,15 +67,17 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
       onFilterChange({
         selectedPriorities, selectedTags, selectedMembers, selectedLists,
         selectedFecha, selectedSubtareas, soloSinAsignar, soloSinEtiquetas,
+        soloSinLeer, soloConTiempo,
       })
     }
-  }, [selectedPriorities, selectedTags, selectedMembers, selectedLists, selectedFecha, selectedSubtareas, soloSinAsignar, soloSinEtiquetas])
+  }, [selectedPriorities, selectedTags, selectedMembers, selectedLists, selectedFecha, selectedSubtareas, soloSinAsignar, soloSinEtiquetas, soloSinLeer, soloConTiempo])
 
   const toggle = (setList, id) =>
     setList(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
 
   const activeCount = selectedPriorities.length + selectedTags.length + selectedMembers.length + selectedLists.length
     + selectedFecha.length + selectedSubtareas.length + (soloSinAsignar ? 1 : 0) + (soloSinEtiquetas ? 1 : 0)
+    + (soloSinLeer ? 1 : 0) + (soloConTiempo ? 1 : 0)
 
   const clearAll = () => {
     setSelectedPriorities([])
@@ -84,6 +88,8 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
     setSelectedSubtareas([])
     setSoloSinAsignar(false)
     setSoloSinEtiquetas(false)
+    setSoloSinLeer(false)
+    setSoloConTiempo(false)
   }
 
   const tabCount = (id) => {
@@ -268,6 +274,18 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
         >
           Sin etiquetas
         </button>
+        <button
+          className={[styles.quickChip, soloSinLeer ? styles.quickChipActive : ""].join(" ")}
+          onClick={() => setSoloSinLeer(v => !v)}
+        >
+          Comentarios sin leer
+        </button>
+        <button
+          className={[styles.quickChip, soloConTiempo ? styles.quickChipActive : ""].join(" ")}
+          onClick={() => setSoloConTiempo(v => !v)}
+        >
+          Con tiempo registrado
+        </button>
       </div>
 
       {activeCount > 0 && (
@@ -344,6 +362,18 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
               <span className={styles.chip}>
                 Sin etiquetas
                 <button className={styles.chipX} onClick={() => setSoloSinEtiquetas(false)}>✕</button>
+              </span>
+            )}
+            {soloSinLeer && (
+              <span className={styles.chip}>
+                Comentarios sin leer
+                <button className={styles.chipX} onClick={() => setSoloSinLeer(false)}>✕</button>
+              </span>
+            )}
+            {soloConTiempo && (
+              <span className={styles.chip}>
+                Con tiempo registrado
+                <button className={styles.chipX} onClick={() => setSoloConTiempo(false)}>✕</button>
               </span>
             )}
           </div>

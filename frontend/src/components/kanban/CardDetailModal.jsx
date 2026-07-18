@@ -4,6 +4,7 @@ import { useBoardStore } from '../../store/boardStore'
 import { useFocusStore } from '../../store/focusStore'
 import { getProjectMembers } from '../../services/boardService'
 import CardChecklist from './CardChecklist'
+import CardTimeTracker from './CardTimeTracker'
 import LabelPicker from './LabelPicker'
 import CardComments from './CardComments'
 import CoverPicker from './CoverPicker'
@@ -60,7 +61,6 @@ export default function CardDetailModal() {
   const [assignSide, setAssignSide] = useState({ open: false, top: 0, right: 0 })
   const dateRef       = useRef(null)
   const assignRef     = useRef(null)
-  const dateSideRef   = useRef(null)
   const labelsWrapRef = useRef(null)
   const assignWrapRef = useRef(null)
 
@@ -302,31 +302,18 @@ export default function CardDetailModal() {
                 </div>
               </div>
 
-              {/* Fecha límite */}
+              {/* Fecha límite — input nativo visible (showPicker fallaba
+                  en algunos navegadores y el selector "no abría") */}
               <div className={styles.metaItem}>
                 <span className={styles.metaLabel}>Fecha límite</span>
-                <div className={styles.metaVal} style={{ position: 'relative' }}>
-                  {dateInfo ? (
-                    <button
-                      className={`${styles.dueChip} ${dateInfo.isPast ? styles.dueChipPast : ''}`}
-                      onClick={() => dateRef.current?.showPicker?.()}
-                    >
-                      <i className="ti ti-calendar-x" aria-hidden="true" /> {dateInfo.label}
-                    </button>
-                  ) : (
-                    <button className={styles.metaEmpty} onClick={() => dateRef.current?.showPicker?.()}>
-                      <i className="ti ti-calendar" aria-hidden="true" /> Añadir fecha
-                    </button>
-                  )}
-                  <input
-                    ref={dateRef}
-                    type="date"
-                    className={styles.hiddenDate}
-                    value={localDate}
-                    onChange={e => setLocalDate(e.target.value)}
-                    onBlur={saveDate}
-                  />
-                </div>
+                <input
+                  ref={dateRef}
+                  type="date"
+                  className={`${styles.dateInput} ${dateInfo?.isPast ? styles.dateInputPast : ''}`}
+                  value={localDate}
+                  onChange={e => setLocalDate(e.target.value)}
+                  onBlur={saveDate}
+                />
               </div>
 
               {/* Columna */}
@@ -373,6 +360,14 @@ export default function CardDetailModal() {
                   </button>
                 </div>
               )}
+            </div>
+
+            {/* Tiempo registrado en esta tarjeta */}
+            <div>
+              <div className={styles.sectionTitle}>
+                <i className="ti ti-hourglass" aria-hidden="true" /> Tiempo en esta tarjeta
+              </div>
+              <CardTimeTracker cardId={selectedCard.id} />
             </div>
 
             {/* Subtareas */}
@@ -456,20 +451,16 @@ export default function CardDetailModal() {
 
             <span className={styles.sideLabel}>Acciones</span>
 
-            {/* Fecha límite */}
-            <div style={{ position: 'relative' }}>
-              <button className={styles.sideBtn} onClick={() => dateSideRef.current?.showPicker?.()}>
-                <i className="ti ti-calendar" aria-hidden="true" /> Fecha límite
-              </button>
-              <input
-                ref={dateSideRef}
-                type="date"
-                className={styles.hiddenDate}
-                value={localDate}
-                onChange={e => setLocalDate(e.target.value)}
-                onBlur={saveDate}
-              />
-            </div>
+            {/* Fecha límite — enfoca el input real de la columna principal */}
+            <button
+              className={styles.sideBtn}
+              onClick={() => {
+                dateRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+                dateRef.current?.focus()
+              }}
+            >
+              <i className="ti ti-calendar" aria-hidden="true" /> Fecha límite
+            </button>
 
             {/* Editar etiquetas */}
             <div ref={labelsWrapRef}>
