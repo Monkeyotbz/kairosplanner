@@ -4,6 +4,7 @@ import { useBoardStore } from '../../store/boardStore'
 import { useFocusStore } from '../../store/focusStore'
 import { getProjectMembers } from '../../services/boardService'
 import CardChecklist from './CardChecklist'
+import CardTimeTracker from './CardTimeTracker'
 import LabelPicker from './LabelPicker'
 import CardComments from './CardComments'
 import CoverPicker from './CoverPicker'
@@ -358,6 +359,14 @@ export default function CardDetailModal() {
                   </button>
                 </div>
               )}
+            </div>
+
+            {/* Tiempo registrado en esta tarjeta */}
+            <div>
+              <div className={styles.sectionTitle}>
+                <i className="ti ti-hourglass" aria-hidden="true" /> Tiempo en esta tarjeta
+              </div>
+              <CardTimeTracker cardId={selectedCard.id} />
             </div>
 
             {/* Subtareas */}

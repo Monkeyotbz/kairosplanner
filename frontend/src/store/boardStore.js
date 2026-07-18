@@ -1,5 +1,8 @@
 import { create } from 'zustand'
-import { getMisProyectos, getBoardByProject, getMyBoard, deleteProject, getProyectoEtiquetas } from '../services/boardService'
+import {
+  getMisProyectos, getBoardByProject, getMyBoard, deleteProject, getProyectoEtiquetas, marcarComentariosLeidos,
+  iniciarRegistroTiempo, detenerRegistroTiempo, getRegistroTiempoActivo,
+} from '../services/boardService'
 import { withRetry, isTimeoutError } from '../services/supabase'
 import { enqueue, flush, hasPending } from '../services/syncQueue'
 import { onReconnect, isOnline } from '../services/connection'
@@ -39,6 +42,10 @@ export const useBoardStore = create((set, get) => ({
   searchQuery: '',
   loading: true,
   error: null,
+  // Cronómetro de tiempo activo (a lo mucho uno por usuario a la vez).
+  // Vive en el store, no en CardTimeTracker, para que la cápsula flotante
+  // lo muestre aunque hayas cerrado la tarjeta.
+  activeTimer: null, // { registroId, cardId, cardTitulo, columnaId, inicio }
 
   // ── Carga inicial ───────────────────────────────────────────
   loadBoard: async (proyectoId = null) => {
@@ -82,6 +89,21 @@ export const useBoardStore = create((set, get) => ({
 
       // Cargar etiquetas del proyecto (para FilterPanel y LabelPicker)
       getProyectoEtiquetas(proyecto.id).then(items => set({ etiquetas: items })).catch(() => {})
+
+      // Retomar un cronómetro que quedó corriendo (cierre de pestaña, F5, etc.)
+      getRegistroTiempoActivo().then(registro => {
+        if (!registro) return
+        const card = Object.values(get().cardsByColumn).flat().find(c => c.id === registro.tarjeta_id)
+        set({
+          activeTimer: {
+            registroId: registro.id,
+            cardId: registro.tarjeta_id,
+            cardTitulo: registro.tarjetas?.titulo || card?.titulo || 'Tarjeta',
+            columnaId: card?.columna_id || null,
+            inicio: registro.inicio,
+          },
+        })
+      }).catch(() => {})
 
       // ── Unirse a la sala de Socket.io ──
       const { nombre, email } = useAuthStore.getState().profile ?? {}
@@ -304,6 +326,58 @@ export const useBoardStore = create((set, get) => ({
         ...s.cardsByColumn,
         [card.columna_id]: (s.cardsByColumn[card.columna_id] || []).map(c =>
           c.id === card.id ? { ...c, subtaskDone, subtaskTotal } : c
+        ),
+      },
+    }))
+  },
+
+  // Marca los comentarios de la tarjeta seleccionada como leídos: persiste
+  // en Supabase y limpia el indicador localmente al instante.
+  markCardCommentsRead: (cardId) => {
+    marcarComentariosLeidos(cardId).catch(console.error)
+    const card = get().selectedCard
+    set(s => ({
+      selectedCard: card?.id === cardId ? { ...card, unreadComments: false } : card,
+      cardsByColumn: Object.fromEntries(
+        Object.entries(s.cardsByColumn).map(([colId, cards]) => [
+          colId,
+          cards.map(c => c.id === cardId ? { ...c, unreadComments: false } : c),
+        ])
+      ),
+    }))
+  },
+
+  // Cronómetro por tarjeta — vive acá (no en CardTimeTracker) para que siga
+  // corriendo y la cápsula flotante lo muestre aunque cierres la tarjeta.
+  startCardTimer: async (cardId) => {
+    if (get().activeTimer) return // ya hay uno corriendo — hay que detenerlo primero
+    const card = Object.values(get().cardsByColumn).flat().find(c => c.id === cardId)
+    if (!card) return
+    const row = await iniciarRegistroTiempo(cardId)
+    set({
+      activeTimer: {
+        registroId: row.id,
+        cardId,
+        cardTitulo: card.titulo,
+        columnaId: card.columna_id,
+        inicio: row.inicio,
+      },
+    })
+  },
+
+  stopCardTimer: async () => {
+    const timer = get().activeTimer
+    if (!timer) return
+    const row = await detenerRegistroTiempo(timer.registroId)
+    set({ activeTimer: null })
+    const card = (get().cardsByColumn[timer.columnaId] || []).find(c => c.id === timer.cardId)
+    const nextTotal = (card?.tiempoTotalSeg || 0) + (row.segundos_totales || 0)
+    set(s => ({
+      selectedCard: s.selectedCard?.id === timer.cardId ? { ...s.selectedCard, tiempoTotalSeg: nextTotal } : s.selectedCard,
+      cardsByColumn: {
+        ...s.cardsByColumn,
+        [timer.columnaId]: (s.cardsByColumn[timer.columnaId] || []).map(c =>
+          c.id === timer.cardId ? { ...c, tiempoTotalSeg: nextTotal } : c
         ),
       },
     }))
