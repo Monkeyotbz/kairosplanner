@@ -12,6 +12,7 @@ import ProductivityPage from './pages/ProductivityPage'
 import EntornoPage from './pages/EntornoPage'
 import FinanzasPage from './pages/FinanzasPage'
 import SpotifyCallbackPage from './pages/SpotifyCallbackPage'
+import JoinProject from './pages/JoinProject'
 import OnboardingPreviewPage from './pages/OnboardingPreviewPage'
 import UpgradePage from './pages/UpgradePage'
 import BillingSuccessPage from './pages/BillingSuccessPage'
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/"         element={<LandingPage />} />
         <Route path="/login"    element={<LoginPage />} />
         <Route path="/callback" element={<SpotifyCallbackPage />} />
+        <Route path="/join/:inviteId" element={<JoinProject />} />
         <Route
           element={
             <ProtectedRoute>

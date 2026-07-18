@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useBoardStore } from '../../store/boardStore'
 import { useChatStore } from '../../store/chatStore'
-import { createProject, searchUsuarios, addMemberToProject, getProjectMembers } from '../../services/boardService'
+import { createProject, searchUsuarios, addMemberToProject, getProjectMembers, createInvitacion } from '../../services/boardService'
 import ThemeSwitcher from './ThemeSwitcher'
 import BoardSwitcher from '../kanban/BoardSwitcher'
 import styles from './BoardNav.module.css'
@@ -24,6 +24,9 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel, filtersOp
   const [members, setMembers]       = useState([])
   const [adding, setAdding]         = useState(null) // userId being added
   const [added, setAdded]           = useState(null) // userId just added
+  const [inviteLink, setInviteLink] = useState('')
+  const [linkCopied, setLinkCopied] = useState(false)
+  const [linkError, setLinkError]   = useState('')
 
   useEffect(() => { loadProyectos() }, [loadProyectos])
 
@@ -39,6 +42,13 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel, filtersOp
   useEffect(() => {
     if (showInvite && proyecto?.id) {
       getProjectMembers(proyecto.id).then(setMembers)
+      // Generar un enlace de invitación real para este proyecto
+      setLinkCopied(false)
+      setInviteLink('')
+      setLinkError('')
+      createInvitacion(proyecto.id)
+        .then(id => setInviteLink(`${window.location.origin}/join/${id}`))
+        .catch(err => { console.error('Error al generar el enlace:', err); setLinkError(err.message || 'No se pudo generar el enlace') })
     }
   }, [showInvite, proyecto?.id])
 
@@ -192,8 +202,20 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel, filtersOp
             )}
 
             <div className={styles.inviteLink}>
-              <span className={styles.inviteLinkText}>kairosplanner.vercel.app</span>
-              <button className={styles.copyBtn} onClick={() => navigator.clipboard.writeText('https://kairosplanner.vercel.app')}>Copiar enlace</button>
+              <span className={styles.inviteLinkText} style={linkError ? { color: '#fca07a' } : undefined}>
+                {linkError ? linkError : inviteLink ? inviteLink.replace(/^https?:\/\//, '') : 'Generando enlace…'}
+              </span>
+              <button
+                className={styles.copyBtn}
+                disabled={!inviteLink}
+                onClick={() => {
+                  navigator.clipboard.writeText(inviteLink)
+                  setLinkCopied(true)
+                  setTimeout(() => setLinkCopied(false), 2000)
+                }}
+              >
+                {linkCopied ? '✓ Copiado' : 'Copiar enlace'}
+              </button>
             </div>
           </div>
         </div>

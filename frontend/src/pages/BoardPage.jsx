@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useBoardStore } from '../store/boardStore'
 import { useToastStore } from '../store/toastStore'
+import { acceptInvitation } from '../services/boardService'
 import BoardNav from '../components/layout/BoardNav'
 import Board from '../components/kanban/Board'
 import EmptyBoard from '../components/kanban/EmptyBoard'
@@ -31,7 +32,19 @@ export default function BoardPage() {
     setActiveFilters(null)
   }
 
-  useEffect(() => { loadBoard() }, [loadBoard])
+  useEffect(() => {
+    // Si veníamos de un enlace de invitación (/join/:id) y tocó pasar por
+    // login primero, la retomamos acá antes de cargar el tablero.
+    const pendingInvite = localStorage.getItem('kairos-pending-invite')
+    if (!pendingInvite) { loadBoard(); return }
+    localStorage.removeItem('kairos-pending-invite')
+    acceptInvitation(pendingInvite)
+      .then(proyectoId => {
+        localStorage.setItem('kairos-last-project', proyectoId)
+        loadBoard(proyectoId)
+      })
+      .catch(() => loadBoard())
+  }, [loadBoard])
 
   useEffect(() => {
     if (loading || toastFired.current) return
