@@ -5,6 +5,7 @@ import BoardNav from '../components/layout/BoardNav'
 import Board from '../components/kanban/Board'
 import EmptyBoard from '../components/kanban/EmptyBoard'
 import SidePanel from '../components/layout/SidePanel'
+import FilterPanel from '../components/kanban/FilterPanel'
 import CardDetailModal from '../components/kanban/CardDetailModal'
 import styles from './BoardPage.module.css'
 
@@ -20,6 +21,15 @@ export default function BoardPage() {
   const [panelOpen, setPanelOpen] = useState(
     () => localStorage.getItem('kairos-panel') === 'true'
   )
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [activeFilters, setActiveFilters] = useState(null)
+
+  // Cerrar el panel limpia los filtros: el tablero nunca queda filtrado
+  // "en silencio" sin que se vea desde dónde quitarlos.
+  function closeFilters() {
+    setFiltersOpen(false)
+    setActiveFilters(null)
+  }
 
   useEffect(() => { loadBoard() }, [loadBoard])
 
@@ -72,13 +82,26 @@ export default function BoardPage() {
 
   return (
     <div className={styles.page}>
-      <BoardNav proyecto={proyecto} panelOpen={panelOpen} onTogglePanel={togglePanel} />
+      <BoardNav
+        proyecto={proyecto}
+        panelOpen={panelOpen}
+        onTogglePanel={togglePanel}
+        filtersOpen={filtersOpen}
+        onToggleFilters={() => filtersOpen ? closeFilters() : setFiltersOpen(true)}
+      />
       <div className={styles.content}>
         <div className={styles.kanbanSide}>
           <div className={styles.boardWrapper}>
-            <Board />
+            <Board activeFilters={activeFilters} />
           </div>
         </div>
+        {filtersOpen && (
+          <FilterPanel
+            proyectoId={proyecto?.id}
+            onFilterChange={setActiveFilters}
+            onClose={closeFilters}
+          />
+        )}
         {panelOpen && <SidePanel onClose={togglePanel} />}
       </div>
       <CardDetailModal />

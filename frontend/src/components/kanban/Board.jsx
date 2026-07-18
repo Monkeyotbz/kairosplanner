@@ -6,7 +6,24 @@ import Column from './Column'
 import Card from './Card'
 import styles from './Board.module.css'
 
-export default function Board() {
+// Bucket de vencimiento de una tarjeta para el filtro de "Fecha límite"
+function fechaBucket(fechaLimite) {
+  if (!fechaLimite) return 'sinfecha'
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  const due = new Date(fechaLimite + 'T00:00:00')
+  const diffDays = Math.round((due - today) / 86400000)
+  if (diffDays < 0) return 'vencida'
+  if (diffDays === 0) return 'hoy'
+  if (diffDays <= 7) return 'semana'
+  return null // fuera de rango: no calza con ningún bucket del filtro
+}
+
+function subtareaBucket(c) {
+  if (!c.subtaskTotal) return 'sin'
+  return c.subtaskDone >= c.subtaskTotal ? 'completas' : 'pendientes'
+}
+
+export default function Board({ activeFilters }) {
   const { columns, cardsByColumn, setCardsByColumn, persistMove, searchQuery, addColumn, reorderColumns } = useBoardStore()
   const [activeCard, setActiveCard] = useState(null)
   const [workingCards, setWorkingCards] = useState(null)
@@ -86,18 +103,41 @@ export default function Board() {
     }
   }
 
+  const {
+    selectedPriorities = [], selectedTags = [], selectedMembers = [], selectedLists = [],
+    selectedFecha = [], selectedSubtareas = [], soloSinAsignar = false, soloSinEtiquetas = false,
+  } = activeFilters || {}
+  const hasActiveFilters = selectedPriorities.length > 0 || selectedTags.length > 0 || selectedMembers.length > 0
+    || selectedLists.length > 0 || selectedFecha.length > 0 || selectedSubtareas.length > 0
+    || soloSinAsignar || soloSinEtiquetas
+
+  function matchesFilters(c) {
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase()
+      if (!c.titulo.toLowerCase().includes(q) && !(c.descripcion || '').toLowerCase().includes(q)) return false
+    }
+    if (selectedPriorities.length && !selectedPriorities.includes(c.prioridad)) return false
+    if (selectedTags.length && !(c.labels || []).some(l => selectedTags.includes(l.id))) return false
+    if (selectedMembers.length && !selectedMembers.includes(c.asignado_a)) return false
+    if (selectedFecha.length && !selectedFecha.includes(fechaBucket(c.fecha_limite))) return false
+    if (selectedSubtareas.length && !selectedSubtareas.includes(subtareaBucket(c))) return false
+    if (soloSinAsignar && c.asignado_a) return false
+    if (soloSinEtiquetas && (c.labels || []).length > 0) return false
+    return true
+  }
+
   const baseCards = workingCards || cardsByColumn
-  const displayCards = searchQuery
+  const displayCards = (searchQuery || hasActiveFilters)
     ? Object.fromEntries(
-        Object.entries(baseCards).map(([colId, cards]) => [
-          colId,
-          cards.filter(c =>
-            c.titulo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (c.descripcion || '').toLowerCase().includes(searchQuery.toLowerCase())
-          ),
-        ])
+        Object.entries(baseCards).map(([colId, cards]) => [colId, cards.filter(matchesFilters)])
       )
     : baseCards
+
+  // Filtro "por lista": las columnas no seleccionadas se ocultan del todo.
+  // Con cualquier otro filtro activo, además se ocultan las columnas que
+  // se quedaron sin ninguna tarjeta que calce (menos ruido visual).
+  const visibleColumns = (selectedLists.length ? columns.filter(col => selectedLists.includes(col.id)) : columns)
+    .filter(col => !hasActiveFilters || (displayCards[col.id] || []).length > 0)
 
   return (
     <DndContext
@@ -108,8 +148,8 @@ export default function Board() {
       onDragEnd={handleDragEnd}
     >
       <div className={styles.board}>
-        <SortableContext items={columns.map(c => c.id)} strategy={horizontalListSortingStrategy}>
-          {columns.map(col => (
+        <SortableContext items={visibleColumns.map(c => c.id)} strategy={horizontalListSortingStrategy}>
+          {visibleColumns.map(col => (
             <Column
               key={col.id}
               column={col}

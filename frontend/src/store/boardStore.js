@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { getMisProyectos, getBoardByProject, getMyBoard, deleteProject } from '../services/boardService'
+import { getMisProyectos, getBoardByProject, getMyBoard, deleteProject, getProyectoEtiquetas } from '../services/boardService'
 import { withRetry, isTimeoutError } from '../services/supabase'
 import { enqueue, flush, hasPending } from '../services/syncQueue'
 import { onReconnect, isOnline } from '../services/connection'
@@ -16,6 +16,7 @@ export const useBoardStore = create((set, get) => ({
   board: null,
   columns: [],
   cardsByColumn: {},
+  etiquetas: [],
   selectedCard: null,
   searchQuery: '',
   loading: true,
@@ -59,6 +60,10 @@ export const useBoardStore = create((set, get) => ({
       _retryAttempt = 0
       _loadedAt = Date.now()
       set({ proyecto, board: boardData.board, columns: boardData.columns, cardsByColumn, loading: false, error: null })
+
+      // Etiquetas del proyecto — las usa el FilterPanel (y LabelPicker las
+      // registra al crear). No bloquea la carga del tablero.
+      getProyectoEtiquetas(proyecto.id).then(items => set({ etiquetas: items })).catch(() => {})
     } catch (err) {
       console.error('Error al cargar tablero:', err)
 
@@ -88,6 +93,10 @@ export const useBoardStore = create((set, get) => ({
     const proyectos = await getMisProyectos()
     set({ proyectos })
   },
+
+  // Registra una etiqueta recién creada (LabelPicker) para que el
+  // FilterPanel la vea sin tener que recargar el tablero.
+  addEtiqueta: (etiqueta) => set(s => ({ etiquetas: [...s.etiquetas, etiqueta] })),
 
   // Elimina un proyecto/tablero por completo (cascade en Supabase)
   removeProyecto: async (proyectoId) => {
@@ -161,6 +170,23 @@ export const useBoardStore = create((set, get) => ({
         ...s.cardsByColumn,
         [card.columna_id]: (s.cardsByColumn[card.columna_id] || []).map(
           c => c.id === card.id ? { ...c, labels } : c
+        ),
+      },
+    }))
+  },
+
+  // Mantiene subtaskDone/subtaskTotal en sync con el checklist real, para
+  // que el filtro de "Subtareas" y el chip de la tarjeta no queden
+  // desactualizados hasta recargar el tablero.
+  updateSelectedCardSubtasks: (subtaskDone, subtaskTotal) => {
+    const card = get().selectedCard
+    if (!card) return
+    set(s => ({
+      selectedCard: { ...card, subtaskDone, subtaskTotal },
+      cardsByColumn: {
+        ...s.cardsByColumn,
+        [card.columna_id]: (s.cardsByColumn[card.columna_id] || []).map(c =>
+          c.id === card.id ? { ...c, subtaskDone, subtaskTotal } : c
         ),
       },
     }))

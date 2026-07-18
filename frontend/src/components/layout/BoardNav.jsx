@@ -6,7 +6,7 @@ import ThemeSwitcher from './ThemeSwitcher'
 import BoardSwitcher from '../kanban/BoardSwitcher'
 import styles from './BoardNav.module.css'
 
-export default function BoardNav({ proyecto, panelOpen, onTogglePanel }) {
+export default function BoardNav({ proyecto, panelOpen, onTogglePanel, filtersOpen, onToggleFilters }) {
   const { isOpen: chatOpen, toggle: toggleChat } = useChatStore()
   const { proyectos, loadBoard, loadProyectos } = useBoardStore()
   const [showSwitcher, setShowSwitcher]       = useState(false)
@@ -92,7 +92,12 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel }) {
       </div>
 
       <div className={styles.right}>
-        <button className={styles.action}>⊟ Filtrar</button>
+        <button
+          className={`${styles.action} ${filtersOpen ? styles.actionActive : ''}`}
+          onClick={onToggleFilters}
+        >
+          ⊟ Filtrar
+        </button>
         <button className={styles.inviteBtn} onClick={() => setShowInvite(true)}>+ Invitar</button>
         <button className={styles.action}>•••</button>
         <div style={{ position: 'relative' }}>

@@ -9,7 +9,7 @@ const PRESET_COLORS = [
 ]
 
 export default function LabelPicker({ onClose, style }) {
-  const { selectedCard, proyecto, updateSelectedCardLabels } = useBoardStore()
+  const { selectedCard, proyecto, updateSelectedCardLabels, addEtiqueta } = useBoardStore()
   const [labels, setLabels]       = useState([])
   const [creating, setCreating]   = useState(false)
   const [newName, setNewName]     = useState('')
@@ -60,6 +60,7 @@ export default function LabelPicker({ onClose, style }) {
     try {
       const label = await createEtiqueta(proyecto.id, name, newColor)
       setLabels(prev => [...prev, label])
+      addEtiqueta(label) // el FilterPanel la ve sin recargar el tablero
       setNewName('')
       setCreating(false)
     } finally { setSaving(false) }
