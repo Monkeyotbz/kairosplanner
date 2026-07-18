@@ -109,6 +109,25 @@ export async function addMemberToProject(proyectoId, userId) {
   if (error) throw error
 }
 
+// ── Invitaciones por enlace ────────────────────────────────────
+export async function createInvitacion(proyectoId) {
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data, error } = await supabase
+    .from('invitaciones')
+    .insert({ proyecto_id: proyectoId, creado_por: user.id })
+    .select('id')
+    .single()
+  if (error) throw error
+  return data.id
+}
+
+// Devuelve el proyecto_id al que quedaste unido.
+export async function acceptInvitation(inviteId) {
+  const { data, error } = await supabase.rpc('accept_invitation', { invite_id: inviteId })
+  if (error) throw error
+  return data
+}
+
 export async function getProjectMembers(proyectoId) {
   const { data: membersData } = await supabase
     .from('miembros')
