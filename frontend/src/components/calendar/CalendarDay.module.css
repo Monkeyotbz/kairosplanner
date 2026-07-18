@@ -46,7 +46,8 @@
   display: block;
   width: 100%;
   text-align: left;
-  background: var(--kairos-bg-col);
+  /* Fondo sólido (negro/blanco según tema) para leer el mes de un vistazo */
+  background: var(--kairos-event-bg);
   border: none;
   border-left: 3px solid var(--chip-bar, var(--kairos-purple-600));
   border-radius: 3px;
@@ -57,11 +58,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: background 0.12s;
+  transition: filter 0.12s, box-shadow 0.12s;
 }
 
 .chip:hover {
-  background: rgba(255,255,255,0.1);
+  box-shadow: inset 0 0 0 1px var(--kairos-border-2), 0 0 0 1px var(--kairos-border-2);
 }
 
 .more {

@@ -56,14 +56,10 @@
   border-radius: 16px;
   cursor: pointer;
   font-family: var(--kairos-font);
-  background:
-    linear-gradient(135deg,
-      color-mix(in srgb, var(--accent) 18%, transparent),
-      color-mix(in srgb, var(--accent) 7%, transparent)),
-    var(--kairos-glass-card-bg);
-  -webkit-backdrop-filter: var(--kairos-glass-card-filter);
-  backdrop-filter: var(--kairos-glass-card-filter);
-  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--kairos-glass-border));
+  /* Fondo sólido (negro/blanco según tema); el color del proyecto queda
+     en el borde y la sombra para no sacrificar legibilidad. */
+  background: var(--kairos-event-bg);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--kairos-glass-border));
   box-shadow: 0 6px 22px color-mix(in srgb, var(--accent) 16%, transparent);
   transition: transform 0.14s ease, box-shadow 0.14s ease;
 }

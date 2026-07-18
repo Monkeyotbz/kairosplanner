@@ -66,6 +66,9 @@
   --kairos-input-bg:      rgba(255,255,255,0.06);
   --kairos-input-border:  rgba(255,255,255,0.12);
   --kairos-modal-bg:      #1a1625;
+  /* Fondo sólido de los eventos del calendario: negro puro en temas
+     oscuros, blanco puro en Snow — máxima legibilidad del tiempo. */
+  --kairos-event-bg:      #000000;
 
   /* ── Sombras ── */
   --kairos-shadow-card:   0 2px 8px rgba(0, 0, 0, 0.18);
@@ -243,6 +246,7 @@
   --kairos-glass-card-filter: none;
   --kairos-card-text-color:   var(--kairos-text-card);
   --kairos-modal-bg:      #FFFFFF;
+  --kairos-event-bg:      #FFFFFF;
   --kairos-surface-1:     rgba(0,0,0,0.03);
   --kairos-surface-2:     rgba(0,0,0,0.06);
   --kairos-surface-3:     rgba(0,0,0,0.10);

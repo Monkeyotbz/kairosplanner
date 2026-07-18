@@ -4,7 +4,6 @@ import CalendarGrid from '../components/calendar/CalendarGrid'
 import DayBlocks    from '../components/calendar/DayBlocks'
 import KairosFlow   from '../components/calendar/KairosFlow'
 import CardDetailModal from '../components/kanban/CardDetailModal'
-import AgendaMusic from '../components/calendar/AgendaMusic'
 import styles from './CalendarPage.module.css'
 
 /* ─── helpers de fecha ─────────────────────────────────────── */
@@ -206,8 +205,6 @@ export default function CalendarPage() {
             cardKeys={cardKeys}
           />
 
-          {/* Mini-reproductor de música — llena el espacio del sidebar */}
-          <AgendaMusic />
         </aside>
 
         {/* Main: vista activa */}
