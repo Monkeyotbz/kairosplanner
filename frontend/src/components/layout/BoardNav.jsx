@@ -141,18 +141,25 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel, filtersOp
         <div className={styles.inviteOverlay} onClick={e => e.target === e.currentTarget && setShowInvite(false)}>
           <div className={styles.inviteModal}>
             <div className={styles.inviteHeader}>
-              <h3>Invitar al proyecto</h3>
-              <button onClick={() => { setShowInvite(false); setSearchQ(''); setResults([]) }}>✕</button>
+              <div>
+                <h3>Invitar al proyecto</h3>
+                <p className={styles.inviteSub}>Agrega personas por su nombre o comparte el enlace del tablero</p>
+              </div>
+              <button onClick={() => { setShowInvite(false); setSearchQ(''); setResults([]) }} aria-label="Cerrar">✕</button>
             </div>
 
             {/* Buscar usuarios */}
-            <input
-              className={styles.inviteSearch}
-              placeholder="Buscar por nombre o correo..."
-              value={searchQ}
-              onChange={e => setSearchQ(e.target.value)}
-              autoFocus
-            />
+            <span className={styles.inviteLabel}><i className="ti ti-user-plus" /> Agregar personas</span>
+            <div className={styles.searchWrap}>
+              <i className={`ti ti-search ${styles.searchIcon}`} />
+              <input
+                className={styles.inviteSearch}
+                placeholder="Buscar por nombre o correo..."
+                value={searchQ}
+                onChange={e => setSearchQ(e.target.value)}
+                autoFocus
+              />
+            </div>
 
             {/* Resultados de búsqueda */}
             {results.length > 0 && (
@@ -201,12 +208,17 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel, filtersOp
               </div>
             )}
 
-            <div className={styles.inviteLink}>
-              <span className={styles.inviteLinkText} style={linkError ? { color: '#fca07a' } : undefined}>
+            <div className={styles.inviteDivider} />
+
+            <span className={styles.inviteLabel}><i className="ti ti-link" /> Enlace de invitación</span>
+            <p className={styles.inviteHint}>Cualquier persona con este enlace se une al proyecto como miembro.</p>
+            <div className={`${styles.inviteLink} ${linkError ? styles.inviteLinkError : ''}`}>
+              <i className={`ti ${linkError ? 'ti-alert-triangle' : 'ti-world'} ${styles.inviteLinkIcon}`} />
+              <span className={styles.inviteLinkText}>
                 {linkError ? linkError : inviteLink ? inviteLink.replace(/^https?:\/\//, '') : 'Generando enlace…'}
               </span>
               <button
-                className={styles.copyBtn}
+                className={`${styles.copyBtn} ${linkCopied ? styles.copyBtnDone : ''}`}
                 disabled={!inviteLink}
                 onClick={() => {
                   navigator.clipboard.writeText(inviteLink)
@@ -214,7 +226,7 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel, filtersOp
                   setTimeout(() => setLinkCopied(false), 2000)
                 }}
               >
-                {linkCopied ? '✓ Copiado' : 'Copiar enlace'}
+                {linkCopied ? '✓ Copiado' : 'Copiar'}
               </button>
             </div>
           </div>
