@@ -99,7 +99,7 @@ export default function Board({ activeFilters }) {
 
     if (newColId && oldColId && newColId !== oldColId) {
       setCardsByColumn(finalCards)
-      await persistMove(active.id, newColId)
+      await persistMove(active.id, newColId, oldColId)
     }
   }
 

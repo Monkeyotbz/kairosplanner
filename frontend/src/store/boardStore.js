@@ -7,12 +7,23 @@ import {
 import { withRetry, isTimeoutError } from '../services/supabase'
 import { enqueue, flush, hasPending } from '../services/syncQueue'
 import { onReconnect, isOnline } from '../services/connection'
+import { getActividad, saveActividad } from '../services/actividadService'
+import { useAuthStore } from './authStore'
 
 // Reintento automático de carga: si loadBoard falla, se reprograma solo con
 // backoff (5s, 10s... máx 30s) — el usuario nunca tiene que recargar a mano.
 let _retryTimer = null
 let _retryAttempt = 0
 let _loadedAt = 0
+
+function actor() {
+  const { nombre, email } = useAuthStore.getState().profile ?? {}
+  return nombre || email || 'Alguien'
+}
+
+function makeActItem(nombre, descripcion) {
+  return { id: `${Date.now()}-${Math.random()}`, nombre_usuario: nombre, descripcion, created_at: new Date().toISOString() }
+}
 
 export const useBoardStore = create((set, get) => ({
   proyectos: [],
@@ -21,6 +32,7 @@ export const useBoardStore = create((set, get) => ({
   columns: [],
   cardsByColumn: {},
   etiquetas: [],
+  actividad: [],
   selectedCard: null,
   searchQuery: '',
   loading: true,
@@ -73,6 +85,9 @@ export const useBoardStore = create((set, get) => ({
       // registra al crear). No bloquea la carga del tablero.
       getProyectoEtiquetas(proyecto.id).then(items => set({ etiquetas: items })).catch(() => {})
 
+      // Historial de actividad del proyecto (feed del SidePanel)
+      getActividad(proyecto.id).then(items => set({ actividad: items })).catch(() => {})
+
       // Retomar un cronómetro que quedó corriendo (cierre de pestaña, F5…)
       getRegistroTiempoActivo().then(registro => {
         if (!registro) return
@@ -121,6 +136,17 @@ export const useBoardStore = create((set, get) => ({
   // FilterPanel la vea sin tener que recargar el tablero.
   addEtiqueta: (etiqueta) => set(s => ({ etiquetas: [...s.etiquetas, etiqueta] })),
 
+  // Registrar actividad propia: al estado ya (feed en vivo) y a Supabase
+  // en segundo plano (historial entre sesiones y para otros miembros).
+  _log: (descripcion) => {
+    const nombre = actor()
+    const userId = useAuthStore.getState().user?.id
+    const proyectoId = get().proyecto?.id
+    const item = makeActItem(nombre, descripcion)
+    set(s => ({ actividad: [...s.actividad, item] }))
+    if (proyectoId) saveActividad(proyectoId, userId, nombre, descripcion).catch(console.error)
+  },
+
   // Elimina un proyecto/tablero por completo (cascade en Supabase)
   removeProyecto: async (proyectoId) => {
     await deleteProject(proyectoId)
@@ -151,12 +177,16 @@ export const useBoardStore = create((set, get) => ({
         [columnaId]: [...(s.cardsByColumn[columnaId] || []), card],
       },
     }))
+    const colName = get().columns.find(c => c.id === columnaId)?.nombre || ''
+    get()._log(`creó "${titulo}"${colName ? ` en ${colName}` : ''}`)
     return card
   },
 
   // Mover una tarjeta entre columnas por id (usado por ABAD y futuras acciones)
   moveCardToColumn: async (cardId, fromCol, toCol) => {
     if (fromCol === toCol) return
+    const cardInfo = (get().cardsByColumn[fromCol] || []).find(c => c.id === cardId)
+    const toColName = get().columns.find(c => c.id === toCol)?.nombre || ''
     set(s => {
       const card = (s.cardsByColumn[fromCol] || []).find(c => c.id === cardId)
       if (!card) return {}
@@ -169,9 +199,11 @@ export const useBoardStore = create((set, get) => ({
       }
     })
     enqueue('card.move', { id: cardId, columna_id: toCol })
+    get()._log(`movió "${cardInfo?.titulo || ''}"${toColName ? ` a ${toColName}` : ''}`)
   },
 
   removeCard: async (cardId, columnaId) => {
+    const cardInfo = (get().cardsByColumn[columnaId] || []).find(c => c.id === cardId)
     set(s => ({
       cardsByColumn: {
         ...s.cardsByColumn,
@@ -179,6 +211,7 @@ export const useBoardStore = create((set, get) => ({
       },
     }))
     enqueue('card.delete', { id: cardId })
+    get()._log(`eliminó "${cardInfo?.titulo || ''}"`)
   },
 
   selectCard: (card) => set({ selectedCard: card }),
@@ -293,6 +326,7 @@ export const useBoardStore = create((set, get) => ({
       columns: [...s.columns, row],
       cardsByColumn: { ...s.cardsByColumn, [row.id]: [] },
     }))
+    get()._log(`creó la lista "${row.nombre}"`)
   },
 
   editColumn: async (id, fields) => {
@@ -301,12 +335,14 @@ export const useBoardStore = create((set, get) => ({
   },
 
   removeColumn: async (id) => {
+    const colName = get().columns.find(c => c.id === id)?.nombre || ''
     set(s => {
       const next = { ...s.cardsByColumn }
       delete next[id]
       return { columns: s.columns.filter(c => c.id !== id), cardsByColumn: next }
     })
     enqueue('column.delete', { id })
+    get()._log(`eliminó la lista "${colName}"`)
   },
 
   // Reordenar columnas por lista de ids (drag o menú)
@@ -369,8 +405,13 @@ export const useBoardStore = create((set, get) => ({
 
   setCardsByColumn: (cardsByColumn) => set({ cardsByColumn }),
 
-  persistMove: async (cardId, newColId) => {
+  persistMove: async (cardId, newColId, fromCol = null) => {
     enqueue('card.move', { id: cardId, columna_id: newColId })
+    if (fromCol && fromCol !== newColId) {
+      const card = (get().cardsByColumn[newColId] || []).find(c => c.id === cardId)
+      const toColName = get().columns.find(c => c.id === newColId)?.nombre || ''
+      get()._log(`movió "${card?.titulo || ''}"${toColName ? ` a ${toColName}` : ''}`)
+    }
   },
 }))
 

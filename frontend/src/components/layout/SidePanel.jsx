@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useFocusStore } from '../../store/focusStore'
+import { useBoardStore } from '../../store/boardStore'
 import styles from './SidePanel.module.css'
 
 function formatTime(seconds) {
@@ -10,9 +11,25 @@ function formatTime(seconds) {
   return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
 }
 
+function timeAgo(dateStr) {
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000)
+  if (diff < 60)    return 'hace un momento'
+  if (diff < 3600)  return `hace ${Math.floor(diff / 60)} min`
+  if (diff < 86400) return `hace ${Math.floor(diff / 3600)} h`
+  return `hace ${Math.floor(diff / 86400)} d`
+}
+
+function actIcon(descripcion) {
+  if (descripcion.includes('movió'))   return 'ti-arrows-move'
+  if (descripcion.includes('eliminó')) return 'ti-trash'
+  if (descripcion.includes('lista'))   return 'ti-layout-columns'
+  return 'ti-plus'
+}
+
 export default function SidePanel({ onClose }) {
   const navigate = useNavigate()
   const { phase, tipo, duracion_plan_min, elapsedSeconds, startBreak, finishSession } = useFocusStore()
+  const actividad = useBoardStore(s => s.actividad)
 
   const isActive   = phase === 'active'
   const isPomodoro = tipo === 'pomodoro'
@@ -45,6 +62,31 @@ export default function SidePanel({ onClose }) {
           <button className={styles.startFocusBtn} onClick={() => navigate('/focus')}>
             ◎ Iniciar sesión de enfoque
           </button>
+        )}
+      </div>
+
+      <div className={styles.divider} />
+
+      {/* ── Historial de actividad ── */}
+      <div className={styles.section}>
+        <p className={styles.sectionLabel}>Actividad reciente</p>
+        {actividad.length === 0 ? (
+          <p className={styles.actEmpty}>Sin actividad aún</p>
+        ) : (
+          <ul className={styles.actList}>
+            {[...actividad].reverse().map(a => (
+              <li key={a.id} className={styles.actItem}>
+                <span className={styles.actIconWrap}>
+                  <i className={`ti ${actIcon(a.descripcion)}`} />
+                </span>
+                <div className={styles.actBody}>
+                  <span className={styles.actNombre}>{a.nombre_usuario}</span>
+                  {' '}{a.descripcion}
+                  <span className={styles.actTime}>{timeAgo(a.created_at)}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
 
