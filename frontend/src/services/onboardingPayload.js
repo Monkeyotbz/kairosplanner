@@ -4,7 +4,7 @@
 
 import { savePerfilKairos } from './perfilKairosService'
 import { createCategoria, setPresupuesto } from './financeService'
-import { createProjectForOnboarding, createCard } from './boardService'
+import { createProjectForOnboarding, createCard, updateCard } from './boardService'
 
 // ── Mapas de configuración ────────────────────────────────────
 
@@ -153,7 +153,6 @@ export async function ejecutarPayloadOnboarding(respuestas) {
     try {
       const card = await createCard({ columna_id: primeraColumnaId, titulo: tarea.texto.trim() })
       if (fl && card?.id) {
-        const { updateCard } = await import('./boardService')
         await updateCard(card.id, { fecha_limite: fl }).catch(() => {})
       }
     } catch (_) {}
