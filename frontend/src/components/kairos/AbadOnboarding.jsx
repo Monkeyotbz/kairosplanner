@@ -4,6 +4,7 @@ import { useOnboardingDespertarStore } from '../../store/onboardingDespertarStor
 import { ejecutarPayloadOnboarding } from '../../services/onboardingPayload'
 import { useSpeech } from '../../hooks/useSpeech'
 import styles from './AbadOnboarding.module.css'
+import { IconVolume, IconVolume3 } from '@tabler/icons-react'
 
 // ── Mapas de display ──────────────────────────────────────────
 
@@ -459,7 +460,7 @@ export default function AbadOnboarding({ preview = false, onExit }) {
           title={isMuted ? 'Activar voz de ABAD' : 'Silenciar voz de ABAD'}
           aria-label={isMuted ? 'Activar voz' : 'Silenciar voz'}
         >
-          <i className={isMuted ? 'ti ti-volume-3' : 'ti ti-volume'} />
+          {isMuted ? <IconVolume3 size="1em" /> : <IconVolume size="1em" />}
         </button>
 
         {/* Barra de progreso */}

@@ -4,6 +4,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { useBoardStore } from '../../store/boardStore'
 import { useFocusStore } from '../../store/focusStore'
 import styles from './Card.module.css'
+import { IconCalendarEvent, IconCircleCheck, IconCheckbox } from '@tabler/icons-react'
 
 const PRIORITY_MAP = {
   alta: { label: 'Alta', cls: styles.priorityAlta },
@@ -118,14 +119,14 @@ export default function Card({ card, columnaId, isOverlay = false }) {
             <div className={styles.meta}>
               {deadline && (
                 <span className={`${styles.deadlineChip} ${styles['deadline_' + deadline.status]}`}>
-                  <i className="ti ti-calendar-event" />
+                  <IconCalendarEvent size="1em" />
                   {deadline.label}
                 </span>
               )}
 
               {hasSubs && (
                 <span className={`${styles.subsChip} ${allDone ? styles.subsChipDone : ''}`}>
-                  <i className={`ti ${allDone ? 'ti-circle-check' : 'ti-checkbox'}`} />
+                  {allDone ? <IconCircleCheck size="1em" /> : <IconCheckbox size="1em" />}
                   {card.subtaskDone}/{card.subtaskTotal}
                 </span>
               )}

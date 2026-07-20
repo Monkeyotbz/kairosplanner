@@ -2,6 +2,15 @@ import { useEffect, useState } from 'react'
 import { getPresupuestos } from '../../services/financeService'
 import { calcHealthScore, scoreColor, scoreLabel } from '../../services/financeAnalytics'
 import styles from './HealthScore.module.css'
+import { IconChevronUp, IconChevronDown, IconPigMoney, IconCreditCard, IconShield, IconTarget, IconTrendingUp } from '@tabler/icons-react'
+
+const INDICATOR_ICONS = {
+  'ti-piggy-bank': IconPigMoney,
+  'ti-credit-card': IconCreditCard,
+  'ti-shield': IconShield,
+  'ti-target': IconTarget,
+  'ti-trending-up': IconTrendingUp,
+}
 
 export default function HealthScore({ summary, recurrencias, transacciones, year, month }) {
   const [presupuestos, setPresupuestos] = useState([])
@@ -51,14 +60,14 @@ export default function HealthScore({ summary, recurrencias, transacciones, year
               return (
                 <li key={i} className={styles.item}>
                   <button className={styles.itemBtn} onClick={() => setExpanded(isOpen ? null : i)}>
-                    <i className={`ti ${ind.icono} ${styles.itemIcon}`} style={{ color: c }} />
+                    {(() => { const Icon = INDICATOR_ICONS[ind.icono]; return Icon ? <Icon size="1em" className={styles.itemIcon} style={{ color: c }} /> : null })()}
                     <span className={styles.itemName}>{ind.nombre}</span>
                     <span className={styles.itemPeso}>×{ind.peso}%</span>
                     <div className={styles.barWrap}>
                       <div className={styles.bar} style={{ width: `${ind.puntaje}%`, background: c }} />
                     </div>
                     <span className={styles.itemPts} style={{ color: c }}>{ind.puntaje}pts</span>
-                    <i className={`ti ti-chevron-${isOpen ? 'up' : 'down'} ${styles.chevron}`} />
+                    {isOpen ? <IconChevronUp size="1em" className={styles.chevron} /> : <IconChevronDown size="1em" className={styles.chevron} />}
                   </button>
                   {isOpen && (
                     <div className={styles.detail}>

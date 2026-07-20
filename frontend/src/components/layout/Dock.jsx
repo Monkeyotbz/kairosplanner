@@ -9,6 +9,7 @@ import { pauseApi, resumeApi, nextApi, setVolumeApi } from '../../services/spoti
 import NotificationBell from './NotificationBell'
 import InfinityLogo from './InfinityLogo'
 import styles from './Dock.module.css'
+import { IconMusic, IconPlayerSkipForward, IconVolume, IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react'
 
 export default function Dock() {
   const navigate = useNavigate()
@@ -107,13 +108,13 @@ export default function Dock() {
             {hasSpotify && (
               <>
                 <button className={styles.miniCtrl} onClick={toggleSpotify} title={spotifyPlaying ? 'Pausar' : 'Reproducir'}>
-                  <i className={spotifyPlaying ? 'ti ti-player-pause' : 'ti ti-player-play'} />
+                  {spotifyPlaying ? <IconPlayerPause size="1em" /> : <IconPlayerPlay size="1em" />}
                 </button>
                 <button className={styles.miniCtrl} onClick={skipSpotify} title="Siguiente">
-                  <i className="ti ti-player-skip-forward" />
+                  <IconPlayerSkipForward size="1em" />
                 </button>
                 <div className={styles.vol}>
-                  <i className="ti ti-volume" />
+                  <IconVolume size="1em" />
                   <input
                     type="range" min="0" max="100" value={volume}
                     className={styles.volSlider}
@@ -130,7 +131,7 @@ export default function Dock() {
           onClick={() => setShowPlayer(!showPlayer)}
           title="Música"
         >
-          <i className="ti ti-music" />
+          <IconMusic size="1em" />
           <span className={styles.musicBtnLabel}>Música</span>
         </button>
       </div>

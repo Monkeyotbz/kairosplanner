@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { getSubtareas, createSubtarea, toggleSubtarea, deleteSubtarea } from '../../services/boardService'
 import { useBoardStore } from '../../store/boardStore'
 import styles from './CardChecklist.module.css'
+import { IconPlus, IconX, IconSquareCheckFilled, IconSquare } from '@tabler/icons-react'
 
 export default function CardChecklist({ cardId, triggerAdd = 0 }) {
   const updateSelectedCardSubtasks = useBoardStore(s => s.updateSelectedCardSubtasks)
@@ -99,7 +100,7 @@ export default function CardChecklist({ cardId, triggerAdd = 0 }) {
                 onClick={() => handleToggle(item.id, item.completada)}
                 aria-label={item.completada ? 'Marcar pendiente' : 'Marcar completada'}
               >
-                <i className={item.completada ? 'ti ti-square-check-filled' : 'ti ti-square'} />
+                {item.completada ? <IconSquareCheckFilled size="1em" /> : <IconSquare size="1em" />}
               </button>
               <span className={styles.itemText}>{item.titulo}</span>
               <button
@@ -107,7 +108,7 @@ export default function CardChecklist({ cardId, triggerAdd = 0 }) {
                 onClick={() => handleDelete(item.id)}
                 aria-label="Eliminar subtarea"
               >
-                <i className="ti ti-x" />
+                <IconX size="1em" />
               </button>
             </li>
           ))}
@@ -137,7 +138,7 @@ export default function CardChecklist({ cardId, triggerAdd = 0 }) {
         </form>
       ) : (
         <button className={styles.addBtn} onClick={() => setAdding(true)}>
-          <i className="ti ti-plus" /> Agregar subtarea
+          <IconPlus size="1em" /> Agregar subtarea
         </button>
       )}
 

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { formatMoney } from '../../services/financeService'
 import { detectDebts, calcPlanDeuda } from '../../services/financeAnalytics'
 import styles from './PlanDeuda.module.css'
+import { IconCircleCheck, IconFlag3, IconInfoCircle, IconMountain, IconPencil } from '@tabler/icons-react'
 
 const CAPITALS_KEY  = 'kairos-debt-capitals'
 const OVERRIDE_KEY  = 'kairos-debt-overrides'
@@ -57,9 +58,9 @@ export default function PlanDeuda({ transacciones, recurrencias, ingresos = 0 })
   if (detected.filter(d => d.tipo !== 'productiva').length === 0) {
     return (
       <section className={styles.section}>
-        <h2 className={styles.heading}><i className="ti ti-mountain" /> Plan de eliminación de deuda</h2>
+        <h2 className={styles.heading}><IconMountain size="1em" /> Plan de eliminación de deuda</h2>
         <div className={styles.empty}>
-          <i className="ti ti-circle-check" style={{ color: '#22c55e', fontSize: 28 }} />
+          <IconCircleCheck size="1em" style={{ color: '#22c55e', fontSize: 28 }} />
           <p>No se detectaron deudas elegibles para el plan.</p>
           <p className={styles.emptyHint}>Las deudas productivas (herramientas, cursos) se excluyen automáticamente.</p>
         </div>
@@ -69,7 +70,7 @@ export default function PlanDeuda({ transacciones, recurrencias, ingresos = 0 })
 
   return (
     <section className={styles.section}>
-      <h2 className={styles.heading}><i className="ti ti-mountain" /> Plan de eliminación de deuda</h2>
+      <h2 className={styles.heading}><IconMountain size="1em" /> Plan de eliminación de deuda</h2>
 
       {/* Control de pago extra */}
       <div className={styles.extraRow}>
@@ -87,7 +88,7 @@ export default function PlanDeuda({ transacciones, recurrencias, ingresos = 0 })
         ) : (
           <button className={styles.extraBtn} onClick={() => setEditExtra(true)}>
             ${formatMoney(extraMensual)}
-            <i className="ti ti-pencil" style={{ fontSize: 11, opacity: 0.5, marginLeft: 4 }} />
+            <IconPencil size="1em" style={{ fontSize: 11, opacity: 0.5, marginLeft: 4 }} />
           </button>
         )}
       </div>
@@ -126,7 +127,7 @@ export default function PlanDeuda({ transacciones, recurrencias, ingresos = 0 })
         {(metodo === 'avalancha' ? plan.avalancha : plan.bolaNieve).length === 0
           ? (
             <div className={styles.noExtra}>
-              <i className="ti ti-info-circle" />
+              <IconInfoCircle size="1em" />
               Define un pago extra mensual para ver cuándo quedarías libre de deuda.
             </div>
           )
@@ -155,7 +156,7 @@ export default function PlanDeuda({ transacciones, recurrencias, ingresos = 0 })
                       title="Editar capital"
                     >
                       ${formatMoney(d.capital)}
-                      <i className="ti ti-pencil" style={{ fontSize: 10, opacity: 0.4, marginLeft: 3 }} />
+                      <IconPencil size="1em" style={{ fontSize: 10, opacity: 0.4, marginLeft: 3 }} />
                     </button>
                   </div>
                   <div className={styles.barWrap}>
@@ -170,7 +171,7 @@ export default function PlanDeuda({ transacciones, recurrencias, ingresos = 0 })
 
       {meses > 0 && (
         <div className={styles.resumen}>
-          <i className="ti ti-flag-3" />
+          <IconFlag3 size="1em" />
           Con este plan quedarías libre de deuda en <strong>{meses} mes{meses !== 1 ? 'es' : ''}</strong>
           {' '}({fechaEn(meses)}).
         </div>

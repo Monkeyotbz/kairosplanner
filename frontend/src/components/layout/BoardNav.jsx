@@ -5,6 +5,7 @@ import { createProject, searchUsuarios, addMemberToProject, getProjectMembers, c
 import ThemeSwitcher from './ThemeSwitcher'
 import BoardSwitcher from '../kanban/BoardSwitcher'
 import styles from './BoardNav.module.css'
+import { IconLink, IconMessageCircle, IconPalette, IconUserPlus, IconSearch, IconAlertTriangle, IconWorld } from '@tabler/icons-react'
 
 export default function BoardNav({ proyecto, panelOpen, onTogglePanel, filtersOpen, onToggleFilters }) {
   const { isOpen: chatOpen, toggle: toggleChat } = useChatStore()
@@ -116,7 +117,7 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel, filtersOp
             onClick={() => setShowTheme(v => !v)}
             title="Cambiar apariencia"
           >
-            <i className="ti ti-palette" style={{ fontSize: 15 }} />
+            <IconPalette size="1em" style={{ fontSize: 15 }} />
           </button>
           <ThemeSwitcher open={showTheme} onClose={() => setShowTheme(false)} />
         </div>
@@ -125,7 +126,7 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel, filtersOp
           onClick={toggleChat}
           title={chatOpen ? 'Cerrar chat' : 'Chat del proyecto'}
         >
-          <i className="ti ti-message-circle" style={{ fontSize: 15 }} />
+          <IconMessageCircle size="1em" style={{ fontSize: 15 }} />
         </button>
         <button
           className={`${styles.panelBtn} ${panelOpen ? styles.panelBtnActive : ''}`}
@@ -149,9 +150,9 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel, filtersOp
             </div>
 
             {/* Buscar usuarios */}
-            <span className={styles.inviteLabel}><i className="ti ti-user-plus" /> Agregar personas</span>
+            <span className={styles.inviteLabel}><IconUserPlus size="1em" /> Agregar personas</span>
             <div className={styles.searchWrap}>
-              <i className={`ti ti-search ${styles.searchIcon}`} />
+              <IconSearch size="1em" className={styles.searchIcon} />
               <input
                 className={styles.inviteSearch}
                 placeholder="Buscar por nombre o correo..."
@@ -210,10 +211,10 @@ export default function BoardNav({ proyecto, panelOpen, onTogglePanel, filtersOp
 
             <div className={styles.inviteDivider} />
 
-            <span className={styles.inviteLabel}><i className="ti ti-link" /> Enlace de invitación</span>
+            <span className={styles.inviteLabel}><IconLink size="1em" /> Enlace de invitación</span>
             <p className={styles.inviteHint}>Cualquier persona con este enlace se une al proyecto como miembro.</p>
             <div className={`${styles.inviteLink} ${linkError ? styles.inviteLinkError : ''}`}>
-              <i className={`ti ${linkError ? 'ti-alert-triangle' : 'ti-world'} ${styles.inviteLinkIcon}`} />
+              {linkError ? <IconAlertTriangle size="1em" className={styles.inviteLinkIcon} /> : <IconWorld size="1em" className={styles.inviteLinkIcon} />}
               <span className={styles.inviteLinkText}>
                 {linkError ? linkError : inviteLink ? inviteLink.replace(/^https?:\/\//, '') : 'Generando enlace…'}
               </span>

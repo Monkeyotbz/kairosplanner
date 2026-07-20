@@ -7,6 +7,7 @@ import {
   getMe, getPlaylists,
 } from '../../services/spotifyService'
 import styles from './MusicPlayer.module.css'
+import { IconMusic, IconPlayerPlay, IconPlayerSkipBack, IconPlayerSkipForward, IconPlayerStop, IconPlaylist, IconPlus, IconUnlink, IconVolume, IconX, IconPlayerPause } from '@tabler/icons-react'
 
 // ── YouTube helpers ───────────────────────────────────────────
 function extractYtInfo(url) {
@@ -206,7 +207,7 @@ export default function MusicPlayer() {
           </button>
         </div>
         <button className={styles.closeBtn} onClick={() => setShowPlayer(false)}>
-          <i className="ti ti-x" />
+          <IconX size="1em" />
         </button>
       </div>
 
@@ -244,7 +245,7 @@ export default function MusicPlayer() {
                   </p>
                 </div>
                 <button className={styles.disconnectBtn} onClick={handleDisconnect} title="Desconectar">
-                  <i className="ti ti-unlink" />
+                  <IconUnlink size="1em" />
                 </button>
               </div>
 
@@ -268,13 +269,13 @@ export default function MusicPlayer() {
 
               {/* Controls */}
               <div className={styles.controls}>
-                <button className={styles.ctrlBtn} onClick={handlePrev}><i className="ti ti-player-skip-back" /></button>
+                <button className={styles.ctrlBtn} onClick={handlePrev}><IconPlayerSkipBack size="1em" /></button>
                 <button className={`${styles.ctrlBtn} ${styles.ctrlBtnMain}`} onClick={handleToggle} disabled={!sdkReady}>
-                  <i className={spotifyPlaying ? 'ti ti-player-pause' : 'ti ti-player-play'} />
+                  {spotifyPlaying ? <IconPlayerPause size="1em" /> : <IconPlayerPlay size="1em" />}
                 </button>
-                <button className={styles.ctrlBtn} onClick={handleNext}><i className="ti ti-player-skip-forward" /></button>
+                <button className={styles.ctrlBtn} onClick={handleNext}><IconPlayerSkipForward size="1em" /></button>
                 <div className={styles.volWrap}>
-                  <i className="ti ti-volume" style={{ fontSize: 13, color: 'var(--kairos-text-muted)' }} />
+                  <IconVolume size="1em" style={{ fontSize: 13, color: 'var(--kairos-text-muted)' }} />
                   <input
                     type="range" min="0" max="100" value={volume}
                     className={styles.volSlider}
@@ -294,13 +295,13 @@ export default function MusicPlayer() {
                       <button key={pl.id} className={styles.plItem} onClick={() => handlePlayPlaylist(pl)}>
                         {pl.images?.[0]?.url
                           ? <img src={pl.images[0].url} className={styles.plThumb} alt="" />
-                          : <div className={styles.plThumbFallback}><i className="ti ti-music" /></div>
+                          : <div className={styles.plThumbFallback}><IconMusic size="1em" /></div>
                         }
                         <div className={styles.plInfo}>
                           <span className={styles.plName}>{pl.name}</span>
                           <span className={styles.plTracks}>{pl.tracks?.total ?? '–'} canciones</span>
                         </div>
-                        <i className="ti ti-player-play" style={{ fontSize: 13, color: 'var(--kairos-text-muted)', flexShrink: 0 }} />
+                        <IconPlayerPlay size="1em" style={{ fontSize: 13, color: 'var(--kairos-text-muted)', flexShrink: 0 }} />
                       </button>
                     ))}
                   </div>
@@ -330,11 +331,11 @@ export default function MusicPlayer() {
               <p className={styles.ytNowPlaying}>
                 <span className={styles.ytDot} /> {ytCurrent.nombre}
                 <button className={styles.ytStopBtn} onClick={() => setYtCurrent(null)}>
-                  <i className="ti ti-player-stop" />
+                  <IconPlayerStop size="1em" />
                 </button>
               </p>
               <div className={styles.volWrap}>
-                <i className="ti ti-volume" style={{ fontSize: 13, color: 'var(--kairos-text-muted)' }} />
+                <IconVolume size="1em" style={{ fontSize: 13, color: 'var(--kairos-text-muted)' }} />
                 <input
                   type="range" min="0" max="100" value={ytVolume}
                   className={styles.volSlider}
@@ -365,17 +366,17 @@ export default function MusicPlayer() {
                             loading="lazy"
                             onError={e => { e.currentTarget.onerror = null; e.currentTarget.style.display = 'none' }}
                           />
-                        : <div className={styles.ytThumbFallback}><i className="ti ti-playlist" /></div>
+                        : <div className={styles.ytThumbFallback}><IconPlaylist size="1em" /></div>
                       }
                       <div className={styles.ytThumbOverlay}>
-                        <i className={isPlaying ? 'ti ti-player-stop' : 'ti ti-player-play'} />
+                        {isPlaying ? <IconPlayerStop size="1em" /> : <IconPlayerPlay size="1em" />}
                       </div>
                     </div>
                     <div className={styles.ytCardMeta}>
                       <span className={styles.ytCardName}>{pl.nombre}</span>
                       {pl.id.startsWith('yt_') && Number(pl.id.replace('yt_', '')) > 5 && (
                         <button className={styles.ytDeleteBtn} onClick={() => removeYtPlaylist(pl.id)}>
-                          <i className="ti ti-x" />
+                          <IconX size="1em" />
                         </button>
                       )}
                     </div>
@@ -403,7 +404,7 @@ export default function MusicPlayer() {
               />
               {ytAddErr && <p className={styles.errorMsg}>{ytAddErr}</p>}
               <button type="submit" className={styles.ytAddBtn} disabled={!ytUrl.trim()}>
-                <i className="ti ti-plus" /> Agregar
+                <IconPlus size="1em" /> Agregar
               </button>
             </form>
           </div>

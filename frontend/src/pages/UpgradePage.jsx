@@ -5,16 +5,17 @@ import { createSubscription, cancelSubscription } from '../services/subscription
 import InfinityLogo from '../components/layout/InfinityLogo'
 import StarField from '../components/layout/StarField'
 import styles from './UpgradePage.module.css'
+import { IconAlertCircle, IconArrowLeft, IconCircleCheck, IconCircleX, IconClock, IconClockOff, IconCreditCard, IconLayoutKanban, IconLock, IconShieldCheck, IconX, IconBrain, IconChartAreaLine, IconCoin, IconFlame, IconPlayerPlay, IconMusic, IconTimeline } from '@tabler/icons-react'
 
 const FEATURES = [
-  { icon: 'ti-layout-kanban', text: 'Tablero Kanban ilimitado con colaboración' },
-  { icon: 'ti-brain',         text: 'ABAD — asistente IA con voz y contexto financiero' },
-  { icon: 'ti-chart-area-line', text: 'Flujo de caja predictivo con recurrentes' },
-  { icon: 'ti-coin',          text: 'Presupuestos Zero-Based por categoría' },
-  { icon: 'ti-flame',         text: 'Sistema de rangos griegos y XP de enfoque' },
-  { icon: 'ti-player-play',   text: 'Modo Enfoque inmersivo con cápsula' },
-  { icon: 'ti-music',         text: 'Reproductor integrado YouTube + Spotify' },
-  { icon: 'ti-timeline',      text: 'Agenda inteligente con bloques de energía' },
+  { icon: IconLayoutKanban,  text: 'Tablero Kanban ilimitado con colaboración' },
+  { icon: IconBrain,         text: 'ABAD — asistente IA con voz y contexto financiero' },
+  { icon: IconChartAreaLine, text: 'Flujo de caja predictivo con recurrentes' },
+  { icon: IconCoin,          text: 'Presupuestos Zero-Based por categoría' },
+  { icon: IconFlame,         text: 'Sistema de rangos griegos y XP de enfoque' },
+  { icon: IconPlayerPlay,    text: 'Modo Enfoque inmersivo con cápsula' },
+  { icon: IconMusic,         text: 'Reproductor integrado YouTube + Spotify' },
+  { icon: IconTimeline,      text: 'Agenda inteligente con bloques de energía' },
 ]
 
 export default function UpgradePage() {
@@ -66,7 +67,7 @@ export default function UpgradePage() {
       {!isExpired && !isPastDue && (
         <div className={styles.nav}>
           <Link to="/board" className={styles.navBack}>
-            <i className="ti ti-arrow-left" /> Volver al tablero
+            <IconArrowLeft size="1em" /> Volver al tablero
           </Link>
         </div>
       )}
@@ -81,25 +82,25 @@ export default function UpgradePage() {
         {/* Aviso de estado */}
         {isExpired && (
           <div className={`${styles.notice} ${styles.noticeWarn}`}>
-            <i className="ti ti-clock-off" />
+            <IconClockOff size="1em" />
             Tu período de prueba ha terminado. Activa tu plan para continuar usando KAIROS.
           </div>
         )}
         {isPastDue && (
           <div className={`${styles.notice} ${styles.noticeWarn}`}>
-            <i className="ti ti-alert-circle" />
+            <IconAlertCircle size="1em" />
             Tu suscripción tiene un pago pendiente. Actualiza tu método de pago.
           </div>
         )}
         {!isExpired && !isPastDue && !isActive && trialDaysLeft > 0 && (
           <div className={`${styles.notice} ${styles.noticeTrial}`}>
-            <i className="ti ti-clock" />
+            <IconClock size="1em" />
             Te quedan <strong>{trialDaysLeft} día{trialDaysLeft !== 1 ? 's' : ''}</strong> de prueba gratuita.
           </div>
         )}
         {isActive && (
           <div className={`${styles.notice} ${styles.noticeOk}`}>
-            <i className="ti ti-circle-check" />
+            <IconCircleCheck size="1em" />
             Tu suscripción está activa. ¡Gracias por apoyar KAIROS!
           </div>
         )}
@@ -125,7 +126,7 @@ export default function UpgradePage() {
           <ul className={styles.features}>
             {FEATURES.map(f => (
               <li key={f.text} className={styles.feature}>
-                <i className={`ti ${f.icon} ${styles.featIcon}`} />
+                <f.icon size="1em" className={styles.featIcon} />
                 <span>{f.text}</span>
               </li>
             ))}
@@ -136,14 +137,14 @@ export default function UpgradePage() {
           {isActive ? (
             <>
               <Link to="/board" className={styles.ctaBtn} style={{ textDecoration: 'none', justifyContent: 'center' }}>
-                <i className="ti ti-layout-kanban" /> Ir al tablero
+                <IconLayoutKanban size="1em" /> Ir al tablero
               </Link>
               <button
                 className={styles.manageBtn}
                 onClick={handleCancel}
                 disabled={working}
               >
-                <i className="ti ti-circle-x" />
+                <IconCircleX size="1em" />
                 {working ? 'Cancelando…' : 'Cancelar suscripción'}
               </button>
             </>
@@ -156,17 +157,17 @@ export default function UpgradePage() {
               {working ? (
                 <><span className={styles.btnSpinner} /> Redirigiendo a MercadoPago…</>
               ) : (
-                <><i className="ti ti-credit-card" /> Suscribirme ahora</>
+                <><IconCreditCard size="1em" /> Suscribirme ahora</>
               )}
             </button>
           )}
 
           <div className={styles.trust}>
-            <span><i className="ti ti-lock" /> Pago seguro con MercadoPago</span>
+            <span><IconLock size="1em" /> Pago seguro con MercadoPago</span>
             <span>·</span>
-            <span><i className="ti ti-shield-check" /> PSE · Tarjetas · Efectivo</span>
+            <span><IconShieldCheck size="1em" /> PSE · Tarjetas · Efectivo</span>
             <span>·</span>
-            <span><i className="ti ti-x" /> Cancela cuando quieras</span>
+            <span><IconX size="1em" /> Cancela cuando quieras</span>
           </div>
         </div>
       </div>

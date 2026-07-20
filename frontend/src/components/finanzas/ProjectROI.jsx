@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getProyectoROI, formatMoney } from '../../services/financeService'
 import styles from './ProjectROI.module.css'
+import { IconAlertTriangle, IconClockDollar, IconPencil, IconTarget, IconTrendingDown, IconTrendingUp } from '@tabler/icons-react'
 
 const metaKey = id => `kairos-meta-tarifa-${id}`
 function readMeta(id) {
@@ -61,7 +62,7 @@ export default function ProjectROI({ proyectoId, version }) {
     <div className={`${styles.card} ${styles[estado]}`}>
       <div className={styles.head}>
         <span className={styles.title}>
-          <i className="ti ti-clock-dollar" /> Tiempo = Dinero
+          <IconClockDollar size="1em" /> Tiempo = Dinero
         </span>
         <span className={styles.sub}>Rentabilidad acumulada del proyecto</span>
       </div>
@@ -105,15 +106,15 @@ export default function ProjectROI({ proyectoId, version }) {
           <div className={styles.verdict}>
             {agujero ? (
               <span className={styles.verdictText}>
-                <i className="ti ti-alert-triangle" /> Agujero financiero: los costos superan los ingresos.
+                <IconAlertTriangle size="1em" /> Agujero financiero: los costos superan los ingresos.
               </span>
             ) : bajoMeta ? (
               <span className={styles.verdictText}>
-                <i className="ti ti-trending-down" /> Por debajo de tu meta de ${formatMoney(meta)}/h.
+                <IconTrendingDown size="1em" /> Por debajo de tu meta de ${formatMoney(meta)}/h.
               </span>
             ) : (
               <span className={styles.verdictText}>
-                <i className="ti ti-trending-up" /> {meta != null
+                <IconTrendingUp size="1em" /> {meta != null
                   ? `Por encima de tu meta de $${formatMoney(meta)}/h.`
                   : `Ganas $${formatMoney(roi.gananciaPorHora)} netos por hora invertida.`}
               </span>
@@ -137,11 +138,11 @@ export default function ProjectROI({ proyectoId, version }) {
           </form>
         ) : meta != null ? (
           <button className={styles.metaChip} onClick={() => { setMetaVal(String(meta)); setEditingMeta(true) }}>
-            <i className="ti ti-target" /> Meta: ${formatMoney(meta)}/h <i className="ti ti-pencil" />
+            <IconTarget size="1em" /> Meta: ${formatMoney(meta)}/h <IconPencil size="1em" />
           </button>
         ) : (
           <button className={styles.metaChip} onClick={() => { setMetaVal(''); setEditingMeta(true) }}>
-            <i className="ti ti-target" /> Definir meta $/h
+            <IconTarget size="1em" /> Definir meta $/h
           </button>
         )}
       </div>

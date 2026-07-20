@@ -1,6 +1,7 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useBoardStore } from '../../store/boardStore'
 import styles from './CardTimerCapsule.module.css'
+import { IconPlayerStop } from '@tabler/icons-react'
 
 function formatTime(seconds) {
   const h = Math.floor(seconds / 3600)
@@ -45,7 +46,7 @@ export default function CardTimerCapsule() {
         {activeTimer.cardTitulo}
       </button>
       <button className={styles.stopBtn} onClick={stopCardTimer} title="Detener cronómetro">
-        <i className="ti ti-player-stop" aria-hidden="true" />
+        <IconPlayerStop size="1em" aria-hidden="true" />
       </button>
     </div>
   )

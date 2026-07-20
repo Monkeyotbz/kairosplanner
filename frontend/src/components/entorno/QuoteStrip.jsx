@@ -3,6 +3,7 @@ import { getActiveFrase } from '../../services/boardService'
 import { useMusicStore } from '../../store/musicStore'
 import { pauseApi, resumeApi, nextApi } from '../../services/spotifyService'
 import styles from './QuoteStrip.module.css'
+import { IconMusic, IconPlayerSkipForward, IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react'
 
 export default function QuoteStrip() {
   const [frase, setFrase] = useState(null)
@@ -54,10 +55,10 @@ export default function QuoteStrip() {
               {spArtist && <span className={styles.miniArtist}>{spArtist}</span>}
             </button>
             <button className={styles.miniCtrl} onClick={toggleSpotify} title={spotifyPlaying ? 'Pausar' : 'Reproducir'}>
-              <i className={spotifyPlaying ? 'ti ti-player-pause' : 'ti ti-player-play'} />
+              {spotifyPlaying ? <IconPlayerPause size="1em" /> : <IconPlayerPlay size="1em" />}
             </button>
             <button className={styles.miniCtrl} onClick={skipSpotify} title="Siguiente">
-              <i className="ti ti-player-skip-forward" />
+              <IconPlayerSkipForward size="1em" />
             </button>
           </div>
         )}
@@ -69,7 +70,7 @@ export default function QuoteStrip() {
               <span className={styles.miniTrack}>{ytCurrent.nombre}</span>
             </button>
             <button className={styles.miniCtrl} onClick={() => setShowPlayer(true)} title="Abrir player">
-              <i className="ti ti-music" />
+              <IconMusic size="1em" />
             </button>
           </div>
         )}
@@ -80,7 +81,7 @@ export default function QuoteStrip() {
             onClick={() => setShowPlayer(!showPlayer)}
             title="Música"
           >
-            <i className="ti ti-music" />
+            <IconMusic size="1em" />
             <span>Música</span>
           </button>
         )}

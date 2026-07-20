@@ -1,5 +1,6 @@
 import { formatMoney, deleteTransaccion } from '../../services/financeService'
 import styles from './TransactionList.module.css'
+import { IconPencil } from '@tabler/icons-react'
 
 function formatDate(d) {
   return new Date(d + 'T00:00:00').toLocaleDateString('es', { day: 'numeric', month: 'short' })
@@ -51,7 +52,7 @@ export default function TransactionList({ transacciones, onDeleted, onEdit }) {
                 </span>
 
                 <button className={styles.editBtn} onClick={() => onEdit?.(t)} title="Editar monto o fecha">
-                  <i className="ti ti-pencil" />
+                  <IconPencil size="1em" />
                 </button>
                 <button className={styles.deleteBtn} onClick={() => handleDelete(t.id)} title="Eliminar">✕</button>
               </li>

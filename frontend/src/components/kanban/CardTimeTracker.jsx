@@ -1,6 +1,7 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useBoardStore } from '../../store/boardStore'
 import styles from './CardTimeTracker.module.css'
+import { IconPlayerPlay, IconPlayerStop, IconClock, IconClockPlay } from '@tabler/icons-react'
 
 function formatDuration(totalSeconds) {
   const h = Math.floor(totalSeconds / 3600)
@@ -36,13 +37,13 @@ export default function CardTimeTracker({ cardId }) {
   return (
     <div className={styles.wrap}>
       <div className={styles.total}>
-        <i className={`ti ${runningHere ? 'ti-clock-play' : 'ti-clock'}`} aria-hidden="true" />
+        {runningHere ? <IconClockPlay size="1em" aria-hidden="true" /> : <IconClock size="1em" aria-hidden="true" />}
         <span>{displayTotal > 0 ? formatDuration(displayTotal) : 'Sin tiempo registrado'}</span>
         {runningHere && <span className={styles.livePulse} />}
       </div>
       {runningHere ? (
         <button className={styles.stopBtn} onClick={stopCardTimer}>
-          <i className="ti ti-player-stop" aria-hidden="true" /> Detener
+          <IconPlayerStop size="1em" aria-hidden="true" /> Detener
         </button>
       ) : runningElsewhere ? (
         <span className={styles.elsewhere} title={`Corriendo en "${activeTimer.cardTitulo}"`}>
@@ -50,7 +51,7 @@ export default function CardTimeTracker({ cardId }) {
         </span>
       ) : (
         <button className={styles.startBtn} onClick={() => startCardTimer(cardId)}>
-          <i className="ti ti-player-play" aria-hidden="true" /> Iniciar tiempo
+          <IconPlayerPlay size="1em" aria-hidden="true" /> Iniciar tiempo
         </button>
       )}
     </div>

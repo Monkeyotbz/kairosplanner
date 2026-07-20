@@ -4,6 +4,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { useBoardStore } from '../../store/boardStore'
 import Card from './Card'
 import styles from './Column.module.css'
+import { IconArrowLeft, IconArrowRight, IconCopy, IconPencil, IconPlus, IconTrash } from '@tabler/icons-react'
 
 const COLORS = ['#B4B2A9', '#534AB7', '#378ADD', '#EF9F27', '#639922', '#D85A30', '#D4537E', '#14b8a6']
 
@@ -97,13 +98,13 @@ export default function Column({ column, cards }) {
           {menuOpen && (
             <div className={styles.menuPopover}>
               <button className={styles.menuItem} onClick={() => { setMenuOpen(false); setAdding(true) }}>
-                <i className="ti ti-plus" aria-hidden="true" /> Añadir tarjeta
+                <IconPlus size="1em" aria-hidden="true" /> Añadir tarjeta
               </button>
               <button className={styles.menuItem} onClick={() => { setMenuOpen(false); setRenaming(true) }}>
-                <i className="ti ti-pencil" aria-hidden="true" /> Renombrar lista
+                <IconPencil size="1em" aria-hidden="true" /> Renombrar lista
               </button>
               <button className={styles.menuItem} onClick={() => { setMenuOpen(false); duplicateColumn(column.id) }}>
-                <i className="ti ti-copy" aria-hidden="true" /> Copiar lista
+                <IconCopy size="1em" aria-hidden="true" /> Copiar lista
               </button>
 
               <div className={styles.menuLabel}>Color de la lista</div>
@@ -122,10 +123,10 @@ export default function Column({ column, cards }) {
               <div className={styles.menuLabel}>Mover lista</div>
               <div className={styles.menuRow}>
                 <button className={styles.menuChip} onClick={() => { setMenuOpen(false); moveColumn(column.id, -1) }}>
-                  <i className="ti ti-arrow-left" /> Izquierda
+                  <IconArrowLeft size="1em" /> Izquierda
                 </button>
                 <button className={styles.menuChip} onClick={() => { setMenuOpen(false); moveColumn(column.id, 1) }}>
-                  Derecha <i className="ti ti-arrow-right" />
+                  Derecha <IconArrowRight size="1em" />
                 </button>
               </div>
 
@@ -138,7 +139,7 @@ export default function Column({ column, cards }) {
 
               <div className={styles.menuDivider} />
               <button className={`${styles.menuItem} ${styles.menuDanger}`} onClick={handleDelete}>
-                <i className="ti ti-trash" aria-hidden="true" /> Eliminar lista
+                <IconTrash size="1em" aria-hidden="true" /> Eliminar lista
               </button>
             </div>
           )}

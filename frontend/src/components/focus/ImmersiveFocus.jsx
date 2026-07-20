@@ -6,6 +6,7 @@ import { pauseApi, resumeApi, nextApi, prevApi } from '../../services/spotifySer
 import InfinityLogo from '../layout/InfinityLogo'
 import FocusCelebration from './FocusCelebration'
 import styles from './ImmersiveFocus.module.css'
+import { IconAdjustmentsHorizontal, IconArrowsMinimize, IconMusic, IconPlayerPause, IconPlayerPlay, IconPlayerSkipBack, IconPlayerSkipForward, IconPlayerStop, IconX } from '@tabler/icons-react'
 
 const RADIUS = 130
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
@@ -112,10 +113,10 @@ export default function ImmersiveFocus() {
       {/* Barra superior */}
       <div className={styles.topBar}>
         <button className={styles.minBtn} onClick={exitImmersive} title="Minimizar (Esc)">
-          <i className="ti ti-arrows-minimize" aria-hidden="true" /> Minimizar
+          <IconArrowsMinimize size="1em" aria-hidden="true" /> Minimizar
         </button>
         <button className={styles.exitBtn} onClick={abandonSession} title="Salir y descartar la sesión">
-          <i className="ti ti-x" aria-hidden="true" /> Salir
+          <IconX size="1em" aria-hidden="true" /> Salir
         </button>
       </div>
 
@@ -136,7 +137,7 @@ export default function ImmersiveFocus() {
           <div className={styles.breakTime}>{formatTime(breakSeconds)}</div>
           <p className={styles.taskDesc}>Respira un momento. Tu cerebro consolida lo trabajado.</p>
           <button className={styles.primaryBtn} onClick={() => resumeSession()}>
-            <i className="ti ti-player-play" aria-hidden="true" /> Retomar enfoque
+            <IconPlayerPlay size="1em" aria-hidden="true" /> Retomar enfoque
           </button>
         </div>
       ) : (
@@ -192,10 +193,10 @@ export default function ImmersiveFocus() {
           {/* Acciones de sesión */}
           <div className={styles.actions}>
             <button className={styles.pauseBtn} onClick={startBreak}>
-              <i className="ti ti-player-pause" aria-hidden="true" /> Pausar
+              <IconPlayerPause size="1em" aria-hidden="true" /> Pausar
             </button>
             <button className={styles.finishBtn} onClick={finishSession}>
-              <i className="ti ti-player-stop" aria-hidden="true" /> Terminar
+              <IconPlayerStop size="1em" aria-hidden="true" /> Terminar
             </button>
           </div>
         </div>
@@ -204,20 +205,20 @@ export default function ImmersiveFocus() {
       {/* Barra de música */}
       <div className={styles.musicBar}>
         <div className={styles.musicNow}>
-          <i className="ti ti-music" aria-hidden="true" />
+          <IconMusic size="1em" aria-hidden="true" />
           <span className={styles.musicText}>{nowPlaying || 'Sin música'}</span>
         </div>
 
         {spotifyTrack ? (
           <div className={styles.musicCtrls}>
             <button className={styles.musicBtn} onClick={() => prevApi(spotifyDeviceId).catch(() => {})}>
-              <i className="ti ti-player-skip-back" aria-hidden="true" />
+              <IconPlayerSkipBack size="1em" aria-hidden="true" />
             </button>
             <button className={styles.musicBtnMain} onClick={toggleSpotify}>
-              <i className={spotifyPlaying ? 'ti ti-player-pause' : 'ti ti-player-play'} aria-hidden="true" />
+              {spotifyPlaying ? <IconPlayerPause size="1em" aria-hidden="true" /> : <IconPlayerPlay size="1em" aria-hidden="true" />}
             </button>
             <button className={styles.musicBtn} onClick={() => nextApi(spotifyDeviceId).catch(() => {})}>
-              <i className="ti ti-player-skip-forward" aria-hidden="true" />
+              <IconPlayerSkipForward size="1em" aria-hidden="true" />
             </button>
           </div>
         ) : (
@@ -235,7 +236,7 @@ export default function ImmersiveFocus() {
         )}
 
         <button className={styles.musicOpen} onClick={openFullPlayer} title="Abrir reproductor completo">
-          <i className="ti ti-adjustments-horizontal" aria-hidden="true" /> Más música
+          <IconAdjustmentsHorizontal size="1em" aria-hidden="true" /> Más música
         </button>
       </div>
     </div>

@@ -9,6 +9,7 @@ import SidePanel from '../components/layout/SidePanel'
 import FilterPanel from '../components/kanban/FilterPanel'
 import CardDetailModal from '../components/kanban/CardDetailModal'
 import styles from './BoardPage.module.css'
+import { IconRefresh, IconCloudOff } from '@tabler/icons-react'
 
 function getTodayStr() {
   const d = new Date()
@@ -81,13 +82,13 @@ export default function BoardPage() {
   if (error) {
     return (
       <div className={`${styles.state} ${styles.errorState}`}>
-        <i className={`ti ti-cloud-off ${styles.errorIcon}`} aria-hidden="true" />
+        <IconCloudOff size="1em" className={styles.errorIcon} aria-hidden="true" />
         <p className={styles.error}>{error}</p>
         <p className={styles.reconnecting}>
           <span className={styles.spinner} /> Reconectando automáticamente…
         </p>
         <button className={styles.retryBtn} onClick={() => loadBoard()}>
-          <i className="ti ti-refresh" aria-hidden="true" /> Reintentar ahora
+          <IconRefresh size="1em" aria-hidden="true" /> Reintentar ahora
         </button>
       </div>
     )

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useFocusStore } from '../../store/focusStore'
 import { useBoardStore } from '../../store/boardStore'
 import styles from './SidePanel.module.css'
+import { IconArrowsMove, IconTrash, IconLayoutColumns, IconPlus } from '@tabler/icons-react'
 
 function formatTime(seconds) {
   const h = Math.floor(seconds / 3600)
@@ -20,10 +21,10 @@ function timeAgo(dateStr) {
 }
 
 function actIcon(descripcion) {
-  if (descripcion.includes('movió'))   return 'ti-arrows-move'
-  if (descripcion.includes('eliminó')) return 'ti-trash'
-  if (descripcion.includes('lista'))   return 'ti-layout-columns'
-  return 'ti-plus'
+  if (descripcion.includes('movió'))   return IconArrowsMove
+  if (descripcion.includes('eliminó')) return IconTrash
+  if (descripcion.includes('lista'))   return IconLayoutColumns
+  return IconPlus
 }
 
 export default function SidePanel({ onClose }) {
@@ -77,7 +78,7 @@ export default function SidePanel({ onClose }) {
             {[...actividad].reverse().map(a => (
               <li key={a.id} className={styles.actItem}>
                 <span className={styles.actIconWrap}>
-                  <i className={`ti ${actIcon(a.descripcion)}`} />
+                  {(() => { const ActIcon = actIcon(a.descripcion); return <ActIcon size="1em" /> })()}
                 </span>
                 <div className={styles.actBody}>
                   <span className={styles.actNombre}>{a.nombre_usuario}</span>

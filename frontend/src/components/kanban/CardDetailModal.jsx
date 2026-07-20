@@ -9,6 +9,7 @@ import LabelPicker from './LabelPicker'
 import CardComments from './CardComments'
 import CoverPicker from './CoverPicker'
 import styles from './CardDetailModal.module.css'
+import { IconAlignLeft, IconCalendar, IconChecklist, IconClockPlay, IconHourglass, IconLayoutKanban, IconMaximize, IconMessage, IconPhoto, IconPlayerPause, IconPlayerStop, IconPlus, IconTag, IconTrash, IconUser, IconUserPlus, IconX } from '@tabler/icons-react'
 
 function formatTime(seconds) {
   const h = Math.floor(seconds / 3600)
@@ -205,14 +206,14 @@ export default function CardDetailModal() {
               onError={e => { e.currentTarget.style.display = 'none' }}
             />
           )}
-          <i className="ti ti-layout-kanban" aria-hidden="true" />
+          <IconLayoutKanban size="1em" aria-hidden="true" />
           <div className={styles.coverActions}>
             <button className={styles.coverBtn} onClick={openCoverPicker}>
-              <i className="ti ti-photo" aria-hidden="true" /> Cambiar portada
+              <IconPhoto size="1em" aria-hidden="true" /> Cambiar portada
             </button>
           </div>
           <button className={styles.closeBtn} onClick={clearSelectedCard} aria-label="Cerrar">
-            <i className="ti ti-x" aria-hidden="true" />
+            <IconX size="1em" aria-hidden="true" />
           </button>
         </div>
 
@@ -239,7 +240,7 @@ export default function CardDetailModal() {
                 </span>
               )}
               <button className={styles.lblAdd} onClick={() => setShowLabels(v => !v)}>
-                <i className="ti ti-plus" aria-hidden="true" /> Etiqueta
+                <IconPlus size="1em" aria-hidden="true" /> Etiqueta
               </button>
               {showLabels && <LabelPicker onClose={() => setShowLabels(false)} />}
             </div>
@@ -270,7 +271,7 @@ export default function CardDetailModal() {
                         <span>{assignedName}</span>
                       </>
                     ) : (
-                      <><i className="ti ti-user" aria-hidden="true" /> Asignar</>
+                      <><IconUser size="1em" aria-hidden="true" /> Asignar</>
                     )}
                   </button>
                   {showAssign && (
@@ -320,7 +321,7 @@ export default function CardDetailModal() {
               <div className={styles.metaItem}>
                 <span className={styles.metaLabel}>Columna</span>
                 <div className={styles.metaVal}>
-                  <i className="ti ti-layout-kanban" style={{ color: column?.color }} aria-hidden="true" />
+                  <IconLayoutKanban size="1em" style={{ color: column?.color }} aria-hidden="true" />
                   <span>{column?.nombre}</span>
                 </div>
               </div>
@@ -329,7 +330,7 @@ export default function CardDetailModal() {
             {/* Timer block */}
             <div className={styles.timerBlock}>
               <div className={styles.timerHead}>
-                <i className="ti ti-clock-play" aria-hidden="true" />
+                <IconClockPlay size="1em" aria-hidden="true" />
                 <span className={styles.timerHeadTitle}>Temporizador de sesión</span>
               </div>
               {isActive ? (
@@ -340,23 +341,23 @@ export default function CardDetailModal() {
                   </div>
                   <div className={styles.timerBtns}>
                     <button className={styles.tBtnPause} onClick={startBreak}>
-                      <i className="ti ti-player-pause" aria-hidden="true" /> Pausar
+                      <IconPlayerPause size="1em" aria-hidden="true" /> Pausar
                     </button>
                     <button className={styles.tBtnStop} onClick={finishSession}>
-                      <i className="ti ti-player-stop" aria-hidden="true" /> Detener y guardar
+                      <IconPlayerStop size="1em" aria-hidden="true" /> Detener y guardar
                     </button>
                   </div>
                   <button className={styles.timerImmersiveBtn} style={{ marginTop: 10 }} onClick={handleImmersive}>
-                    <i className="ti ti-maximize" aria-hidden="true" /> Modo inmersivo
+                    <IconMaximize size="1em" aria-hidden="true" /> Modo inmersivo
                   </button>
                 </>
               ) : (
                 <div className={styles.timerBtns}>
                   <button className={styles.timerStartBtn} onClick={() => { clearSelectedCard(); navigate('/focus') }}>
-                    <i className="ti ti-clock-play" aria-hidden="true" /> Iniciar sesión
+                    <IconClockPlay size="1em" aria-hidden="true" /> Iniciar sesión
                   </button>
                   <button className={styles.timerImmersiveBtn} onClick={handleImmersive}>
-                    <i className="ti ti-maximize" aria-hidden="true" /> Modo inmersivo
+                    <IconMaximize size="1em" aria-hidden="true" /> Modo inmersivo
                   </button>
                 </div>
               )}
@@ -365,7 +366,7 @@ export default function CardDetailModal() {
             {/* Tiempo registrado en esta tarjeta */}
             <div>
               <div className={styles.sectionTitle}>
-                <i className="ti ti-hourglass" aria-hidden="true" /> Tiempo en esta tarjeta
+                <IconHourglass size="1em" aria-hidden="true" /> Tiempo en esta tarjeta
               </div>
               <CardTimeTracker cardId={selectedCard.id} />
             </div>
@@ -373,7 +374,7 @@ export default function CardDetailModal() {
             {/* Subtareas */}
             <div>
               <div className={styles.sectionTitle}>
-                <i className="ti ti-checklist" aria-hidden="true" /> Subtareas
+                <IconChecklist size="1em" aria-hidden="true" /> Subtareas
               </div>
               <CardChecklist cardId={selectedCard.id} triggerAdd={addSubtask} />
             </div>
@@ -381,7 +382,7 @@ export default function CardDetailModal() {
             {/* Description */}
             <div>
               <div className={styles.sectionTitle}>
-                <i className="ti ti-align-left" aria-hidden="true" /> Descripción
+                <IconAlignLeft size="1em" aria-hidden="true" /> Descripción
               </div>
               <textarea
                 className={styles.descArea}
@@ -400,7 +401,7 @@ export default function CardDetailModal() {
             {/* Comentarios */}
             <div>
               <div className={styles.sectionTitle}>
-                <i className="ti ti-message" aria-hidden="true" /> Comentarios
+                <IconMessage size="1em" aria-hidden="true" /> Comentarios
               </div>
               <CardComments cardId={selectedCard.id} />
             </div>
@@ -459,7 +460,7 @@ export default function CardDetailModal() {
                 dateRef.current?.focus()
               }}
             >
-              <i className="ti ti-calendar" aria-hidden="true" /> Fecha límite
+              <IconCalendar size="1em" aria-hidden="true" /> Fecha límite
             </button>
 
             {/* Editar etiquetas */}
@@ -469,7 +470,7 @@ export default function CardDetailModal() {
                 const r = e.currentTarget.getBoundingClientRect()
                 setLabelsSide({ open: true, top: r.bottom + 4, right: window.innerWidth - r.right })
               }}>
-                <i className="ti ti-tag" aria-hidden="true" /> Editar etiquetas
+                <IconTag size="1em" aria-hidden="true" /> Editar etiquetas
               </button>
               {labelsSide.open && (
                 <LabelPicker
@@ -486,7 +487,7 @@ export default function CardDetailModal() {
                 const r = e.currentTarget.getBoundingClientRect()
                 setAssignSide({ open: true, top: r.bottom + 4, right: window.innerWidth - r.right })
               }}>
-                <i className="ti ti-user-plus" aria-hidden="true" /> Asignar miembro
+                <IconUserPlus size="1em" aria-hidden="true" /> Asignar miembro
               </button>
               {assignSide.open && (
                 <div
@@ -521,17 +522,17 @@ export default function CardDetailModal() {
 
             {/* Añadir subtarea */}
             <button className={styles.sideBtn} onClick={() => setAddSubtask(n => n + 1)}>
-              <i className="ti ti-checklist" aria-hidden="true" /> Añadir subtarea
+              <IconChecklist size="1em" aria-hidden="true" /> Añadir subtarea
             </button>
 
             {/* Portada */}
             <button className={styles.sideBtn} onClick={openCoverPicker}>
-              <i className="ti ti-photo" aria-hidden="true" /> Portada
+              <IconPhoto size="1em" aria-hidden="true" /> Portada
             </button>
 
             <span className={styles.sideLabel}>Peligro</span>
             <button className={`${styles.sideBtn} ${styles.sideBtnDanger}`} onClick={handleDelete}>
-              <i className="ti ti-trash" aria-hidden="true" /> Eliminar tarjeta
+              <IconTrash size="1em" aria-hidden="true" /> Eliminar tarjeta
             </button>
 
           </div>
