@@ -1,5 +1,6 @@
 import { useToastStore } from '../../store/toastStore'
 import styles from './ToastContainer.module.css'
+import { IconClockCheck, IconCloudOff, IconAlarm, IconBell } from '@tabler/icons-react'
 
 export default function ToastContainer() {
   const { toasts, removeToast } = useToastStore()
@@ -21,7 +22,7 @@ function FocusRecoveryToast({ toast, onClose }) {
   return (
     <div className={`${styles.toast} ${styles.recovery}`}>
       <div className={styles.iconWrap}>
-        <i className="ti ti-clock-check" />
+        <IconClockCheck size="1em" />
       </div>
       <div className={styles.body}>
         <p className={styles.title}>Sesión de enfoque recuperada</p>
@@ -50,7 +51,7 @@ function ErrorToast({ toast, onClose }) {
   return (
     <div className={`${styles.toast} ${styles.urgent}`}>
       <div className={styles.iconWrap}>
-        <i className="ti ti-cloud-off" />
+        <IconCloudOff size="1em" />
       </div>
       <div className={styles.body}>
         <p className={styles.title}>{toast.title || 'Algo salió mal'}</p>
@@ -75,7 +76,7 @@ function DeadlineToast({ toast, onClose }) {
   return (
     <div className={`${styles.toast} ${isUrgent ? styles.urgent : styles.warning}`}>
       <div className={styles.iconWrap}>
-        <i className={`ti ${isUrgent ? 'ti-alarm' : 'ti-bell'}`} />
+        {isUrgent ? <IconAlarm size="1em" /> : <IconBell size="1em" />}
       </div>
       <div className={styles.body}>
         <p className={styles.title}>Vencimientos pendientes</p>

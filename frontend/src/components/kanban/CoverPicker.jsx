@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import styles from './CoverPicker.module.css'
+import { IconPhoto, IconSearch, IconX } from '@tabler/icons-react'
 
 const ACCESS_KEY = import.meta.env.VITE_UNSPLASH_ACCESS_KEY
 
@@ -65,7 +66,7 @@ export default function CoverPicker({ onSelect, onRemove, onClose, currentUrl, s
         {/* Cabecera */}
         <div className={styles.header}>
           <span className={styles.title}>
-            <i className="ti ti-photo" /> Portada
+            <IconPhoto size="1em" /> Portada
           </span>
           <div className={styles.headerRight}>
             {currentUrl && (
@@ -74,14 +75,14 @@ export default function CoverPicker({ onSelect, onRemove, onClose, currentUrl, s
               </button>
             )}
             <button className={styles.closeBtn} onClick={onClose}>
-              <i className="ti ti-x" />
+              <IconX size="1em" />
             </button>
           </div>
         </div>
 
         {/* Buscador */}
         <div className={styles.searchRow}>
-          <i className="ti ti-search" />
+          <IconSearch size="1em" />
           <input
             className={styles.searchInput}
             placeholder="Buscar imágenes..."

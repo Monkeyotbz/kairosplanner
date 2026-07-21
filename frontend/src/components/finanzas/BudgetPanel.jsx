@@ -3,6 +3,7 @@ import {
   getPresupuestos, setPresupuesto, deletePresupuestoCategoria,
   getCategorias, calcBudgetProgress, formatMoney,
 } from '../../services/financeService'
+import { IconArrowDownRight, IconPencil, IconRepeat, IconTarget, IconTargetArrow, IconTrash } from '@tabler/icons-react'
 import styles from './BudgetPanel.module.css'
 
 const ESTADO_LABEL = {
@@ -37,10 +38,10 @@ export default function BudgetPanel({ transacciones, year, month, monthLabel }) 
       <div className={styles.head}>
         <div className={styles.headTitles}>
           <h2 className={styles.heading}>
-            <i className="ti ti-target" /> Presupuestos
+            <IconTarget size="1em" /> Presupuestos
           </h2>
           <span className={styles.subtitle}>
-            <i className="ti ti-repeat" /> Cada mes hereda el valor anterior · {monthLabel}
+            <IconRepeat size="1em" /> Cada mes hereda el valor anterior · {monthLabel}
           </span>
         </div>
         <button className={styles.addBtn} onClick={() => setFormFor({})}>
@@ -52,7 +53,7 @@ export default function BudgetPanel({ transacciones, year, month, monthLabel }) 
         <div className={styles.state}><span className={styles.spinner} /> Cargando...</div>
       ) : progreso.length === 0 ? (
         <div className={styles.empty}>
-          <i className="ti ti-target-arrow" />
+          <IconTargetArrow size="1em" />
           <p className={styles.emptyTitle}>Aún no defines presupuestos</p>
           <p className={styles.emptyText}>
             Fija un límite mensual por categoría (ej. $500 en Software) y KAIROS te avisará
@@ -72,16 +73,16 @@ export default function BudgetPanel({ transacciones, year, month, monthLabel }) 
                     {cat.nombre || 'Categoría'}
                     {p.heredado && (
                       <span className={styles.heredado} title="Valor heredado de un mes anterior. Edítalo para fijar uno propio.">
-                        <i className="ti ti-arrow-down-right" /> heredado
+                        <IconArrowDownRight size="1em" /> heredado
                       </span>
                     )}
                   </span>
                   <div className={styles.cardActions}>
                     <button className={styles.iconBtn} title="Editar este mes" onClick={() => setFormFor(p)}>
-                      <i className="ti ti-pencil" />
+                      <IconPencil size="1em" />
                     </button>
                     <button className={styles.iconBtn} title="Eliminar (todos los meses)" onClick={() => handleDelete(p.categoria_id)}>
-                      <i className="ti ti-trash" />
+                      <IconTrash size="1em" />
                     </button>
                   </div>
                 </div>

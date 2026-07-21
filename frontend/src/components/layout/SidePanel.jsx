@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useFocusStore } from '../../store/focusStore'
 import { useBoardStore } from '../../store/boardStore'
 import styles from './SidePanel.module.css'
+import { IconArrowsMove, IconTrash, IconLayoutColumns, IconPlus } from '@tabler/icons-react'
 
 function formatTime(seconds) {
   const h = Math.floor(seconds / 3600)
@@ -13,24 +14,17 @@ function formatTime(seconds) {
 
 function timeAgo(dateStr) {
   const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000)
-  if (diff < 60)   return 'hace un momento'
-  if (diff < 3600) return `hace ${Math.floor(diff / 60)} min`
+  if (diff < 60)    return 'hace un momento'
+  if (diff < 3600)  return `hace ${Math.floor(diff / 60)} min`
   if (diff < 86400) return `hace ${Math.floor(diff / 3600)} h`
   return `hace ${Math.floor(diff / 86400)} d`
 }
 
-const ICON = {
-  created:  'ti-plus',
-  moved:    'ti-arrows-move',
-  deleted:  'ti-trash',
-  lista:    'ti-layout-columns',
-}
-
 function actIcon(descripcion) {
-  if (descripcion.includes('movió'))   return ICON.moved
-  if (descripcion.includes('eliminó')) return ICON.deleted
-  if (descripcion.includes('lista'))   return ICON.lista
-  return ICON.created
+  if (descripcion.includes('movió'))   return IconArrowsMove
+  if (descripcion.includes('eliminó')) return IconTrash
+  if (descripcion.includes('lista'))   return IconLayoutColumns
+  return IconPlus
 }
 
 export default function SidePanel({ onClose }) {
@@ -77,7 +71,6 @@ export default function SidePanel({ onClose }) {
       {/* ── Historial de actividad ── */}
       <div className={styles.section}>
         <p className={styles.sectionLabel}>Actividad reciente</p>
-
         {actividad.length === 0 ? (
           <p className={styles.actEmpty}>Sin actividad aún</p>
         ) : (
@@ -85,7 +78,7 @@ export default function SidePanel({ onClose }) {
             {[...actividad].reverse().map(a => (
               <li key={a.id} className={styles.actItem}>
                 <span className={styles.actIconWrap}>
-                  <i className={`ti ${actIcon(a.descripcion)}`} />
+                  {(() => { const ActIcon = actIcon(a.descripcion); return <ActIcon size="1em" /> })()}
                 </span>
                 <div className={styles.actBody}>
                   <span className={styles.actNombre}>{a.nombre_usuario}</span>

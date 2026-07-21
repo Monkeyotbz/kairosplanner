@@ -7,6 +7,7 @@ import { useBoardStore } from '../../store/boardStore'
 import ThemeSwitcher from './ThemeSwitcher'
 import InfinityLogo from './InfinityLogo'
 import styles from './Topbar.module.css'
+import { IconPalette, IconUser } from '@tabler/icons-react'
 
 export default function Topbar() {
   const navigate = useNavigate()
@@ -93,7 +94,7 @@ export default function Topbar() {
               onClick={() => setShowTheme(v => !v)}
               title="Apariencia"
             >
-              <i className="ti ti-palette" />
+              <IconPalette size="1em" />
             </button>
             <ThemeSwitcher open={showTheme} onClose={() => setShowTheme(false)} />
           </div>
@@ -123,7 +124,7 @@ export default function Topbar() {
                 </div>
                 <div className={styles.userMenuDivider} />
                 <button className={styles.userMenuItem} onClick={() => { setShowUserMenu(false); navigate('/entorno') }}>
-                  <i className="ti ti-user" /> Mi perfil
+                  <IconUser size="1em" /> Mi perfil
                 </button>
                 <div className={styles.userMenuDivider} />
                 <button className={styles.logoutBtn} onClick={handleLogout}>

@@ -6,6 +6,7 @@ import PlanDeuda       from './PlanDeuda'
 import MetasAhorro     from './MetasAhorro'
 import PatrimonioNeto  from './PatrimonioNeto'
 import styles from './AnalisisFinanciero.module.css'
+import { IconAlertTriangle, IconLayoutDashboard } from '@tabler/icons-react'
 
 const BALANCE_KEY  = 'kairos-cashflow-saldo'
 const CAPITALS_KEY = 'kairos-debt-capitals'
@@ -27,7 +28,7 @@ function DistBar({ label, real, ideal, color }) {
       </div>
       <span className={`${styles.distPct} ${ok ? '' : styles.distOver}`}>{real}%</span>
       <span className={styles.distIdeal}>/ {ideal}%</span>
-      {!ok && <i className="ti ti-alert-triangle" style={{ color: '#ef4444', fontSize: 12 }} />}
+      {!ok && <IconAlertTriangle size="1em" style={{ color: '#ef4444', fontSize: 12 }} />}
     </div>
   )
 }
@@ -83,7 +84,7 @@ export default function AnalisisFinanciero({ year, month }) {
       {/* ── Dashboard ejecutivo ─────────────────────────────────── */}
       <section className={styles.dashboard}>
         <h2 className={styles.dashTitle}>
-          <i className="ti ti-layout-dashboard" /> Estado de mi economía
+          <IconLayoutDashboard size="1em" /> Estado de mi economía
         </h2>
 
         <div className={styles.dashGrid}>

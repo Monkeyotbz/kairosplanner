@@ -8,6 +8,7 @@ import {
   addTransaccion, deleteTransaccion, getCategorias,
   getPresupuestos, getTransacciones, calcBudgetProgress, calcSummary,
 } from '../../services/financeService'
+import { IconArrowBackUp, IconSend, IconX, IconVolume, IconVolume3, IconMicrophone, IconMicrophoneFilled } from '@tabler/icons-react'
 import { getFocusProgress } from '../../services/rankService'
 import InfinityLogo from '../layout/InfinityLogo'
 import styles from './AbadChat.module.css'
@@ -344,9 +345,9 @@ export default function AbadChat() {
           title={isMuted ? 'Activar voz de ABAD' : 'Silenciar voz de ABAD'}
           aria-label={isMuted ? 'Activar voz' : 'Silenciar voz'}
         >
-          <i className={isMuted ? 'ti ti-volume-3' : 'ti ti-volume'} />
+          {isMuted ? <IconVolume3 size="1em" /> : <IconVolume size="1em" />}
         </button>
-        <button className={styles.close} onClick={close} aria-label="Cerrar"><i className="ti ti-x" /></button>
+        <button className={styles.close} onClick={close} aria-label="Cerrar"><IconX size="1em" /></button>
       </div>
 
       <div className={styles.messages} ref={listRef}>
@@ -387,7 +388,7 @@ export default function AbadChat() {
       {undoVisible && (
         <div className={styles.undoBanner}>
           <span>Acción ejecutada</span>
-          <button onClick={handleUndo}><i className="ti ti-arrow-back-up" /> Cancelar</button>
+          <button onClick={handleUndo}><IconArrowBackUp size="1em" /> Cancelar</button>
         </div>
       )}
 
@@ -397,7 +398,7 @@ export default function AbadChat() {
           onClick={toggleListening}
           title={isListening ? 'Detener' : 'Hablar'}
         >
-          <i className={isListening ? 'ti ti-microphone-filled' : 'ti ti-microphone'} />
+          {isListening ? <IconMicrophoneFilled size="1em" /> : <IconMicrophone size="1em" />}
         </button>
         <input
           className={styles.input}
@@ -408,7 +409,7 @@ export default function AbadChat() {
           disabled={isListening}
         />
         <button className={styles.send} onClick={() => submit(input)} disabled={!input.trim() || thinking} title="Enviar">
-          <i className="ti ti-send" />
+          <IconSend size="1em" />
         </button>
       </div>
     </div>

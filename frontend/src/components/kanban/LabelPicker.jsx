@@ -62,7 +62,7 @@ export default function LabelPicker({ onClose, style }) {
     try {
       const label = await createEtiqueta(proyecto.id, name, newColor)
       setLabels(prev => [...prev, label])
-      addEtiqueta(label)
+      addEtiqueta(label) // el FilterPanel la ve sin recargar el tablero
       setNewName('')
       setCreating(false)
     } catch (err) {

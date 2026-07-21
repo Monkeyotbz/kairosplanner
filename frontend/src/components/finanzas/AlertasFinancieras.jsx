@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { getPresupuestos } from '../../services/financeService'
 import { calcAlertas } from '../../services/financeAnalytics'
 import styles from './AlertasFinancieras.module.css'
+import { IconBellRinging, IconX } from '@tabler/icons-react'
 
 const TIPO_STYLE = {
   peligro:    { bg: 'rgba(239,68,68,0.1)',  border: 'rgba(239,68,68,0.3)',  dot: '#ef4444' },
@@ -32,7 +33,7 @@ export default function AlertasFinancieras({ summary, recurrencias, transaccione
   return (
     <section className={styles.section}>
       <h2 className={styles.heading}>
-        <i className="ti ti-bell-ringing" /> Alertas inteligentes
+        <IconBellRinging size="1em" /> Alertas inteligentes
         <span className={styles.badge}>{alertas.length}</span>
       </h2>
       <div className={styles.list}>
@@ -49,7 +50,7 @@ export default function AlertasFinancieras({ summary, recurrencias, transaccione
                 </div>
               </div>
               <button className={styles.close} onClick={() => dismiss(a.titulo)} title="Descartar">
-                <i className="ti ti-x" />
+                <IconX size="1em" />
               </button>
             </div>
           )

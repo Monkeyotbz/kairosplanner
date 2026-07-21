@@ -306,9 +306,9 @@
   left: 8px;
   right: 8px;
   z-index: 3;
-  background: var(--kairos-glass-card-bg, var(--kairos-modal-bg));
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  /* Fondo sólido (negro/blanco según tema): los bloques se leen de un
+     vistazo sobre el fondo estrellado — nada de transparencias aquí. */
+  background: var(--kairos-event-bg);
   border: 1px solid var(--kairos-border-2);
   border-left: 3px solid var(--kairos-purple-600);
   border-radius: 8px;

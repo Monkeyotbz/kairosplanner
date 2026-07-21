@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { formatMoney } from '../../services/financeService'
 import { calcMeta } from '../../services/financeAnalytics'
 import styles from './MetasAhorro.module.css'
+import { IconPencil, IconRocket, IconTarget, IconTrash } from '@tabler/icons-react'
 
 const GOALS_KEY = 'kairos-savings-goals'
 const MESES_NOMBRE = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
@@ -68,7 +69,7 @@ export default function MetasAhorro() {
   return (
     <section className={styles.section}>
       <div className={styles.head}>
-        <h2 className={styles.heading}><i className="ti ti-rocket" /> Metas de ahorro</h2>
+        <h2 className={styles.heading}><IconRocket size="1em" /> Metas de ahorro</h2>
         <button className={styles.addBtn} onClick={() => { setForm(EMPTY); setEditIdx(null); setShowForm(true) }}>
           + Nueva meta
         </button>
@@ -76,7 +77,7 @@ export default function MetasAhorro() {
 
       {goals.length === 0 && !showForm && (
         <div className={styles.empty}>
-          <i className="ti ti-target" style={{ fontSize: 28, color: 'var(--kairos-purple-400, #a78bfa)' }} />
+          <IconTarget size="1em" style={{ fontSize: 28, color: 'var(--kairos-purple-400, #a78bfa)' }} />
           <p>Define tu primera meta de ahorro y KAIROS calcula cuándo la alcanzas.</p>
         </div>
       )}
@@ -166,10 +167,10 @@ export default function MetasAhorro() {
                 <span className={styles.cardNombre}>{g.nombre}</span>
                 <div className={styles.cardActions}>
                   <button className={styles.iconBtn} onClick={() => startEdit(i)} title="Editar">
-                    <i className="ti ti-pencil" />
+                    <IconPencil size="1em" />
                   </button>
                   <button className={styles.iconBtn} onClick={() => remove(i)} title="Eliminar">
-                    <i className="ti ti-trash" />
+                    <IconTrash size="1em" />
                   </button>
                 </div>
               </div>

@@ -3,6 +3,7 @@ import { useFocusStore } from '../../store/focusStore'
 import { useMusicStore } from '../../store/musicStore'
 import { getFocusProgress } from '../../services/rankService'
 import styles from './FocusCapsule.module.css'
+import { IconArrowsMaximize, IconCheck, IconMusic, IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react'
 
 function formatTime(seconds) {
   const h = Math.floor(seconds / 3600)
@@ -71,7 +72,7 @@ export default function FocusCapsule() {
         <span className={styles.task}>{activeTask?.titulo || 'Sesión de enfoque'}</span>
         <div className={styles.sub}>
           {r && <span className={styles.rank}><span style={{ color: r.color }}>{r.icon}</span> {r.name}</span>}
-          {nowPlaying && <span className={styles.music}><i className="ti ti-music" /> {nowPlaying}</span>}
+          {nowPlaying && <span className={styles.music}><IconMusic size="1em" /> {nowPlaying}</span>}
         </div>
       </div>
 
@@ -79,18 +80,18 @@ export default function FocusCapsule() {
       <div className={styles.ctrls}>
         {isBreak ? (
           <button className={styles.btn} onClick={() => resumeSession()} title="Retomar">
-            <i className="ti ti-player-play" />
+            <IconPlayerPlay size="1em" />
           </button>
         ) : (
           <button className={styles.btn} onClick={startBreak} title="Pausar">
-            <i className="ti ti-player-pause" />
+            <IconPlayerPause size="1em" />
           </button>
         )}
         <button className={styles.btn} onClick={() => enterImmersive()} title="Expandir">
-          <i className="ti ti-arrows-maximize" />
+          <IconArrowsMaximize size="1em" />
         </button>
         <button className={`${styles.btn} ${styles.btnFinish}`} onClick={() => { finishSession(); enterImmersive() }} title="Terminar">
-          <i className="ti ti-check" />
+          <IconCheck size="1em" />
         </button>
       </div>
     </div>

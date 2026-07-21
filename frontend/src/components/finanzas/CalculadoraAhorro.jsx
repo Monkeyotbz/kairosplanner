@@ -3,6 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+import { IconAlertTriangle, IconCalculator, IconCash, IconPencil, IconTrash } from '@tabler/icons-react'
 import { formatMoney } from '../../services/financeService'
 import { calcMeta, fmtK } from '../../services/financeAnalytics'
 import styles from './CalculadoraAhorro.module.css'
@@ -156,9 +157,9 @@ export default function CalculadoraAhorro({ recurrencias }) {
   if (salario <= 0) {
     return (
       <section className={styles.section}>
-        <h2 className={styles.heading}><i className="ti ti-calculator" /> Calculadora de ahorro</h2>
+        <h2 className={styles.heading}><IconCalculator size="1em" /> Calculadora de ahorro</h2>
         <div className={styles.empty}>
-          <i className="ti ti-cash" />
+          <IconCash size="1em" />
           <p>Agrega tu salario como <strong>recurrente de tipo ingreso</strong> y aquí podrás
           definir metas de ahorro como porcentaje de lo que ganas.</p>
         </div>
@@ -172,7 +173,7 @@ export default function CalculadoraAhorro({ recurrencias }) {
     <section className={styles.section}>
       <div className={styles.head}>
         <div className={styles.headTitles}>
-          <h2 className={styles.heading}><i className="ti ti-calculator" /> Calculadora de ahorro</h2>
+          <h2 className={styles.heading}><IconCalculator size="1em" /> Calculadora de ahorro</h2>
           <span className={styles.subtitle}>
             Define metas como % de tu ingreso recurrente (${fmtK(salario)}/mes) y mide su proyección
           </span>
@@ -208,7 +209,7 @@ export default function CalculadoraAhorro({ recurrencias }) {
         <div className={styles.simMeta}>
           {excede ? (
             <span className={styles.simWarn}>
-              <i className="ti ti-alert-triangle" /> Supera tu margen libre (${fmtK(margen)}/mes después de gastos fijos)
+              <IconAlertTriangle size="1em" /> Supera tu margen libre (${fmtK(margen)}/mes después de gastos fijos)
             </span>
           ) : (
             <span>
@@ -266,10 +267,10 @@ export default function CalculadoraAhorro({ recurrencias }) {
                   <span className={styles.metaPct}>{g.porcentaje}% del salario</span>
                   <div className={styles.metaActions}>
                     <button className={styles.iconBtn} onClick={() => openEdit(g)} title="Editar">
-                      <i className="ti ti-pencil" />
+                      <IconPencil size="1em" />
                     </button>
                     <button className={styles.iconBtn} onClick={() => remove(g)} title="Eliminar">
-                      <i className="ti ti-trash" />
+                      <IconTrash size="1em" />
                     </button>
                   </div>
                 </div>

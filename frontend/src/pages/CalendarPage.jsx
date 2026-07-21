@@ -4,8 +4,8 @@ import CalendarGrid from '../components/calendar/CalendarGrid'
 import DayBlocks    from '../components/calendar/DayBlocks'
 import KairosFlow   from '../components/calendar/KairosFlow'
 import CardDetailModal from '../components/kanban/CardDetailModal'
-import AgendaMusic from '../components/calendar/AgendaMusic'
 import styles from './CalendarPage.module.css'
+import { IconInfinity, IconCalendarMonth, IconLayoutList } from '@tabler/icons-react'
 
 /* ─── helpers de fecha ─────────────────────────────────────── */
 function toKey(d) {
@@ -142,9 +142,9 @@ export default function CalendarPage() {
   }, [selectedDay])
 
   const VIEW_TABS = [
-    { id: 'planner', label: 'Flujo', icon: 'ti-infinity' },
-    { id: 'month',   label: 'Mes',   icon: 'ti-calendar-month' },
-    { id: 'day',     label: 'Día',   icon: 'ti-layout-list' },
+    { id: 'planner', label: 'Flujo', icon: IconInfinity },
+    { id: 'month',   label: 'Mes',   icon: IconCalendarMonth },
+    { id: 'day',     label: 'Día',   icon: IconLayoutList },
   ]
 
   const isDayView = view === 'planner' || view === 'day'
@@ -171,7 +171,7 @@ export default function CalendarPage() {
                 className={`${styles.viewBtn} ${view === t.id ? styles.viewBtnActive : ''}`}
                 onClick={() => setView(t.id)}
               >
-                <i className={`ti ${t.icon}`} />
+                <t.icon size="1em" />
                 <span className={styles.viewBtnLabel}>{t.label}</span>
               </button>
             ))}
@@ -206,8 +206,6 @@ export default function CalendarPage() {
             cardKeys={cardKeys}
           />
 
-          {/* Mini-reproductor de música — llena el espacio del sidebar */}
-          <AgendaMusic />
         </aside>
 
         {/* Main: vista activa */}

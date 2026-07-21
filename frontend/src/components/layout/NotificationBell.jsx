@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useBoardStore } from '../../store/boardStore'
 import { getUpcomingDeadlines } from '../../services/boardService'
 import styles from './NotificationBell.module.css'
+import { IconBell, IconChecks, IconAlarm, IconClockExclamation, IconClock } from '@tabler/icons-react'
 
 function getDateStr(date) {
   const y = date.getFullYear()
@@ -108,7 +109,7 @@ export default function NotificationBell({ openUp = false }) {
         title="Notificaciones de vencimiento"
         aria-label={`Notificaciones${total > 0 ? ` (${total})` : ''}`}
       >
-        <i className="ti ti-bell" />
+        <IconBell size="1em" />
         {total > 0 && (
           <span className={`${styles.badge} ${overdue.length > 0 ? styles.badgeUrgent : ''}`}>
             {total > 9 ? '9+' : total}
@@ -125,7 +126,7 @@ export default function NotificationBell({ openUp = false }) {
 
           {total === 0 ? (
             <div className={styles.empty}>
-              <i className="ti ti-checks" />
+              <IconChecks size="1em" />
               <span>Sin tareas por vencer</span>
             </div>
           ) : (
@@ -134,21 +135,21 @@ export default function NotificationBell({ openUp = false }) {
                 label="Vencidas"
                 cards={overdue}
                 accent="#f87171"
-                icon="ti-alarm"
+                icon={IconAlarm}
                 onCardClick={handleCardClick}
               />
               <NotifSection
                 label="Vence hoy"
                 cards={dueToday}
                 accent="#fb923c"
-                icon="ti-clock-exclamation"
+                icon={IconClockExclamation}
                 onCardClick={handleCardClick}
               />
               <NotifSection
                 label="Vence mañana"
                 cards={dueTomorrow}
                 accent="#facc15"
-                icon="ti-clock"
+                icon={IconClock}
                 onCardClick={handleCardClick}
               />
             </div>
@@ -159,12 +160,12 @@ export default function NotificationBell({ openUp = false }) {
   )
 }
 
-function NotifSection({ label, cards, accent, icon, onCardClick }) {
+function NotifSection({ label, cards, accent, icon: Icon, onCardClick }) {
   if (cards.length === 0) return null
   return (
     <div className={styles.section}>
       <div className={styles.sectionLabel} style={{ color: accent }}>
-        <i className={`ti ${icon}`} />
+        <Icon size="1em" />
         {label}
         <span className={styles.sectionCount}>{cards.length}</span>
       </div>

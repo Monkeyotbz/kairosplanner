@@ -3,6 +3,10 @@ import {
   getRecurrencias, addRecurrencia, updateRecurrencia, deleteRecurrencia,
   getCategorias, formatMoney,
 } from '../../services/financeService'
+import {
+  IconCalendarRepeat, IconClock, IconPencil, IconRepeat, IconTrash,
+  IconCalendarWeek, IconCalendarStats, IconCalendarMonth, IconCalendarEvent, IconCalendarStar,
+} from '@tabler/icons-react'
 import styles from './RecurrenciasPanel.module.css'
 
 const FREC_LABEL = {
@@ -16,13 +20,13 @@ const FREC_LABEL = {
 }
 
 const FREC_ICON = {
-  diaria:     'ti-calendar-repeat',
-  semanal:    'ti-calendar-week',
-  quincenal:  'ti-calendar-stats',
-  mensual:    'ti-calendar-month',
-  bimestral:  'ti-calendar-event',
-  trimestral: 'ti-calendar-event',
-  anual:      'ti-calendar-star',
+  diaria:     IconCalendarRepeat,
+  semanal:    IconCalendarWeek,
+  quincenal:  IconCalendarStats,
+  mensual:    IconCalendarMonth,
+  bimestral:  IconCalendarEvent,
+  trimestral: IconCalendarEvent,
+  anual:      IconCalendarStar,
 }
 
 function nextOccurrence(r) {
@@ -174,7 +178,7 @@ export default function RecurrenciasPanel({ onChange }) {
       <div className={styles.head}>
         <div className={styles.headTitles}>
           <h2 className={styles.heading}>
-            <i className="ti ti-repeat" /> Recurrentes
+            <IconRepeat size="1em" /> Recurrentes
           </h2>
           <span className={styles.subtitle}>
             Pagos e ingresos que se repiten — base del pronóstico de flujo de caja
@@ -187,7 +191,7 @@ export default function RecurrenciasPanel({ onChange }) {
         <div className={styles.state}><span className={styles.spinner} /> Cargando...</div>
       ) : items.length === 0 ? (
         <div className={styles.empty}>
-          <i className="ti ti-calendar-repeat" />
+          <IconCalendarRepeat size="1em" />
           <p className={styles.emptyTitle}>Sin recurrentes definidos</p>
           <p className={styles.emptyText}>
             Agrega tus pagos fijos (renta, suscripciones) e ingresos periódicos
@@ -320,7 +324,7 @@ function RecurList({ label, items, accent, onToggle, onEdit, onDelete }) {
           return (
             <div key={item.id} className={`${styles.card} ${!item.activa ? styles.cardInactive : ''}`}>
               <div className={styles.cardTop}>
-                <i className={`ti ${FREC_ICON[item.frecuencia] || 'ti-calendar'} ${styles.frecIcon}`} />
+                {(() => { const FrecIcon = FREC_ICON[item.frecuencia] || IconCalendarEvent; return <FrecIcon size="1em" className={styles.frecIcon} /> })()}
                 <span className={styles.concepto}>{item.concepto}</span>
                 <span className={styles.monto} style={{ color: accent }}>
                   {item.tipo === 'ingreso' ? '+' : '-'}${formatMoney(item.monto)}
@@ -330,7 +334,7 @@ function RecurList({ label, items, accent, onToggle, onEdit, onDelete }) {
                 <span className={styles.frec}>{FREC_LABEL[item.frecuencia]}</span>
                 {next && (
                   <span className={styles.next}>
-                    <i className="ti ti-clock" /> próx. {fmtDate(next)}
+                    <IconClock size="1em" /> próx. {fmtDate(next)}
                   </span>
                 )}
                 {item.categorias_finanzas && (
@@ -348,10 +352,10 @@ function RecurList({ label, items, accent, onToggle, onEdit, onDelete }) {
                   <span className={styles.toggleThumb} />
                 </button>
                 <button className={styles.iconBtn} onClick={() => onEdit(item)} title="Editar">
-                  <i className="ti ti-pencil" />
+                  <IconPencil size="1em" />
                 </button>
                 <button className={`${styles.iconBtn} ${styles.iconBtnDel}`} onClick={() => onDelete(item)} title="Eliminar">
-                  <i className="ti ti-trash" />
+                  <IconTrash size="1em" />
                 </button>
               </div>
             </div>

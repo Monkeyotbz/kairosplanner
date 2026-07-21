@@ -3,6 +3,7 @@ import {
   getPresupuestoProyecto, setPresupuestoProyecto, deletePresupuestoProyecto,
   budgetState, formatMoney,
 } from '../../services/financeService'
+import { IconArrowDownRight, IconPencil, IconRepeat, IconTarget, IconTrash } from '@tabler/icons-react'
 import styles from './ProjectBudgetBar.module.css'
 
 const ESTADO_LABEL = {
@@ -57,7 +58,7 @@ export default function ProjectBudgetBar({ proyectoId, gastado, year, month, mon
     return (
       <div className={styles.prompt}>
         <span className={styles.promptText}>
-          <i className="ti ti-target" /> Define un tope de costos para vigilar este proyecto
+          <IconTarget size="1em" /> Define un tope de costos para vigilar este proyecto
         </span>
         <button className={styles.promptBtn} onClick={() => setEditing(true)}>Definir tope</button>
       </div>
@@ -93,17 +94,17 @@ export default function ProjectBudgetBar({ proyectoId, gastado, year, month, mon
     <div className={`${styles.card} ${styles[estado]}`}>
       <div className={styles.top}>
         <span className={styles.label}>
-          <i className="ti ti-target" /> Tope de costos
+          <IconTarget size="1em" /> Tope de costos
           {budget?.heredado
-            ? <span className={styles.recurr}><i className="ti ti-arrow-down-right" /> heredado</span>
-            : <span className={styles.recurr}><i className="ti ti-repeat" /> cada mes</span>}
+            ? <span className={styles.recurr}><IconArrowDownRight size="1em" /> heredado</span>
+            : <span className={styles.recurr}><IconRepeat size="1em" /> cada mes</span>}
         </span>
         <div className={styles.actions}>
           <button className={styles.iconBtn} title="Editar" onClick={() => setEditing(true)}>
-            <i className="ti ti-pencil" />
+            <IconPencil size="1em" />
           </button>
           <button className={styles.iconBtn} title="Quitar tope" onClick={clear}>
-            <i className="ti ti-trash" />
+            <IconTrash size="1em" />
           </button>
         </div>
       </div>

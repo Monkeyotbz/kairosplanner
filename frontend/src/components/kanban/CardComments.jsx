@@ -3,6 +3,7 @@ import { useAuthStore } from '../../store/authStore'
 import { useBoardStore } from '../../store/boardStore'
 import { getComentarios, addComentario, deleteComentario } from '../../services/boardService'
 import styles from './CardComments.module.css'
+import { IconSend, IconX } from '@tabler/icons-react'
 
 function timeAgo(dateStr) {
   const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000)
@@ -27,6 +28,7 @@ export default function CardComments({ cardId }) {
     getComentarios(cardId)
       .then(setComments)
       .finally(() => setLoading(false))
+    // Abrir los comentarios cuenta como leerlos
     markCardCommentsRead(cardId)
   }, [cardId])
 
@@ -68,7 +70,7 @@ export default function CardComments({ cardId }) {
                     <span className={styles.when}>{timeAgo(c.creado_en)}</span>
                     {isMine && (
                       <button className={styles.delBtn} onClick={() => handleDelete(c.id)}>
-                        <i className="ti ti-x" />
+                        <IconX size="1em" />
                       </button>
                     )}
                   </div>
@@ -94,7 +96,7 @@ export default function CardComments({ cardId }) {
           }}
         />
         <button type="submit" className={styles.sendBtn} disabled={!text.trim() || sending}>
-          <i className="ti ti-send" />
+          <IconSend size="1em" />
         </button>
       </form>
     </div>

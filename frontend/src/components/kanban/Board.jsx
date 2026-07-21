@@ -6,6 +6,7 @@ import Column from './Column'
 import Card from './Card'
 import styles from './Board.module.css'
 
+// Bucket de vencimiento de una tarjeta para el filtro de "Fecha límite"
 function fechaBucket(fechaLimite) {
   if (!fechaLimite) return 'sinfecha'
   const today = new Date(); today.setHours(0, 0, 0, 0)
@@ -108,8 +109,8 @@ export default function Board({ activeFilters }) {
     soloSinLeer = false, soloConTiempo = false,
   } = activeFilters || {}
   const hasActiveFilters = selectedPriorities.length > 0 || selectedTags.length > 0 || selectedMembers.length > 0
-    || selectedLists.length > 0 || selectedFecha.length > 0 || selectedSubtareas.length > 0 || soloSinAsignar || soloSinEtiquetas
-    || soloSinLeer || soloConTiempo
+    || selectedLists.length > 0 || selectedFecha.length > 0 || selectedSubtareas.length > 0
+    || soloSinAsignar || soloSinEtiquetas || soloSinLeer || soloConTiempo
 
   function matchesFilters(c) {
     if (searchQuery) {

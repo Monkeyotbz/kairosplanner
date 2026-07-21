@@ -4,6 +4,7 @@ import { useSubscriptionStore } from '../store/subscriptionStore'
 import InfinityLogo from '../components/layout/InfinityLogo'
 import StarField from '../components/layout/StarField'
 import styles from './BillingSuccessPage.module.css'
+import { IconArrowRight, IconBrain, IconChartAreaLine, IconCheck, IconFlame } from '@tabler/icons-react'
 
 export default function BillingSuccessPage() {
   const { load } = useSubscriptionStore()
@@ -21,7 +22,7 @@ export default function BillingSuccessPage() {
         <div className={styles.iconWrap}>
           <InfinityLogo size={72} state="idle" />
           <div className={styles.checkBadge}>
-            <i className="ti ti-check" />
+            <IconCheck size="1em" />
           </div>
         </div>
         <h1 className={styles.title}>¡Bienvenido a KAIROS Pro!</h1>
@@ -29,12 +30,12 @@ export default function BillingSuccessPage() {
           Tu suscripción está activa. Ahora tienes acceso completo al poder del momento oportuno.
         </p>
         <div className={styles.perks}>
-          <span><i className="ti ti-brain" /> ABAD IA activo</span>
-          <span><i className="ti ti-chart-area-line" /> Flujo de caja</span>
-          <span><i className="ti ti-flame" /> Rangos y XP</span>
+          <span><IconBrain size="1em" /> ABAD IA activo</span>
+          <span><IconChartAreaLine size="1em" /> Flujo de caja</span>
+          <span><IconFlame size="1em" /> Rangos y XP</span>
         </div>
         <Link to="/board" className={styles.btn}>
-          Ir al tablero <i className="ti ti-arrow-right" />
+          Ir al tablero <IconArrowRight size="1em" />
         </Link>
         <p className={styles.hint}>
           ¿Necesitas gestionar tu suscripción? La encuentras en{' '}

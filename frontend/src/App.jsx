@@ -1,26 +1,31 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import ProtectedRoute from './components/ui/ProtectedRoute'
 import AppShell from './components/layout/AppShell'
 import LoginPage from './pages/LoginPage'
 import LandingPage from './pages/LandingPage'
-import BoardPage from './pages/BoardPage'
-import FocusPage from './pages/FocusPage'
-import CalendarPage from './pages/CalendarPage'
-import ProductivityPage from './pages/ProductivityPage'
-import EntornoPage from './pages/EntornoPage'
-import FinanzasPage from './pages/FinanzasPage'
-import SpotifyCallbackPage from './pages/SpotifyCallbackPage'
-import JoinProject from './pages/JoinProject'
-import OnboardingPreviewPage from './pages/OnboardingPreviewPage'
-import UpgradePage from './pages/UpgradePage'
-import BillingSuccessPage from './pages/BillingSuccessPage'
-import WTWApp from './wtw/WTWApp'
+
+const BoardPage             = lazy(() => import('./pages/BoardPage'))
+const FocusPage              = lazy(() => import('./pages/FocusPage'))
+const CalendarPage           = lazy(() => import('./pages/CalendarPage'))
+const ProductivityPage       = lazy(() => import('./pages/ProductivityPage'))
+const EntornoPage            = lazy(() => import('./pages/EntornoPage'))
+const FinanzasPage           = lazy(() => import('./pages/FinanzasPage'))
+const SpotifyCallbackPage    = lazy(() => import('./pages/SpotifyCallbackPage'))
+const JoinProject            = lazy(() => import('./pages/JoinProject'))
+const OnboardingPreviewPage  = lazy(() => import('./pages/OnboardingPreviewPage'))
+const UpgradePage            = lazy(() => import('./pages/UpgradePage'))
+const BillingSuccessPage     = lazy(() => import('./pages/BillingSuccessPage'))
+const WTWApp                 = lazy(() => import('./wtw/WTWApp'))
 
 const isWTW = window.location.host.startsWith('wtw.') ||
               new URLSearchParams(window.location.search).get('wtw') === 'true' ||
               window.location.pathname.startsWith('/wtw')
+
+const PageFallback = () => (
+  <div style={{ position: 'fixed', inset: 0, background: 'var(--kairos-bg, #0d0a1c)' }} />
+)
 
 export default function App() {
   const init = useAuthStore((s) => s.init)
@@ -30,13 +35,16 @@ export default function App() {
   if (isWTW) {
     return (
       <BrowserRouter>
-        <WTWApp />
+        <Suspense fallback={<PageFallback />}>
+          <WTWApp />
+        </Suspense>
       </BrowserRouter>
     )
   }
 
   return (
     <BrowserRouter>
+      <Suspense fallback={<PageFallback />}>
       <Routes>
         <Route path="/"         element={<LandingPage />} />
         <Route path="/login"    element={<LoginPage />} />
@@ -61,6 +69,7 @@ export default function App() {
         <Route path="/upgrade"         element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
         <Route path="/billing-success" element={<ProtectedRoute><BillingSuccessPage /></ProtectedRoute>} />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }

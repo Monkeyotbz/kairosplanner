@@ -6,6 +6,7 @@ import { getSubtareasForCards, toggleSubtarea } from '../../services/boardServic
 import InfinityLogo from '../layout/InfinityLogo'
 import KairosSeal from './KairosSeal'
 import styles from './KairosFlow.module.css'
+import { IconAlertTriangle, IconCards, IconCheckbox, IconCornerDownRight, IconSparkles, IconFlag, IconChevronDown, IconChevronRight, IconSquareCheckFilled, IconSquare } from '@tabler/icons-react'
 
 /* ─── helpers ──────────────────────────────────────────────── */
 function toKey(d) {
@@ -326,12 +327,12 @@ export default function KairosFlow({ selectedDay, cards, columnMap }) {
         </div>
       </header>
 
-      {error && <div className={styles.error}><i className="ti ti-alert-triangle" /> {error}</div>}
+      {error && <div className={styles.error}><IconAlertTriangle size="1em" /> {error}</div>}
 
       {/* ── Bandeja ── */}
       <div className={styles.tray}>
         <span className={styles.trayLabel}>
-          <i className="ti ti-cards" /> Arrastra tarjetas o subtareas a la corriente
+          <IconCards size="1em" /> Arrastra tarjetas o subtareas a la corriente
         </span>
         <div className={styles.trayScroll}>
           {trayCards.length === 0 ? (
@@ -351,14 +352,14 @@ export default function KairosFlow({ selectedDay, cards, columnMap }) {
                 >
                   <span className={styles.trayBar} style={{ background: col?.color || 'var(--kairos-purple-600)' }} />
                   <span className={styles.trayTitle}>{card.titulo}</span>
-                  {due && <i className={`ti ti-flag ${styles.trayDue}`} title="Vence este día" />}
+                  {due && <IconFlag size="1em" className={styles.trayDue} title="Vence este día" />}
                   {subs.length > 0 && (
                     <span
                       className={styles.trayExpand}
                       onClick={e => { e.stopPropagation(); toggleExpand(card.id) }}
                       title="Ver subtareas"
                     >
-                      <i className={`ti ti-chevron-${expanded ? 'down' : 'right'}`} /> {subs.length}
+                      {expanded ? <IconChevronDown size="1em" /> : <IconChevronRight size="1em" />} {subs.length}
                     </span>
                   )}
                 </button>
@@ -370,7 +371,7 @@ export default function KairosFlow({ selectedDay, cards, columnMap }) {
                     onDragStart={e => { e.dataTransfer.setData('text/plain', `sub:${sub.id}:${card.id}`); e.dataTransfer.effectAllowed = 'move' }}
                     title="Arrastra al carril"
                   >
-                    <i className="ti ti-corner-down-right" />
+                    <IconCornerDownRight size="1em" />
                     <span className={styles.traySubTitle}>{sub.titulo}</span>
                   </button>
                 ))}
@@ -399,7 +400,7 @@ export default function KairosFlow({ selectedDay, cards, columnMap }) {
           {win && (
             <div className={styles.kairosWindow} style={{ top: `${hourToPct(win.start)}%`, height: `${hourToPct(win.end) - hourToPct(win.start)}%` }}>
               <span className={styles.kairosWindowLabel}>
-                <i className="ti ti-sparkles" /> Ventana Kairos
+                <IconSparkles size="1em" /> Ventana Kairos
                 {isReal && <span className={styles.kairosReal}>· según tu historial</span>}
               </span>
               <span className={styles.kairosWindowTime}>{fmtHour(win.start)} – {fmtHour(win.end)}</span>
@@ -438,7 +439,7 @@ export default function KairosFlow({ selectedDay, cards, columnMap }) {
                     onClick={e => { e.stopPropagation(); toggleSub(sub) }}
                     title={sub.completada ? 'Marcar pendiente' : 'Marcar completada'}
                   >
-                    <i className={sub.completada ? 'ti ti-square-check-filled' : 'ti ti-square'} />
+                    {sub.completada ? <IconSquareCheckFilled size="1em" /> : <IconSquare size="1em" />}
                   </button>
                 )}
                 <span className={styles.blockTime}>{fmtHalfHour(snapHalf(sH))}</span>
@@ -451,7 +452,7 @@ export default function KairosFlow({ selectedDay, cards, columnMap }) {
                     onClick={e => openChecklist(e, card.id)}
                     title="Ver subtareas"
                   >
-                    <i className="ti ti-checkbox" /> {done}/{subs.length}
+                    <IconCheckbox size="1em" /> {done}/{subs.length}
                   </button>
                 )}
 
@@ -495,7 +496,7 @@ export default function KairosFlow({ selectedDay, cards, columnMap }) {
               {cardSubs(checklist.cardId).map(sub => (
                 <li key={sub.id} className={`${styles.checklistItem} ${sub.completada ? styles.checklistDone : ''}`}>
                   <button className={styles.checklistCheck} onClick={() => toggleSub(sub)}>
-                    <i className={sub.completada ? 'ti ti-square-check-filled' : 'ti ti-square'} />
+                    {sub.completada ? <IconSquareCheckFilled size="1em" /> : <IconSquare size="1em" />}
                   </button>
                   <span>{sub.titulo}</span>
                 </li>

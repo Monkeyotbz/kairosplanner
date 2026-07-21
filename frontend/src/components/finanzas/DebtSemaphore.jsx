@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { formatMoney } from '../../services/financeService'
 import { detectDebts, fmtK } from '../../services/financeAnalytics'
 import styles from './DebtSemaphore.module.css'
+import { IconCircleCheck, IconTrafficLights } from '@tabler/icons-react'
 
 const TIPO_CONFIG = {
   toxica:     { label: '🔴 Deuda tóxica',       color: '#ef4444', bg: 'rgba(239,68,68,0.12)',  hint: 'Eliminar primero. Posible costo de interés alto.' },
@@ -37,9 +38,9 @@ export default function DebtSemaphore({ transacciones, recurrencias, ingresos = 
   if (debts.length === 0) {
     return (
       <section className={styles.section}>
-        <h2 className={styles.heading}><i className="ti ti-traffic-lights" /> Semáforo de deuda</h2>
+        <h2 className={styles.heading}><IconTrafficLights size="1em" /> Semáforo de deuda</h2>
         <div className={styles.empty}>
-          <i className="ti ti-circle-check" style={{ color: '#22c55e', fontSize: 28 }} />
+          <IconCircleCheck size="1em" style={{ color: '#22c55e', fontSize: 28 }} />
           <p>No se detectaron deudas este mes. ¡Excelente!</p>
         </div>
       </section>
@@ -48,7 +49,7 @@ export default function DebtSemaphore({ transacciones, recurrencias, ingresos = 
 
   return (
     <section className={styles.section}>
-      <h2 className={styles.heading}><i className="ti ti-traffic-lights" /> Semáforo de deuda</h2>
+      <h2 className={styles.heading}><IconTrafficLights size="1em" /> Semáforo de deuda</h2>
 
       {/* Resumen */}
       <div className={styles.resumen}>

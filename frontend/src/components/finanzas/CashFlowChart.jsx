@@ -3,6 +3,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ReferenceLine, ResponsiveContainer, Dot,
 } from 'recharts'
+import { IconAlertTriangle, IconChartAreaLine, IconPencil, IconTrendingUp } from '@tabler/icons-react'
 import { projectCashFlow, finDeMesActual, formatMoney } from '../../services/financeService'
 import styles from './CashFlowChart.module.css'
 
@@ -87,7 +88,7 @@ export default function CashFlowChart({ recurrencias, currentMonthBalance = 0 })
       <div className={styles.head}>
         <div className={styles.headTitles}>
           <h2 className={styles.heading}>
-            <i className="ti ti-trending-up" /> Flujo de caja
+            <IconTrendingUp size="1em" /> Flujo de caja
           </h2>
           <span className={styles.subtitle}>
             Proyección desde el mes próximo — el mes actual ya está descontado en tu balance
@@ -121,7 +122,7 @@ export default function CashFlowChart({ recurrencias, currentMonthBalance = 0 })
           ) : (
             <button className={styles.kpiVal} onClick={() => setEditingSaldo(true)} title="Editar saldo inicial">
               ${formatMoney(startBalance)}
-              <i className="ti ti-pencil" style={{ fontSize: 11, marginLeft: 4, opacity: 0.5 }} />
+              <IconPencil size="1em" style={{ fontSize: 11, marginLeft: 4, opacity: 0.5 }} />
             </button>
           )}
         </div>
@@ -143,7 +144,7 @@ export default function CashFlowChart({ recurrencias, currentMonthBalance = 0 })
           <>
             <div className={styles.kpiSep} />
             <div className={`${styles.kpi} ${styles.kpiWarn}`}>
-              <i className="ti ti-alert-triangle" />
+              <IconAlertTriangle size="1em" />
               <span className={styles.kpiLabel}>Saldo negativo detectado</span>
             </div>
           </>
@@ -153,7 +154,7 @@ export default function CashFlowChart({ recurrencias, currentMonthBalance = 0 })
       {/* Gráfica */}
       {recurrencias.filter(r => r.activa).length === 0 ? (
         <div className={styles.empty}>
-          <i className="ti ti-chart-area-line" />
+          <IconChartAreaLine size="1em" />
           <p>Agrega recurrentes para ver la proyección</p>
         </div>
       ) : (

@@ -5,6 +5,7 @@ import { getMessages, sendMessage } from '../../services/chatService'
 import { getProjectMembers } from '../../services/boardService'
 import { socket } from '../../services/socketService'
 import styles from './ChatPanel.module.css'
+import { IconMessageCircle, IconMessageOff, IconSend, IconX } from '@tabler/icons-react'
 
 function timeLabel(dateStr) {
   const d = new Date(dateStr)
@@ -92,11 +93,11 @@ export default function ChatPanel({ onClose }) {
       {/* Cabecera */}
       <div className={styles.header}>
         <div className={styles.headerTitle}>
-          <i className="ti ti-message-circle" />
+          <IconMessageCircle size="1em" />
           <span>Chat del proyecto</span>
         </div>
         <button className={styles.closeBtn} onClick={onClose}>
-          <i className="ti ti-x" />
+          <IconX size="1em" />
         </button>
       </div>
 
@@ -131,7 +132,7 @@ export default function ChatPanel({ onClose }) {
           </div>
         ) : messages.length === 0 ? (
           <div className={styles.empty}>
-            <i className="ti ti-message-off" />
+            <IconMessageOff size="1em" />
             <p>No hay mensajes aún</p>
             <small>¡Sé el primero en escribir!</small>
           </div>
@@ -187,7 +188,7 @@ export default function ChatPanel({ onClose }) {
           onClick={handleSend}
           disabled={!input.trim() || sending}
         >
-          <i className="ti ti-send" />
+          <IconSend size="1em" />
         </button>
       </div>
 

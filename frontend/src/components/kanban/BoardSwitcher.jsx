@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useBoardStore } from '../../store/boardStore'
 import { createProject } from '../../services/boardService'
 import styles from './BoardSwitcher.module.css'
+import { IconClock, IconLayoutBoard, IconPlus, IconSearch, IconTrash, IconX } from '@tabler/icons-react'
 
 // Portada determinista por tablero (gradiente derivado del id/nombre)
 function coverGradient(seed = '') {
@@ -102,7 +103,7 @@ export default function BoardSwitcher({ onClose }) {
               title="Eliminar tablero"
               onClick={e => { e.stopPropagation(); setConfirmId(p.id) }}
             >
-              <i className="ti ti-trash" aria-hidden="true" />
+              <IconTrash size="1em" aria-hidden="true" />
             </button>
           )}
         </div>
@@ -134,7 +135,7 @@ export default function BoardSwitcher({ onClose }) {
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
         <div className={styles.header}>
           <div className={styles.searchWrap}>
-            <i className="ti ti-search" aria-hidden="true" />
+            <IconSearch size="1em" aria-hidden="true" />
             <input
               className={styles.search}
               placeholder="Buscar tableros..."
@@ -143,13 +144,13 @@ export default function BoardSwitcher({ onClose }) {
               autoFocus
             />
           </div>
-          <button className={styles.close} onClick={onClose} aria-label="Cerrar"><i className="ti ti-x" /></button>
+          <button className={styles.close} onClick={onClose} aria-label="Cerrar"><IconX size="1em" /></button>
         </div>
 
         <div className={styles.body}>
           {recentBoards.length > 0 && (
             <section className={styles.section}>
-              <p className={styles.sectionTitle}><i className="ti ti-clock" /> Recientes</p>
+              <p className={styles.sectionTitle}><IconClock size="1em" /> Recientes</p>
               <div className={styles.grid}>
                 {recentBoards.map(p => <BoardCard key={p.id} p={p} />)}
               </div>
@@ -157,7 +158,7 @@ export default function BoardSwitcher({ onClose }) {
           )}
 
           <section className={styles.section}>
-            <p className={styles.sectionTitle}><i className="ti ti-layout-board" /> {query.trim() ? 'Resultados' : 'Todos tus tableros'}</p>
+            <p className={styles.sectionTitle}><IconLayoutBoard size="1em" /> {query.trim() ? 'Resultados' : 'Todos tus tableros'}</p>
             <div className={styles.grid}>
               {filtered.map(p => <BoardCard key={p.id} p={p} />)}
 
@@ -180,7 +181,7 @@ export default function BoardSwitcher({ onClose }) {
                   </form>
                 ) : (
                   <button className={styles.newCard} onClick={() => setCreating(true)}>
-                    <i className="ti ti-plus" aria-hidden="true" />
+                    <IconPlus size="1em" aria-hidden="true" />
                     <span>Crear tablero</span>
                   </button>
                 )

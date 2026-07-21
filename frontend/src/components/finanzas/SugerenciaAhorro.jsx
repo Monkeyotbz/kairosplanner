@@ -1,6 +1,7 @@
 import { formatMoney } from '../../services/financeService'
 import { fmtK } from '../../services/financeAnalytics'
 import styles from './SugerenciaAhorro.module.css'
+import { IconAlertTriangle, IconArrowRight, IconBulb, IconPigMoney } from '@tabler/icons-react'
 
 // Cuántas veces al mes ocurre cada frecuencia (para normalizar montos)
 const FACTOR_MENSUAL = {
@@ -31,13 +32,13 @@ export default function SugerenciaAhorro({ recurrencias, onGoToMetas }) {
     <section className={styles.section}>
       <div className={styles.head}>
         <div className={styles.headTitles}>
-          <h2 className={styles.heading}><i className="ti ti-piggy-bank" /> Sugerencia de ahorro</h2>
+          <h2 className={styles.heading}><IconPigMoney size="1em" /> Sugerencia de ahorro</h2>
           <span className={styles.subtitle}>
             Calculada con tus ingresos y gastos recurrentes normalizados al mes
           </span>
         </div>
         <button className={styles.linkBtn} onClick={onGoToMetas}>
-          Gestionar metas <i className="ti ti-arrow-right" />
+          Gestionar metas <IconArrowRight size="1em" />
         </button>
       </div>
 
@@ -60,7 +61,7 @@ export default function SugerenciaAhorro({ recurrencias, onGoToMetas }) {
 
       {capacidad <= 0 ? (
         <div className={`${styles.tip} ${styles.tipDanger}`}>
-          <i className="ti ti-alert-triangle" />
+          <IconAlertTriangle size="1em" />
           <p>
             Tus gastos fijos superan tus ingresos fijos por <strong>${formatMoney(Math.abs(capacidad))}</strong> al mes.
             Antes de ahorrar, revisa qué recurrente puedes reducir o eliminar.
@@ -68,7 +69,7 @@ export default function SugerenciaAhorro({ recurrencias, onGoToMetas }) {
         </div>
       ) : (
         <div className={styles.tip}>
-          <i className="ti ti-bulb" />
+          <IconBulb size="1em" />
           <p>
             Cada mes te quedan <strong>${formatMoney(capacidad)}</strong> libres después de tus fijos.
             KAIROS sugiere apartar <strong className={styles.sugerido}>${formatMoney(sugerido)}</strong> al mes

@@ -84,13 +84,14 @@ export const useBoardStore = create((set, get) => ({
       _loadedAt = Date.now()
       set({ proyecto, board: boardData.board, columns: boardData.columns, cardsByColumn, loading: false, error: null })
 
-      // Cargar historial de actividad
-      getActividad(proyecto.id).then(items => set({ actividad: items })).catch(() => {})
-
-      // Cargar etiquetas del proyecto (para FilterPanel y LabelPicker)
+      // Etiquetas del proyecto — las usa el FilterPanel (y LabelPicker las
+      // registra al crear). No bloquea la carga del tablero.
       getProyectoEtiquetas(proyecto.id).then(items => set({ etiquetas: items })).catch(() => {})
 
-      // Retomar un cronómetro que quedó corriendo (cierre de pestaña, F5, etc.)
+      // Historial de actividad del proyecto (feed del SidePanel)
+      getActividad(proyecto.id).then(items => set({ actividad: items })).catch(() => {})
+
+      // Retomar un cronómetro que quedó corriendo (cierre de pestaña, F5…)
       getRegistroTiempoActivo().then(registro => {
         if (!registro) return
         const card = Object.values(get().cardsByColumn).flat().find(c => c.id === registro.tarjeta_id)
@@ -218,7 +219,8 @@ export const useBoardStore = create((set, get) => ({
   // FilterPanel la vea sin tener que recargar el tablero.
   addEtiqueta: (etiqueta) => set(s => ({ etiquetas: [...s.etiquetas, etiqueta] })),
 
-  // Registrar actividad propia en estado + Supabase
+  // Registrar actividad propia: al estado ya (feed en vivo) y a Supabase
+  // en segundo plano (historial entre sesiones y para otros miembros).
   _log: (descripcion) => {
     const nombre = actor()
     const userId = useAuthStore.getState().user?.id
@@ -483,12 +485,12 @@ export const useBoardStore = create((set, get) => ({
 
   setCardsByColumn: (cardsByColumn) => set({ cardsByColumn }),
 
-  persistMove: async (cardId, newColId, fromCol) => {
+  persistMove: async (cardId, newColId, fromCol = null) => {
     const state = get()
     const cardInfo = (state.cardsByColumn[newColId] || []).find(c => c.id === cardId)
     const toColName = state.columns.find(c => c.id === newColId)?.nombre || ''
     enqueue('card.move', { id: cardId, columna_id: newColId })
-    if (fromCol) {
+    if (fromCol && fromCol !== newColId) {
       socket.emit('card:moved', { cardId, fromCol, toCol: newColId, cardTitle: cardInfo?.titulo || '', toColName, nombre: actor() })
       get()._log(`movió "${cardInfo?.titulo || ''}"${toColName ? ` a ${toColName}` : ''}`)
     }
@@ -504,12 +506,10 @@ onReconnect(() => {
   if ((s.error && s.error !== 'empty') || stale) s.loadBoard()
 })
 
-// Si cierras la pestaña/navegador (o el sistema operativo alcanza a avisarle
-// al navegador antes de apagar el equipo) con un cronómetro corriendo, lo
-// detenemos para que no siga contando tiempo con KAIROS cerrado. No hay
-// forma de detectar un corte de energía o un cierre forzado — para eso
-// sirve el "retomar" al cargar el tablero (arriba), que no deja que un
-// cronómetro huérfano quede corriendo para siempre.
+// Si cierras la pestaña/navegador con un cronómetro corriendo, lo detenemos
+// para que no siga contando tiempo con KAIROS cerrado. Un cierre forzado o
+// un corte de energía no avisan — para eso está el "retomar" al cargar el
+// tablero (arriba), que no deja cronómetros huérfanos corriendo por siempre.
 if (typeof window !== 'undefined') {
   const stopIfRunning = () => {
     const timer = useBoardStore.getState().activeTimer

@@ -3,6 +3,7 @@ import { useBoardStore } from '../../store/boardStore'
 import { getEventos } from '../../services/calendarService'
 import KairosSeal from './KairosSeal'
 import styles from './DayBlocks.module.css'
+import { IconAlertTriangle, IconClock, IconConfetti, IconFlag } from '@tabler/icons-react'
 
 /* ─── helpers ──────────────────────────────────────────────── */
 function toKey(d) {
@@ -123,7 +124,7 @@ export default function DayBlocks({ selectedDay, cards, columnMap }) {
       <div className={styles.stack}>
         {total === 0 && (
           <div className={styles.empty}>
-            <i className="ti ti-confetti" />
+            <IconConfetti size="1em" />
             <p className={styles.emptyTitle}>Nada agendado este día</p>
             <p className={styles.emptyHint}>
               Ve a <strong>Flujo</strong> y arrastra una tarjeta a tu ventana Kairos, o asígnale fecha desde el Tablero.
@@ -149,7 +150,7 @@ export default function DayBlocks({ selectedDay, cards, columnMap }) {
                 <span className={styles.title}>{b.title}</span>
                 <span className={styles.meta}>
                   {b.colName && <span className={styles.colChip}>{b.colName}</span>}
-                  {b.durMin > 0 && <span className={styles.dur}><i className="ti ti-clock" /> {fmtDur(b.durMin)}</span>}
+                  {b.durMin > 0 && <span className={styles.dur}><IconClock size="1em" /> {fmtDur(b.durMin)}</span>}
                 </span>
               </div>
               <span className={styles.energy} style={{ '--en': en.color }} title={`Energía: ${en.label}`}>
@@ -161,7 +162,7 @@ export default function DayBlocks({ selectedDay, cards, columnMap }) {
 
         {pendientes.length > 0 && (
           <div className={styles.pendingGroup}>
-            <span className={styles.pendingLabel}><i className="ti ti-flag" /> Vence hoy · sin hora</span>
+            <span className={styles.pendingLabel}><IconFlag size="1em" /> Vence hoy · sin hora</span>
             {pendientes.map(p => (
               <button
                 key={p.id}
@@ -176,7 +177,7 @@ export default function DayBlocks({ selectedDay, cards, columnMap }) {
                   <span className={styles.title}>{p.title}</span>
                   <span className={styles.meta}>
                     {p.colName && <span className={styles.colChip}>{p.colName}</span>}
-                    {p.prioridad === 'alta' && <span className={styles.urgent}><i className="ti ti-alert-triangle" /> Alta</span>}
+                    {p.prioridad === 'alta' && <span className={styles.urgent}><IconAlertTriangle size="1em" /> Alta</span>}
                   </span>
                 </div>
               </button>

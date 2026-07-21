@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useOnboardingStore } from '../../store/onboardingStore'
 import InfinityLogo from './InfinityLogo'
 import styles from './Onboarding.module.css'
+import { IconLayoutKanban, IconFocus2 } from '@tabler/icons-react'
 
 const STEPS = [
   {
@@ -10,7 +11,7 @@ const STEPS = [
     text: 'No es otra app de deadlines y cronómetros. KAIROS crea las condiciones para que entres en flow y trabajes en tu momento de máxima capacidad — tu Kairós, el instante oportuno.',
   },
   {
-    icon: 'ti-layout-kanban',
+    icon: IconLayoutKanban,
     title: 'Tu tablero',
     text: 'Organiza tus tareas en listas. Arrastra tarjetas, crea y ordena listas, asigna miembros, etiquetas y fechas. Todo fluye sin fricción.',
   },
@@ -20,7 +21,7 @@ const STEPS = [
     text: 'Pulsa el logo infinito del centro para hablar o escribir con ABAD. Te responde sobre tus pendientes y puede crear o mover tarjetas por ti, por voz.',
   },
   {
-    icon: 'ti-focus-2',
+    icon: IconFocus2,
     title: 'Modo Enfoque',
     text: 'Entra en una sesión inmersiva sin distracciones, con música y tu tarea. Gana XP, sube de rango y construye tu racha diaria.',
   },
@@ -50,7 +51,7 @@ export default function Onboarding() {
         <div className={styles.visual}>
           {s.logo
             ? <InfinityLogo size={88} state={step === 2 ? 'listening' : 'idle'} />
-            : <div className={styles.icon}><i className={`ti ${s.icon}`} /></div>}
+            : <div className={styles.icon}><s.icon size="1em" /></div>}
         </div>
 
         <h1 className={styles.title}>{s.title}</h1>

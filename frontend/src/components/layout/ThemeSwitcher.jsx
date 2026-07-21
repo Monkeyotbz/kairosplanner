@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react'
 import { useThemeStore, THEMES } from '../../store/themeStore'
 import styles from './ThemeSwitcher.module.css'
+import { IconCheck, IconPalette } from '@tabler/icons-react'
 
 export default function ThemeSwitcher({ open, onClose }) {
   const { theme, setTheme } = useThemeStore()
@@ -19,7 +20,7 @@ export default function ThemeSwitcher({ open, onClose }) {
 
   return (
     <div className={styles.panel} ref={ref}>
-      <p className={styles.title}><i className="ti ti-palette" /> Apariencia</p>
+      <p className={styles.title}><IconPalette size="1em" /> Apariencia</p>
       <div className={styles.grid}>
         {THEMES.map(t => (
           <button
@@ -33,7 +34,7 @@ export default function ThemeSwitcher({ open, onClose }) {
               <div className={styles.previewAccent} style={{ background: t.accent }} />
               {theme === t.id && (
                 <div className={styles.previewCheck}>
-                  <i className="ti ti-check" />
+                  <IconCheck size="1em" />
                 </div>
               )}
             </div>

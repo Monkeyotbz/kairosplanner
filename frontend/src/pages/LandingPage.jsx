@@ -5,6 +5,7 @@ import { useThemeStore, THEMES } from '../store/themeStore'
 import StarField from '../components/layout/StarField'
 import InfinityLogo from '../components/layout/InfinityLogo'
 import styles from './LandingPage.module.css'
+import { IconBrain, IconBrandReact, IconBrandSpotify, IconBrandYoutube, IconCalendar, IconCheck, IconCheckbox, IconDatabase, IconInfoCircle, IconMicrophone, IconMusicOff, IconPalette, IconPlayerSkipBack, IconPlayerSkipForward, IconShieldCheck, IconSparkles, IconUser, IconSquarePlus, IconCoin, IconArrowsExchange, IconLayoutKanban, IconFocus2, IconChartDonut3, IconMusic, IconCalendarEvent, IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react'
 
 export default function LandingPage() {
   const user  = useAuthStore(s => s.user)
@@ -143,12 +144,12 @@ function LandingThemeSwitcher() {
         title="Cambiar ambiente"
         aria-label="Cambiar ambiente"
       >
-        <i className="ti ti-palette" />
+        <IconPalette size="1em" />
       </button>
 
       {open && (
         <div className={styles.themePanel}>
-          <p className={styles.themePanelTitle}><i className="ti ti-sparkles" /> Elige tu ambiente</p>
+          <p className={styles.themePanelTitle}><IconSparkles size="1em" /> Elige tu ambiente</p>
           <div className={styles.themeGrid}>
             {LANDING_THEMES.map(t => (
               <button
@@ -160,7 +161,7 @@ function LandingThemeSwitcher() {
                 <div className={styles.swatchPreview} style={{ background: t.bg }}>
                   <div className={styles.swatchDot} style={{ background: t.accent }} />
                   {activeId === t.id && (
-                    <div className={styles.swatchCheck}><i className="ti ti-check" /></div>
+                    <div className={styles.swatchCheck}><IconCheck size="1em" /></div>
                   )}
                 </div>
                 <span className={styles.swatchName}>{t.name}</span>
@@ -326,17 +327,17 @@ function KanbanMockup({ highlightTitle = null }) {
           <p className={styles.cardPopoverDesc}>{activeCard.desc}</p>
           <div className={styles.cardPopoverMeta}>
             <div className={styles.cardPopoverRow}>
-              <i className="ti ti-checkbox" />
+              <IconCheckbox size="1em" />
               <span>Subtareas</span>
               <strong>{activeCard.check}</strong>
             </div>
             <div className={styles.cardPopoverRow}>
-              <i className="ti ti-calendar" />
+              <IconCalendar size="1em" />
               <span>Fecha límite</span>
               <strong>{activeCard.date}</strong>
             </div>
             <div className={styles.cardPopoverRow}>
-              <i className="ti ti-user" />
+              <IconUser size="1em" />
               <span>Asignado</span>
               <span className={styles.mockupAvatar} style={{ background: activeCard.avatarColor + '40', border: `1px solid ${activeCard.avatarColor}99`, width: 18, height: 18, fontSize: 9 }}>
                 {activeCard.avatar}
@@ -407,19 +408,19 @@ function PhilosophySection() {
 const DEMO_SEQUENCE = [
   {
     command: 'Crea una tarjeta "Revisar diseño" para mañana',
-    result: { type: 'card', text: 'Tarjeta creada en "Por hacer" ✓', icon: 'ti-square-plus' },
+    result: { type: 'card', text: 'Tarjeta creada en "Por hacer" ✓', icon: IconSquarePlus },
   },
   {
     command: '¿Cuándo es mi pico de productividad hoy?',
-    result: { type: 'insight', text: 'Tu Kairos: 10:42 – 12:15 · máximo potencial', icon: 'ti-brain' },
+    result: { type: 'insight', text: 'Tu Kairos: 10:42 – 12:15 · máximo potencial', icon: IconBrain },
   },
   {
     command: 'Registra $50 en herramientas de diseño',
-    result: { type: 'confirm', text: 'Gasto registrado en Finanzas ✓', icon: 'ti-coin' },
+    result: { type: 'confirm', text: 'Gasto registrado en Finanzas ✓', icon: IconCoin },
   },
   {
     command: 'Mueve "Sprint planning" a En flow',
-    result: { type: 'confirm', text: 'Tarjeta movida a "En flow" ✓', icon: 'ti-arrows-exchange' },
+    result: { type: 'confirm', text: 'Tarjeta movida a "En flow" ✓', icon: IconArrowsExchange },
   },
 ]
 
@@ -511,7 +512,7 @@ function VoiceSection() {
         {/* Resultado */}
         {phase === 'result' && (
           <div className={styles.voiceResult}>
-            <i className={`ti ${current.result.icon}`} />
+            <current.result.icon size="1em" />
             <span>{current.result.text}</span>
           </div>
         )}
@@ -539,7 +540,7 @@ function VoiceSection() {
               className={`${styles.voiceChip} ${cmdIdx === i && phase !== 'idle' ? styles.voiceChipActive : ''}`}
               onClick={() => startCommand(i)}
             >
-              <i className="ti ti-microphone" /> {item.command}
+              <IconMicrophone size="1em" /> {item.command}
             </button>
           ))}
         </div>
@@ -550,10 +551,10 @@ function VoiceSection() {
 
 /* ───────────────────── Música / Ambiente sonoro ───────────────────── */
 const PLAYLISTS = [
-  { name: 'Deep Focus',      time: '2:42:18', platform: 'spotify', color: '#1DB954', icon: 'ti-brand-spotify' },
-  { name: 'Lo-fi Beats',     time: '1:58:04', platform: 'spotify', color: '#1DB954', icon: 'ti-brand-spotify' },
-  { name: 'Flow State',      time: '3:10:55', platform: 'youtube', color: '#FF0000', icon: 'ti-brand-youtube' },
-  { name: 'Binaural Alpha',  time: '0:58:22', platform: 'youtube', color: '#FF0000', icon: 'ti-brand-youtube' },
+  { name: 'Deep Focus',      time: '2:42:18', platform: 'spotify', color: '#1DB954', icon: IconBrandSpotify },
+  { name: 'Lo-fi Beats',     time: '1:58:04', platform: 'spotify', color: '#1DB954', icon: IconBrandSpotify },
+  { name: 'Flow State',      time: '3:10:55', platform: 'youtube', color: '#FF0000', icon: IconBrandYoutube },
+  { name: 'Binaural Alpha',  time: '0:58:22', platform: 'youtube', color: '#FF0000', icon: IconBrandYoutube },
 ]
 
 function MusicSection() {
@@ -577,8 +578,8 @@ function MusicSection() {
             <InfinityLogo size={20} state={playing ? 'pulsing' : 'idle'} />
             <span className={styles.musicPlayerTitle}>Reproductor KAIROS</span>
             <div className={styles.musicPlatforms}>
-              <span className={styles.musicBadge} style={{ color: '#1DB954' }}><i className="ti ti-brand-spotify" /> Spotify</span>
-              <span className={styles.musicBadge} style={{ color: '#FF0000' }}><i className="ti ti-brand-youtube" /> YouTube</span>
+              <span className={styles.musicBadge} style={{ color: '#1DB954' }}><IconBrandSpotify size="1em" /> Spotify</span>
+              <span className={styles.musicBadge} style={{ color: '#FF0000' }}><IconBrandYoutube size="1em" /> YouTube</span>
             </div>
           </div>
 
@@ -586,7 +587,7 @@ function MusicSection() {
             ? (
               <div className={styles.musicNowPlaying}>
                 <div className={styles.musicAlbumArt} style={{ background: playing.platform === 'spotify' ? 'rgba(29,185,84,0.15)' : 'rgba(255,0,0,0.12)', borderColor: playing.platform === 'spotify' ? 'rgba(29,185,84,0.35)' : 'rgba(255,0,0,0.3)' }}>
-                  <i className={`ti ${playing.icon}`} style={{ color: playing.color, fontSize: 36 }} />
+                  <playing.icon size="1em" style={{ color: playing.color, fontSize: 36 }} />
                 </div>
                 <div className={styles.musicInfo}>
                   <p className={styles.musicTrackName}>{playing.name}</p>
@@ -599,22 +600,22 @@ function MusicSection() {
             )
             : (
               <div className={styles.musicEmpty}>
-                <i className="ti ti-music-off" />
+                <IconMusicOff size="1em" />
                 <span>Selecciona una playlist para comenzar</span>
               </div>
             )
           }
 
           <div className={styles.musicControls}>
-            <button className={styles.musicCtrl}><i className="ti ti-player-skip-back" /></button>
+            <button className={styles.musicCtrl}><IconPlayerSkipBack size="1em" /></button>
             <button
               className={`${styles.musicCtrl} ${styles.musicCtrlPlay}`}
               onClick={() => setPlaying(v => v ? null : PLAYLISTS[0])}
               style={{ background: playing ? 'rgba(255,255,255,0.1)' : 'var(--c-accent)' }}
             >
-              <i className={`ti ${playing ? 'ti-player-pause' : 'ti-player-play'}`} />
+              {playing ? <IconPlayerPause size="1em" /> : <IconPlayerPlay size="1em" />}
             </button>
-            <button className={styles.musicCtrl}><i className="ti ti-player-skip-forward" /></button>
+            <button className={styles.musicCtrl}><IconPlayerSkipForward size="1em" /></button>
           </div>
         </div>
 
@@ -629,7 +630,7 @@ function MusicSection() {
                 onClick={() => setPlaying(pl)}
               >
                 <div className={styles.musicPlaylistIcon} style={{ background: pl.color + '1a', border: `1px solid ${pl.color}44` }}>
-                  <i className={`ti ${pl.icon}`} style={{ color: pl.color }} />
+                  <pl.icon size="1em" style={{ color: pl.color }} />
                 </div>
                 <div className={styles.musicPlaylistInfo}>
                   <span className={styles.musicPlaylistName}>{pl.name}</span>
@@ -644,7 +645,7 @@ function MusicSection() {
             ))}
           </div>
           <p className={styles.musicPlaylistsNote}>
-            <i className="ti ti-info-circle" /> Spotify requiere cuenta Premium para reproducción en browser
+            <IconInfoCircle size="1em" /> Spotify requiere cuenta Premium para reproducción en browser
           </p>
         </div>
       </div>
@@ -654,12 +655,12 @@ function MusicSection() {
 
 /* ───────────────────── Módulos / Features ───────────────────── */
 const FEATURES = [
-  { icon: 'ti-layout-kanban',     name: 'Tablero Kanban',   desc: 'Arrastra, asigna y etiqueta. Tu trabajo fluye sin fricción.' },
-  { icon: 'ti-focus-2',          name: 'Modo Enfoque',     desc: 'Pomodoro como ritual, no como reloj. Con pausas activas.' },
-  { icon: 'ti-chart-donut-3',    name: 'Estadísticas',     desc: 'Descubre cuándo rindes más y capitaliza ese momento.' },
-  { icon: 'ti-music',            name: 'Música integrada',  desc: 'Spotify y YouTube para alinear tu entorno sonoro.' },
-  { icon: 'ti-coin',            name: 'Finanzas',         desc: 'Controla gastos personales y por proyecto, sin salir del flow.' },
-  { icon: 'ti-calendar-event',  name: 'Agenda inteligente', desc: 'Vista mes y lista, con alertas de vencimiento oportunas.' },
+  { icon: IconLayoutKanban,  name: 'Tablero Kanban',   desc: 'Arrastra, asigna y etiqueta. Tu trabajo fluye sin fricción.' },
+  { icon: IconFocus2,        name: 'Modo Enfoque',     desc: 'Pomodoro como ritual, no como reloj. Con pausas activas.' },
+  { icon: IconChartDonut3,   name: 'Estadísticas',     desc: 'Descubre cuándo rindes más y capitaliza ese momento.' },
+  { icon: IconMusic,         name: 'Música integrada',  desc: 'Spotify y YouTube para alinear tu entorno sonoro.' },
+  { icon: IconCoin,          name: 'Finanzas',         desc: 'Controla gastos personales y por proyecto, sin salir del flow.' },
+  { icon: IconCalendarEvent, name: 'Agenda inteligente', desc: 'Vista mes y lista, con alertas de vencimiento oportunas.' },
 ]
 
 function FeaturesSection() {
@@ -675,7 +676,7 @@ function FeaturesSection() {
       <div className={styles.featGrid}>
         {FEATURES.map(f => (
           <div key={f.name} className={styles.featCard}>
-            <div className={styles.featIcon}><i className={`ti ${f.icon}`} /></div>
+            <div className={styles.featIcon}><f.icon size="1em" /></div>
             <h3 className={styles.featName}>{f.name}</h3>
             <p className={styles.featDesc}>{f.desc}</p>
           </div>
@@ -707,11 +708,11 @@ function PricingSection() {
             <span className={styles.pricingPer}>prueba completa</span>
           </div>
           <ul className={styles.pricingFeats}>
-            <li><i className="ti ti-check" /> Todos los módulos sin límite</li>
-            <li><i className="ti ti-check" /> ABAD — agente de IA incluido</li>
-            <li><i className="ti ti-check" /> Música + Spotify + YouTube</li>
-            <li><i className="ti ti-check" /> Estadísticas y rangos</li>
-            <li><i className="ti ti-check" /> Sin tarjeta de crédito</li>
+            <li><IconCheck size="1em" /> Todos los módulos sin límite</li>
+            <li><IconCheck size="1em" /> ABAD — agente de IA incluido</li>
+            <li><IconCheck size="1em" /> Música + Spotify + YouTube</li>
+            <li><IconCheck size="1em" /> Estadísticas y rangos</li>
+            <li><IconCheck size="1em" /> Sin tarjeta de crédito</li>
           </ul>
           <button
             className={styles.pricingBtnSecondary}
@@ -731,11 +732,11 @@ function PricingSection() {
           </div>
           <p className={styles.pricingNote}>Pago seguro vía MercadoPago</p>
           <ul className={styles.pricingFeats}>
-            <li><i className="ti ti-check" /> Todo lo del período de prueba</li>
-            <li><i className="ti ti-check" /> Acceso permanente sin cortes</li>
-            <li><i className="ti ti-check" /> Nuevas funciones al lanzarse</li>
-            <li><i className="ti ti-check" /> Soporte prioritario</li>
-            <li><i className="ti ti-check" /> Cancela cuando quieras</li>
+            <li><IconCheck size="1em" /> Todo lo del período de prueba</li>
+            <li><IconCheck size="1em" /> Acceso permanente sin cortes</li>
+            <li><IconCheck size="1em" /> Nuevas funciones al lanzarse</li>
+            <li><IconCheck size="1em" /> Soporte prioritario</li>
+            <li><IconCheck size="1em" /> Cancela cuando quieras</li>
           </ul>
           <button
             className={styles.pricingBtnPro}
@@ -747,7 +748,7 @@ function PricingSection() {
       </div>
 
       <p className={styles.pricingDisclaimer}>
-        <i className="ti ti-shield-check" /> Al terminar la prueba se te notificará antes de cualquier cobro.
+        <IconShieldCheck size="1em" /> Al terminar la prueba se te notificará antes de cualquier cobro.
         No hay cargos automáticos sin confirmación.
       </p>
     </section>
@@ -776,10 +777,10 @@ function AboutSection() {
             ABAD para capturar sin interrumpir el trabajo.
           </p>
           <div className={styles.aboutStack}>
-            <span className={styles.aboutChip}><i className="ti ti-brand-react" /> React</span>
-            <span className={styles.aboutChip}><i className="ti ti-database" /> Supabase</span>
-            <span className={styles.aboutChip}><i className="ti ti-brain" /> Claude AI</span>
-            <span className={styles.aboutChip}><i className="ti ti-brand-spotify" /> Spotify</span>
+            <span className={styles.aboutChip}><IconBrandReact size="1em" /> React</span>
+            <span className={styles.aboutChip}><IconDatabase size="1em" /> Supabase</span>
+            <span className={styles.aboutChip}><IconBrain size="1em" /> Claude AI</span>
+            <span className={styles.aboutChip}><IconBrandSpotify size="1em" /> Spotify</span>
           </div>
         </div>
       </div>

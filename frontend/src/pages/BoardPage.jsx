@@ -9,6 +9,7 @@ import SidePanel from '../components/layout/SidePanel'
 import FilterPanel from '../components/kanban/FilterPanel'
 import CardDetailModal from '../components/kanban/CardDetailModal'
 import styles from './BoardPage.module.css'
+import { IconRefresh, IconCloudOff } from '@tabler/icons-react'
 
 function getTodayStr() {
   const d = new Date()
@@ -19,9 +20,19 @@ export default function BoardPage() {
   const { proyecto, loading, error, loadBoard, cardsByColumn } = useBoardStore()
   const addToast = useToastStore(s => s.addToast)
   const toastFired = useRef(false)
-  const [panelOpen, setPanelOpen] = useState(() => localStorage.getItem('kairos-panel') === 'true')
+  const [panelOpen, setPanelOpen] = useState(
+    () => localStorage.getItem('kairos-panel') === 'true'
+  )
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const [activeFilters, setActiveFilters] = useState({ selectedPriorities: [], selectedTags: [], selectedMembers: [] })
+  const [activeFilters, setActiveFilters] = useState(null)
+
+  // Cerrar el panel limpia los filtros: el tablero nunca queda filtrado
+  // "en silencio" sin que se vea desde dónde quitarlos.
+  function closeFilters() {
+    setFiltersOpen(false)
+    setActiveFilters(null)
+  }
+
 
   useEffect(() => {
     // Si veníamos de un enlace de invitación (/join/:id) y tocó pasar por
@@ -62,13 +73,13 @@ export default function BoardPage() {
   if (error) {
     return (
       <div className={`${styles.state} ${styles.errorState}`}>
-        <i className={`ti ti-cloud-off ${styles.errorIcon}`} aria-hidden="true" />
+        <IconCloudOff size="1em" className={styles.errorIcon} aria-hidden="true" />
         <p className={styles.error}>{error}</p>
         <p className={styles.reconnecting}>
           <span className={styles.spinner} /> Reconectando automáticamente…
         </p>
         <button className={styles.retryBtn} onClick={() => loadBoard()}>
-          <i className="ti ti-refresh" aria-hidden="true" /> Reintentar ahora
+          <IconRefresh size="1em" aria-hidden="true" /> Reintentar ahora
         </button>
       </div>
     )
@@ -81,8 +92,7 @@ export default function BoardPage() {
         panelOpen={panelOpen}
         onTogglePanel={togglePanel}
         filtersOpen={filtersOpen}
-        onToggleFilters={() => setFiltersOpen(v => !v)}
-        onFilterChange={setActiveFilters}
+        onToggleFilters={() => filtersOpen ? closeFilters() : setFiltersOpen(true)}
       />
       <div className={styles.content}>
         <div className={styles.kanbanSide}>
@@ -92,10 +102,9 @@ export default function BoardPage() {
         </div>
         {filtersOpen && (
           <FilterPanel
-            open
             proyectoId={proyecto?.id}
             onFilterChange={setActiveFilters}
-            onClose={() => setFiltersOpen(false)}
+            onClose={closeFilters}
           />
         )}
         {panelOpen && <SidePanel onClose={togglePanel} />}

@@ -215,6 +215,8 @@
   font-weight: 600;
 }
 
+/* Input de fecha nativo visible — showPicker() fallaba en algunos
+   navegadores y el selector "no abría" */
 .dateInput {
   background: var(--kairos-surface-2);
   color: var(--kairos-text-secondary);
@@ -229,6 +231,7 @@
   color-scheme: dark;
 }
 .dateInput:hover { background: var(--kairos-surface-3); }
+:global([data-theme="snow"]) .dateInput { color-scheme: light; }
 
 .dateInputPast {
   background: rgba(216, 90, 48, 0.18);

@@ -212,7 +212,7 @@
   align-items: center;
   justify-content: center;
   font-size: 11px;
-  color: #818cf8;
+  color: var(--kairos-purple-400, #818cf8);
   margin-top: 1px;
 }
 

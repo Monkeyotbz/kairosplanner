@@ -109,7 +109,7 @@ export async function addMemberToProject(proyectoId, userId) {
   if (error) throw error
 }
 
-// ── Invitaciones por enlace ────────────────────────────────────
+// ── Invitaciones por enlace ──────────────────────────────────
 export async function createInvitacion(proyectoId) {
   const { data: { user } } = await supabase.auth.getUser()
   const { data, error } = await supabase
@@ -121,13 +121,17 @@ export async function createInvitacion(proyectoId) {
   return data.id
 }
 
-// Devuelve el proyecto_id al que quedaste unido.
+// Canjea la invitación (RPC SECURITY DEFINER). Devuelve el proyecto_id
+// al que quedaste unido.
 export async function acceptInvitation(inviteId) {
   const { data, error } = await supabase.rpc('accept_invitation', { invite_id: inviteId })
   if (error) throw error
   return data
 }
 
+// En dos pasos a propósito: el FK de miembros apunta a auth.users, no a
+// la tabla pública usuarios, así que el embed `usuarios(email, nombre)`
+// devolvía null y la UI mostraba "Sin miembros" / Asignar vacío.
 export async function getProjectMembers(proyectoId) {
   const { data: membersData } = await supabase
     .from('miembros')
@@ -395,7 +399,7 @@ export async function detenerRegistroTiempo(id) {
 
 // El cronómetro que quedó corriendo (fin=null) de una visita anterior —
 // para restaurarlo en la cápsula flotante aunque hayas cerrado la tarjeta
-// o recargado la página.
+// o recargado la página. RLS limita el resultado al usuario actual.
 export async function getRegistroTiempoActivo() {
   const { data, error } = await supabase
     .from('registros_tiempo')

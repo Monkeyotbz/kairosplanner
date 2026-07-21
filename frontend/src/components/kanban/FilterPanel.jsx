@@ -138,7 +138,7 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
                 >
                   <span className={styles.priorityDot} style={{ background: p.color }} />
                   <span className={styles.optionLabel}>{p.label}</span>
-                  {active && <span className={styles.checkMark}>v</span>}
+                  {active && <span className={styles.checkMark}>✓</span>}
                 </button>
               )
             })}
@@ -166,7 +166,7 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
                   >
                     {t.nombre}
                   </span>
-                  {active && <span className={styles.checkMark}>v</span>}
+                  {active && <span className={styles.checkMark}>✓</span>}
                 </button>
               )
             })}
@@ -192,7 +192,7 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
                     {m.avatar}
                   </span>
                   <span className={styles.optionLabel}>{m.label}</span>
-                  {active && <span className={styles.checkMark}>v</span>}
+                  {active && <span className={styles.checkMark}>✓</span>}
                 </button>
               )
             })}
@@ -213,7 +213,7 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
                 >
                   <span className={styles.priorityDot} style={{ background: col.color || "#5a4fcf" }} />
                   <span className={styles.optionLabel}>{col.nombre}</span>
-                  {active && <span className={styles.checkMark}>v</span>}
+                  {active && <span className={styles.checkMark}>✓</span>}
                 </button>
               )
             })}
@@ -233,7 +233,7 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
                 >
                   <span className={styles.priorityDot} style={{ background: f.color }} />
                   <span className={styles.optionLabel}>{f.label}</span>
-                  {active && <span className={styles.checkMark}>v</span>}
+                  {active && <span className={styles.checkMark}>✓</span>}
                 </button>
               )
             })}
@@ -253,7 +253,7 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
                 >
                   <span className={styles.priorityDot} style={{ background: s.color }} />
                   <span className={styles.optionLabel}>{s.label}</span>
-                  {active && <span className={styles.checkMark}>v</span>}
+                  {active && <span className={styles.checkMark}>✓</span>}
                 </button>
               )
             })}
@@ -298,7 +298,7 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
                 <span key={id} className={styles.chip}>
                   <span className={styles.chipDot} style={{ background: p.color }} />
                   {p.label}
-                  <button className={styles.chipX} onClick={() => toggle(setSelectedPriorities, id)}>x</button>
+                  <button className={styles.chipX} onClick={() => toggle(setSelectedPriorities, id)}>✕</button>
                 </span>
               ) : null
             })}
@@ -308,7 +308,7 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
                 <span key={id} className={styles.chip}>
                   <span className={styles.chipDot} style={{ background: t.color }} />
                   {t.nombre}
-                  <button className={styles.chipX} onClick={() => toggle(setSelectedTags, id)}>x</button>
+                  <button className={styles.chipX} onClick={() => toggle(setSelectedTags, id)}>✕</button>
                 </span>
               ) : null
             })}
@@ -318,7 +318,7 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
                 <span key={id} className={styles.chip}>
                   <span className={styles.chipAvatar} style={{ background: m.color }}>{m.avatar}</span>
                   {m.label}
-                  <button className={styles.chipX} onClick={() => toggle(setSelectedMembers, id)}>x</button>
+                  <button className={styles.chipX} onClick={() => toggle(setSelectedMembers, id)}>✕</button>
                 </span>
               ) : null
             })}
@@ -328,7 +328,7 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
                 <span key={id} className={styles.chip}>
                   <span className={styles.chipDot} style={{ background: col.color || "#5a4fcf" }} />
                   {col.nombre}
-                  <button className={styles.chipX} onClick={() => toggle(setSelectedLists, id)}>x</button>
+                  <button className={styles.chipX} onClick={() => toggle(setSelectedLists, id)}>✕</button>
                 </span>
               ) : null
             })}
@@ -338,7 +338,7 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
                 <span key={id} className={styles.chip}>
                   <span className={styles.chipDot} style={{ background: f.color }} />
                   {f.label}
-                  <button className={styles.chipX} onClick={() => toggle(setSelectedFecha, id)}>x</button>
+                  <button className={styles.chipX} onClick={() => toggle(setSelectedFecha, id)}>✕</button>
                 </span>
               ) : null
             })}
@@ -348,32 +348,32 @@ export default function FilterPanel({ proyectoId, onFilterChange, onClose }) {
                 <span key={id} className={styles.chip}>
                   <span className={styles.chipDot} style={{ background: s.color }} />
                   {s.label}
-                  <button className={styles.chipX} onClick={() => toggle(setSelectedSubtareas, id)}>x</button>
+                  <button className={styles.chipX} onClick={() => toggle(setSelectedSubtareas, id)}>✕</button>
                 </span>
               ) : null
             })}
             {soloSinAsignar && (
               <span className={styles.chip}>
                 Sin asignar
-                <button className={styles.chipX} onClick={() => setSoloSinAsignar(false)}>x</button>
+                <button className={styles.chipX} onClick={() => setSoloSinAsignar(false)}>✕</button>
               </span>
             )}
             {soloSinEtiquetas && (
               <span className={styles.chip}>
                 Sin etiquetas
-                <button className={styles.chipX} onClick={() => setSoloSinEtiquetas(false)}>x</button>
+                <button className={styles.chipX} onClick={() => setSoloSinEtiquetas(false)}>✕</button>
               </span>
             )}
             {soloSinLeer && (
               <span className={styles.chip}>
                 Comentarios sin leer
-                <button className={styles.chipX} onClick={() => setSoloSinLeer(false)}>x</button>
+                <button className={styles.chipX} onClick={() => setSoloSinLeer(false)}>✕</button>
               </span>
             )}
             {soloConTiempo && (
               <span className={styles.chip}>
                 Con tiempo registrado
-                <button className={styles.chipX} onClick={() => setSoloConTiempo(false)}>x</button>
+                <button className={styles.chipX} onClick={() => setSoloConTiempo(false)}>✕</button>
               </span>
             )}
           </div>

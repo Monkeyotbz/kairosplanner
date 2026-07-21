@@ -13,8 +13,12 @@ export function marcarDespertarDone() {
   try { localStorage.setItem(DONE_KEY, '1') } catch (_) {}
 }
 
+// Desactivado temporalmente (jul-19): no debe aparecer solo para perfiles
+// nuevos mientras se revisa el flujo. Se puede seguir probando en
+// /onboarding-preview (modo preview, no usa este store). Para reactivar
+// el auto-disparo, volver a: isOpen: !isDone()
 export const useOnboardingDespertarStore = create((set) => ({
-  isOpen: !isDone(),
+  isOpen: false,
   open:  () => set({ isOpen: true }),
   close: () => {
     marcarDespertarDone()

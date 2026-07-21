@@ -3,6 +3,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, R
 import { formatMoney } from '../../services/financeService'
 import { detectDebts, calcPatrimonioNeto, proyectarPatrimonio } from '../../services/financeAnalytics'
 import styles from './PatrimonioNeto.module.css'
+import { IconAlertTriangle, IconChartLine, IconInfoCircle, IconPencil } from '@tabler/icons-react'
 
 const BALANCE_KEY  = 'kairos-cashflow-saldo'
 const CAPITALS_KEY = 'kairos-debt-capitals'
@@ -62,7 +63,7 @@ export default function PatrimonioNeto({ transacciones, recurrencias, ahorroMens
 
   return (
     <section className={styles.section}>
-      <h2 className={styles.heading}><i className="ti ti-chart-line" /> Patrimonio neto</h2>
+      <h2 className={styles.heading}><IconChartLine size="1em" /> Patrimonio neto</h2>
 
       {/* KPIs */}
       <div className={styles.kpis}>
@@ -75,7 +76,7 @@ export default function PatrimonioNeto({ transacciones, recurrencias, ahorroMens
           <span className={styles.kpiLabel}>
             Otros activos
             <button className={styles.editBtn} onClick={() => setEditActivos(true)} title="Editar">
-              <i className="ti ti-pencil" />
+              <IconPencil size="1em" />
             </button>
           </span>
           {editActivos ? (
@@ -107,7 +108,7 @@ export default function PatrimonioNeto({ transacciones, recurrencias, ahorroMens
 
       {isNeg && (
         <div className={styles.warning}>
-          <i className="ti ti-alert-triangle" />
+          <IconAlertTriangle size="1em" />
           Tu patrimonio neto es negativo — tienes más deudas que activos.
           {ceroFecha && ahorroMensual > 0 && (
             <> Con tu ritmo de ahorro actual, saldrías del rojo en <strong>{ceroFecha}</strong>.</>
@@ -145,7 +146,7 @@ export default function PatrimonioNeto({ transacciones, recurrencias, ahorroMens
         </div>
       ) : (
         <div className={styles.noChart}>
-          <i className="ti ti-info-circle" />
+          <IconInfoCircle size="1em" />
           Define metas de ahorro para ver la proyección de tu patrimonio neto.
         </div>
       )}

@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import '@tabler/icons-webfont/dist/tabler-icons.min.css' // iconos auto-alojados (sin CDN) — solo WTW
 import { useWTWStore } from './store/wtwStore'
 import StarField from '../components/layout/StarField'
 import WTWLoginPage from './pages/WTWLoginPage'

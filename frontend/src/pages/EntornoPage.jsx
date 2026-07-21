@@ -7,6 +7,7 @@ import { useSubscriptionStore } from '../store/subscriptionStore'
 import { signOut, changePassword, sendPasswordReset } from '../services/authService'
 import { updateProfileName, uploadAvatar, updateAvatarUrl } from '../services/profileService'
 import styles from './EntornoPage.module.css'
+import { IconCamera, IconCheck, IconCircleCheck, IconCrown, IconLink, IconLock, IconLogout, IconMail, IconRoute, IconSend, IconTrash, IconUpload } from '@tabler/icons-react'
 
 export default function EntornoPage() {
   const navigate = useNavigate()
@@ -172,7 +173,7 @@ export default function EntornoPage() {
                   <div className={styles.avatarOverlay}>
                     {uploadingAvatar
                       ? <span className={styles.avatarSpinner} />
-                      : <i className="ti ti-camera" />
+                      : <IconCamera size="1em" />
                     }
                   </div>
                 </button>
@@ -180,17 +181,17 @@ export default function EntornoPage() {
                 {showAvatarMenu && (
                   <div className={styles.avatarMenu}>
                     <button className={styles.avatarMenuItem} onClick={() => fileInputRef.current?.click()}>
-                      <i className="ti ti-upload" /> Subir imagen
+                      <IconUpload size="1em" /> Subir imagen
                     </button>
                     <button
                       className={`${styles.avatarMenuItem} ${avatarMode === 'url' ? styles.avatarMenuItemActive : ''}`}
                       onClick={() => setAvatarMode(avatarMode === 'url' ? null : 'url')}
                     >
-                      <i className="ti ti-link" /> Usar URL
+                      <IconLink size="1em" /> Usar URL
                     </button>
                     {avatarSrc && (
                       <button className={`${styles.avatarMenuItem} ${styles.avatarMenuItemDanger}`} onClick={handleRemoveAvatar}>
-                        <i className="ti ti-trash" /> Quitar foto
+                        <IconTrash size="1em" /> Quitar foto
                       </button>
                     )}
                     {avatarMode === 'url' && (
@@ -286,7 +287,7 @@ export default function EntornoPage() {
                   <div className={styles.themePreview} style={{ background: t.bg }}>
                     <div className={styles.themePreviewSidebar} style={{ background: t.sidebar }} />
                     <div className={styles.themePreviewAccent}  style={{ background: t.accent }} />
-                    {theme === t.id && <div className={styles.themeCheck}><i className="ti ti-check" /></div>}
+                    {theme === t.id && <div className={styles.themeCheck}><IconCheck size="1em" /></div>}
                   </div>
                   <span className={styles.themeSwatchName}>{t.name}</span>
                 </button>
@@ -303,7 +304,7 @@ export default function EntornoPage() {
             {/* Cambiar contraseña */}
             <div className={styles.secBlock}>
               <div className={styles.secBlockHead}>
-                <div className={styles.secBlockIcon}><i className="ti ti-lock" /></div>
+                <div className={styles.secBlockIcon}><IconLock size="1em" /></div>
                 <div>
                   <p className={styles.secBlockTitle}>Cambiar contraseña</p>
                   <p className={styles.secBlockSub}>Elige una contraseña segura de al menos 6 caracteres.</p>
@@ -352,7 +353,7 @@ export default function EntornoPage() {
             {/* Recuperar contraseña */}
             <div className={styles.secBlock}>
               <div className={styles.secBlockHead}>
-                <div className={styles.secBlockIcon}><i className="ti ti-mail" /></div>
+                <div className={styles.secBlockIcon}><IconMail size="1em" /></div>
                 <div>
                   <p className={styles.secBlockTitle}>Recuperar contraseña</p>
                   <p className={styles.secBlockSub}>
@@ -361,12 +362,12 @@ export default function EntornoPage() {
                 </div>
               </div>
               {resetSent
-                ? <p className={styles.resetSent}><i className="ti ti-circle-check" /> Email enviado — revisa tu bandeja de entrada.</p>
+                ? <p className={styles.resetSent}><IconCircleCheck size="1em" /> Email enviado — revisa tu bandeja de entrada.</p>
                 : (
                   <>
                     {resetError && <p className={styles.formError}>{resetError}</p>}
                     <button className={styles.resetBtn} onClick={handlePasswordReset} disabled={resetSending}>
-                      {resetSending ? 'Enviando…' : <><i className="ti ti-send" /> Enviar email de recuperación</>}
+                      {resetSending ? 'Enviando…' : <><IconSend size="1em" /> Enviar email de recuperación</>}
                     </button>
                   </>
                 )
@@ -385,7 +386,7 @@ export default function EntornoPage() {
                 <p className={styles.accountRowSub}>Vuelve a ver la introducción a KAIROS.</p>
               </div>
               <button className={styles.resetBtn} onClick={openOnboarding}>
-                <i className="ti ti-route" /> Ver recorrido
+                <IconRoute size="1em" /> Ver recorrido
               </button>
             </div>
           </div>
@@ -433,7 +434,7 @@ export default function EntornoPage() {
                 )}
               </div>
               <Link to="/upgrade" className={styles.resetBtn} style={{ textDecoration: 'none' }}>
-                <i className="ti ti-crown" />
+                <IconCrown size="1em" />
                 {subInfo?.status === 'active' ? 'Gestionar' : 'Ver plan'}
               </Link>
             </div>
@@ -450,7 +451,7 @@ export default function EntornoPage() {
                 <p className={styles.accountRowSub}>{email}</p>
               </div>
               <button className={styles.logoutBtn} onClick={handleLogout}>
-                <i className="ti ti-logout" /> Cerrar sesión
+                <IconLogout size="1em" /> Cerrar sesión
               </button>
             </div>
           </div>

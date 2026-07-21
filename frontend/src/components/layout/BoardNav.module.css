@@ -241,37 +241,81 @@
 }
 
 .inviteModal {
-  background: var(--kairos-purple-800);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--kairos-modal-bg);
+  border: 1px solid var(--kairos-border-1);
   border-radius: var(--kairos-radius-lg);
-  padding: 28px;
+  padding: 24px 26px;
   width: 100%;
-  max-width: 400px;
+  max-width: 440px;
   box-shadow: var(--kairos-shadow-modal);
 }
 
 .inviteHeader {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 14px;
+  gap: 12px;
+  margin-bottom: 18px;
 }
-.inviteHeader h3 { font-size: 15px; font-weight: 700; color: var(--kairos-text-primary); }
+.inviteHeader h3 { font-size: 16px; font-weight: 700; color: var(--kairos-text-primary); }
+
+.inviteSub {
+  font-size: 12px;
+  color: var(--kairos-text-muted);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.inviteLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--kairos-text-muted);
+  margin-bottom: 8px;
+}
+.inviteLabel i { font-size: 13px; color: var(--kairos-purple-400); }
+
+.inviteHint {
+  font-size: 11.5px;
+  color: var(--kairos-text-muted);
+  margin: -2px 0 8px;
+  line-height: 1.4;
+}
+
+.searchWrap { position: relative; margin-bottom: 10px; }
+.searchIcon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--kairos-text-muted);
+  pointer-events: none;
+}
+
+.inviteDivider {
+  height: 1px;
+  background: var(--kairos-border-1);
+  margin: 16px 0 14px;
+}
 .inviteHeader button { font-size: 14px; color: var(--kairos-text-muted); padding: 2px 6px; border-radius: 4px; cursor: pointer; transition: color 0.12s; }
 .inviteHeader button:hover { color: var(--kairos-text-primary); }
 
 /* ── Search ── */
 .inviteSearch {
   width: 100%;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: var(--kairos-input-bg);
+  border: 1px solid var(--kairos-input-border);
   border-radius: var(--kairos-radius-sm);
-  padding: 9px 12px;
+  padding: 9px 12px 9px 32px;
   font-size: 13px;
   color: var(--kairos-text-primary);
   font-family: var(--kairos-font);
   outline: none;
-  margin-bottom: 10px;
   transition: border-color 0.15s;
 }
 .inviteSearch::placeholder { color: var(--kairos-text-muted); }
@@ -360,16 +404,20 @@
 .inviteLink {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  gap: 9px;
+  background: var(--kairos-surface-1);
+  border: 1px solid var(--kairos-border-1);
   border-radius: var(--kairos-radius-sm);
-  padding: 8px 12px;
+  padding: 9px 10px 9px 12px;
 }
+.inviteLinkError { border-color: rgba(216, 90, 48, 0.4); }
+.inviteLinkError .inviteLinkText, .inviteLinkError .inviteLinkIcon { color: #fca07a; }
+
+.inviteLinkIcon { font-size: 14px; color: var(--kairos-purple-400); flex-shrink: 0; }
 
 .inviteLinkText {
   flex: 1;
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--kairos-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -381,14 +429,18 @@
   color: #fff;
   font-size: 12px;
   font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 4px;
+  padding: 5px 14px;
+  border-radius: 6px;
   border: none;
   cursor: pointer;
   font-family: var(--kairos-font);
   white-space: nowrap;
   flex-shrink: 0;
+  transition: background 0.15s;
 }
+.copyBtn:hover:not(:disabled) { background: var(--kairos-purple-400); }
+.copyBtn:disabled { opacity: 0.5; cursor: default; }
+.copyBtnDone { background: rgba(74,222,128,0.18) !important; color: #4ade80 !important; }
 
 /* ── Colaboración en tiempo real ── */
 
