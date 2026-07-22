@@ -325,6 +325,11 @@
   user-select: none;
 }
 .block:hover { border-color: var(--kairos-purple-400); }
+
+.blockGoogleIcon {
+  flex-shrink: 0;
+  color: #4285F4;
+}
 .blockEditing {
   cursor: grabbing;
   z-index: 6;

@@ -1,9 +1,10 @@
 import { useMemo, useState, useEffect, useCallback } from 'react'
 import { useBoardStore } from '../../store/boardStore'
 import { getEventos } from '../../services/calendarService'
+import { socket } from '../../services/socketService'
 import KairosSeal from './KairosSeal'
 import styles from './DayBlocks.module.css'
-import { IconAlertTriangle, IconClock, IconConfetti, IconFlag } from '@tabler/icons-react'
+import { IconAlertTriangle, IconClock, IconConfetti, IconFlag, IconBrandGoogle } from '@tabler/icons-react'
 
 /* ─── helpers ──────────────────────────────────────────────── */
 function toKey(d) {
@@ -52,6 +53,11 @@ export default function DayBlocks({ selectedDay, cards, columnMap }) {
   }, [proyecto?.id, selectedDay])
   useEffect(() => { load() }, [load])
 
+  useEffect(() => {
+    socket.on('calendar:synced', load)
+    return () => { socket.off('calendar:synced', load) }
+  }, [load])
+
   const dayKey  = toKey(selectedDay)
   const isToday = dayKey === toKey(today0())
 
@@ -64,10 +70,11 @@ export default function DayBlocks({ selectedDay, cards, columnMap }) {
       const end   = ev.fecha_fin ? new Date(ev.fecha_fin) : null
       const sH    = start.getHours() + start.getMinutes() / 60
       const durMin = end ? (end - start) / 60000 : 0
+      const isGoogle = ev.origen === 'google'
       return {
         id: ev.id, kind: 'evento', title: ev.titulo,
-        color: col?.color || PURPLE, colName: col?.nombre,
-        start, end, sH, durMin, cardId: card?.id || null,
+        color: isGoogle ? '#4285F4' : (col?.color || PURPLE), colName: col?.nombre,
+        start, end, sH, durMin, cardId: card?.id || null, isGoogle,
       }
     }).sort((a, b) => a.sH - b.sH)
   }, [eventos, cardById, columnMap])
@@ -140,14 +147,17 @@ export default function DayBlocks({ selectedDay, cards, columnMap }) {
               className={styles.block}
               style={{ '--accent': b.color }}
               onClick={() => openCard(b.cardId)}
-              title={b.cardId ? 'Abrir tarjeta' : b.title}
+              title={b.isGoogle ? `${b.title} · sincronizado desde Google Calendar` : (b.cardId ? 'Abrir tarjeta' : b.title)}
             >
               <span className={styles.timePill}>
                 {fmtTime(b.start)}{b.end && <span className={styles.timeEnd}>{fmtTime(b.end)}</span>}
               </span>
               <span className={styles.accentBar} />
               <div className={styles.body}>
-                <span className={styles.title}>{b.title}</span>
+                <span className={styles.title}>
+                  {b.isGoogle && <IconBrandGoogle size="0.85em" style={{ marginRight: 4, verticalAlign: -1 }} />}
+                  {b.title}
+                </span>
                 <span className={styles.meta}>
                   {b.colName && <span className={styles.colChip}>{b.colName}</span>}
                   {b.durMin > 0 && <span className={styles.dur}><IconClock size="1em" /> {fmtDur(b.durMin)}</span>}

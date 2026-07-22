@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 
-const EVENT_SELECT = 'id, proyecto_id, tarjeta_id, subtarea_id, titulo, fecha_inicio, fecha_fin, tipo'
+const EVENT_SELECT = 'id, proyecto_id, tarjeta_id, subtarea_id, titulo, fecha_inicio, fecha_fin, tipo, origen, google_event_id'
 
 // ── Eventos de calendario (time-blocking) ────────────────────
 

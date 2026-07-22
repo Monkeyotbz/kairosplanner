@@ -3,6 +3,9 @@ import cors from 'cors'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import 'dotenv/config'
+import googleCalendarRouter from './routes/googleCalendar.js'
+import { startRenewGoogleChannelsJob } from './jobs/renewGoogleChannels.js'
+import { setIo } from './socketBus.js'
 
 const app = express()
 const httpServer = createServer(app)
@@ -11,11 +14,14 @@ const ORIGINS = ['http://localhost:5173', 'http://localhost:5174']
 const io = new Server(httpServer, {
   cors: { origin: ORIGINS, methods: ['GET', 'POST'] },
 })
+setIo(io)
 
 app.use(cors({ origin: ORIGINS }))
 app.use(express.json())
 
 app.get('/health', (_req, res) => res.json({ status: 'ok', project: 'KAIROS' }))
+
+app.use('/api/google-calendar', googleCalendarRouter)
 
 // Presencia: proyectoId → Map<socketId, nombre>
 const presence = {}
@@ -59,3 +65,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3001
 httpServer.listen(PORT, () => console.log(`KAIROS backend en http://localhost:${PORT}`))
+
+startRenewGoogleChannelsJob()

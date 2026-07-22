@@ -1,9 +1,13 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useBoardStore } from '../store/boardStore'
+import { useToastStore } from '../store/toastStore'
 import CalendarGrid from '../components/calendar/CalendarGrid'
 import DayBlocks    from '../components/calendar/DayBlocks'
 import KairosFlow   from '../components/calendar/KairosFlow'
+import GoogleCalendarConnect from '../components/calendar/GoogleCalendarConnect'
 import CardDetailModal from '../components/kanban/CardDetailModal'
+import { getEventos } from '../services/calendarService'
+import { socket } from '../services/socketService'
 import styles from './CalendarPage.module.css'
 import { IconInfinity, IconCalendarMonth, IconLayoutList } from '@tabler/icons-react'
 
@@ -108,8 +112,27 @@ export default function CalendarPage() {
   const selectedCard  = useBoardStore(s => s.selectedCard)
   const loading       = useBoardStore(s => s.loading)
   const loadBoard     = useBoardStore(s => s.loadBoard)
+  const proyecto      = useBoardStore(s => s.proyecto)
+  const addToast      = useToastStore(s => s.addToast)
 
   useEffect(() => { if (!columns.length) loadBoard() }, [])
+
+  // Vuelta del consentimiento de Google (backend redirige acá con
+  // ?google_calendar=connected|error tras el intercambio de tokens).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const result = params.get('google_calendar')
+    if (!result) return
+    if (result === 'connected') {
+      addToast({ _type: 'board-activity', icon: 'ti-brand-google', text: 'Google Calendar conectado', duration: 5000 })
+    } else {
+      addToast({ _type: 'error', title: 'No se pudo conectar Google Calendar', sub: params.get('reason') || '' })
+    }
+    params.delete('google_calendar')
+    params.delete('reason')
+    const rest = params.toString()
+    window.history.replaceState({}, '', window.location.pathname + (rest ? `?${rest}` : ''))
+  }, [])
 
   const allCards = useMemo(() =>
     Object.values(cardsByColumn).flat().filter(c => c.fecha_limite),
@@ -123,6 +146,25 @@ export default function CalendarPage() {
 
   // Set de fechas con tarjetas (para puntos en el mini-calendario)
   const cardKeys = useMemo(() => new Set(allCards.map(c => c.fecha_limite)), [allCards])
+
+  // Eventos del mes visible (vista Mes) — KairosFlow/DayBlocks cargan
+  // los suyos por día, esto es solo para que CalendarGrid pueda mostrar
+  // también los eventos sincronizados de Google (antes era invisible ahí).
+  const [monthEventos, setMonthEventos] = useState([])
+  const loadMonthEventos = useCallback(() => {
+    if (!proyecto?.id) { setMonthEventos([]); return }
+    const start = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
+    const end   = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+    getEventos(proyecto.id, start.toISOString(), end.toISOString())
+      .then(setMonthEventos)
+      .catch(() => setMonthEventos([]))
+  }, [proyecto?.id, currentDate])
+  useEffect(() => { loadMonthEventos() }, [loadMonthEventos])
+
+  useEffect(() => {
+    socket.on('calendar:synced', loadMonthEventos)
+    return () => { socket.off('calendar:synced', loadMonthEventos) }
+  }, [loadMonthEventos])
 
   // Navegación del planner por día
   const goToPrevDay = () => setSelectedDay(d => { const n = new Date(d); n.setDate(n.getDate()-1); return n })
@@ -206,6 +248,7 @@ export default function CalendarPage() {
             cardKeys={cardKeys}
           />
 
+          <GoogleCalendarConnect proyectoId={proyecto?.id} isAdmin={proyecto?.rol === 'admin'} />
         </aside>
 
         {/* Main: vista activa */}
@@ -225,7 +268,7 @@ export default function CalendarPage() {
               columnMap={columnMap}
             />
           ) : (
-            <CalendarGrid currentDate={currentDate} cards={allCards} columnMap={columnMap} />
+            <CalendarGrid currentDate={currentDate} cards={allCards} columnMap={columnMap} eventos={monthEventos} />
           )}
         </div>
       </div>

@@ -3,10 +3,11 @@ import { useBoardStore } from '../../store/boardStore'
 import { getEventos, createEvento, deleteEvento, updateEvento } from '../../services/calendarService'
 import { getMySessions, getHourlyFocus } from '../../services/statsService'
 import { getSubtareasForCards, toggleSubtarea } from '../../services/boardService'
+import { socket } from '../../services/socketService'
 import InfinityLogo from '../layout/InfinityLogo'
 import KairosSeal from './KairosSeal'
 import styles from './KairosFlow.module.css'
-import { IconAlertTriangle, IconCards, IconCheckbox, IconCornerDownRight, IconSparkles, IconFlag, IconChevronDown, IconChevronRight, IconSquareCheckFilled, IconSquare } from '@tabler/icons-react'
+import { IconAlertTriangle, IconCards, IconCheckbox, IconCornerDownRight, IconSparkles, IconFlag, IconChevronDown, IconChevronRight, IconSquareCheckFilled, IconSquare, IconBrandGoogle } from '@tabler/icons-react'
 
 /* ─── helpers ──────────────────────────────────────────────── */
 function toKey(d) {
@@ -143,6 +144,14 @@ export default function KairosFlow({ selectedDay, cards, columnMap }) {
   }, [proyecto?.id, selectedDay])
   useEffect(() => { load() }, [load])
 
+  // Refresco en vivo cuando el backend sincroniza con Google Calendar
+  // (mismo canal de socket que ya usa el tablero) — sin esto habría
+  // que recargar la página para ver lo recién traído.
+  useEffect(() => {
+    socket.on('calendar:synced', load)
+    return () => { socket.off('calendar:synced', load) }
+  }, [load])
+
   const selKey   = toKey(selectedDay)
   const todayKey = toKey(today0())
   const isToday  = selKey === todayKey
@@ -251,6 +260,7 @@ export default function KairosFlow({ selectedDay, cards, columnMap }) {
   const [editing, setEditing] = useState(null)
   function beginEdit(e, ev, mode) {
     if (String(ev.id).startsWith('tmp-')) return
+    if (ev.origen === 'google') return // sincronizado de Google — solo lectura, se edita allá
     e.stopPropagation()
     const sH = hourFloatOf(ev.fecha_inicio)
     const eH = ev.fecha_fin ? hourFloatOf(ev.fecha_fin) : sH + DEFAULT_DUR
@@ -414,7 +424,8 @@ export default function KairosFlow({ selectedDay, cards, columnMap }) {
             const eH = isEd ? editing.endH : (ev.fecha_fin ? hourFloatOf(ev.fecha_fin) : sH + DEFAULT_DUR)
             const card = ev.tarjeta_id ? cardById[ev.tarjeta_id] : null
             const col  = card ? columnMap[card.columna_id] : null
-            const color = col?.color || 'var(--kairos-purple-600)'
+            const isGoogle = ev.origen === 'google'
+            const color = isGoogle ? '#4285F4' : (col?.color || 'var(--kairos-purple-600)')
             const top = hourToPct(sH)
             const height = Math.max(hourToPct(eH) - top, 3.2)
 
@@ -430,8 +441,9 @@ export default function KairosFlow({ selectedDay, cards, columnMap }) {
                 className={`${styles.block} ${isEd ? styles.blockEditing : ''} ${sub?.completada ? styles.blockDone : ''}`}
                 style={{ top: `${top}%`, height: `${height}%`, borderLeftColor: color }}
                 onPointerDown={e => beginEdit(e, ev, 'move')}
-                role="button" title="Arrastra para mover · click para abrir"
+                role="button" title={isGoogle ? `${ev.titulo} · sincronizado desde Google Calendar` : 'Arrastra para mover · click para abrir'}
               >
+                {isGoogle && <IconBrandGoogle size="1em" className={styles.blockGoogleIcon} title="Sincronizado desde Google Calendar" />}
                 {sub && (
                   <button
                     className={styles.blockCheck}
@@ -456,13 +468,17 @@ export default function KairosFlow({ selectedDay, cards, columnMap }) {
                   </button>
                 )}
 
-                <button
-                  className={styles.blockRemove}
-                  onPointerDown={e => e.stopPropagation()}
-                  onClick={e => { e.stopPropagation(); removeEvento(ev.id) }}
-                  title="Quitar del calendario"
-                >✕</button>
-                <div className={styles.blockResize} onPointerDown={e => beginEdit(e, ev, 'resize')} title="Arrastra para cambiar la duración" />
+                {!isGoogle && (
+                  <button
+                    className={styles.blockRemove}
+                    onPointerDown={e => e.stopPropagation()}
+                    onClick={e => { e.stopPropagation(); removeEvento(ev.id) }}
+                    title="Quitar del calendario"
+                  >✕</button>
+                )}
+                {!isGoogle && (
+                  <div className={styles.blockResize} onPointerDown={e => beginEdit(e, ev, 'resize')} title="Arrastra para cambiar la duración" />
+                )}
               </div>
             )
           })}

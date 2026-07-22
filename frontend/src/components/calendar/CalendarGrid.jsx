@@ -41,7 +41,7 @@ function toKey(date) {
   return `${y}-${m}-${d}`
 }
 
-export default function CalendarGrid({ currentDate, cards, columnMap }) {
+export default function CalendarGrid({ currentDate, cards, columnMap, eventos = [] }) {
   const days = useMemo(() => buildMonthDays(currentDate), [currentDate])
 
   const cardsByDate = useMemo(() => {
@@ -52,6 +52,19 @@ export default function CalendarGrid({ currentDate, cards, columnMap }) {
     })
     return map
   }, [cards])
+
+  // Solo los de Google: los nativos de Kairos con tarjeta ya se ven
+  // como chip por fecha_limite arriba; sin esto, lo sincronizado de
+  // Google era invisible en la vista de mes.
+  const googleEventsByDate = useMemo(() => {
+    const map = {}
+    eventos.filter(ev => ev.origen === 'google').forEach(ev => {
+      const key = toKey(new Date(ev.fecha_inicio))
+      if (!map[key]) map[key] = []
+      map[key].push(ev)
+    })
+    return map
+  }, [eventos])
 
   const todayKey = toKey(new Date())
 
@@ -70,6 +83,7 @@ export default function CalendarGrid({ currentDate, cards, columnMap }) {
               isCurrentMonth={current}
               isToday={key === todayKey}
               cards={cardsByDate[key] || []}
+              googleEventos={googleEventsByDate[key] || []}
               columnMap={columnMap}
             />
           )
